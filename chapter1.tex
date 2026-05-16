@@ -1,0 +1,52 @@
+\section{Background}
+{\fontsize{12}{14}\selectfont
+The convergence of artificial intelligence (AI) and health has resulted in revolutionary advancements in how individuals track, measure and enhance their physical condition. Specifically, the development of computer vision-based pose estimation has transformed the potential of machines to perceive and analyse human motion. With the help of OpenCV and MediaPipe tools, developers and researchers are now able to build systems that can track body landmarks in real-time and deliver actionable insights. These technologies, previously only available to high-end robotics or surveillance technology, are now being applied within health and fitness software allowing for smart workout coaching to be brought directly to users. \\
+
+\noindent
+Conventional ways of maintaining proper form and posture throughout exercise normally involve the use of human trainers. But with the increasing trend towards home workouts, home gyms and personal training, the gap in real-time correction and feedback is also increasing. This gap can result in poor posture, inefficient workouts and even injuries. AI-powered systems act as a bridge to this gap by providing precise feedback through camera-based monitoring, allowing users to stay in the right form and monitor progress without supervision. \\
+
+\noindent
+BioMimic project was envisioned to develop an intelligent pose tracker for a gym that not only senses the movement of users but also examines the accuracy of their posture in real time. With an eye on important gym exercises such as squats, curls and lunges, BioMimic hopes to guide users in exercising correctly while reducing the dangers that come with incorrect form. By using this system, we seek to make better fitness tracking and coaching more accessible, cheaper, smarter and more personalized. \\
+
+\section{Motivation}
+{\fontsize{12}{14}\selectfont
+The main motivation for BioMimic is based on a very practical issue that many people encounter in their exercises - proper posture and form when performing exercises. Whether one works out at a gym or home, poor form can result in long-term damage, diminished workout effectiveness and even disappointment with working out among fitness buffs. For newbies who do not have access to qualified personal trainers or know the correct biomechanics of exercising, this issue is further exacerbated. An answer, that would be a good virtual trainer providing consistent feedback on execution, would be extremely useful. \\
+
+\noindent
+ Additionally, the COVID-19 pandemic has amplified the adoption of at-home workout solutions. With gyms closed and social distancing norms in place, people turned to online platforms and mobile applications for fitness training. However, most of these platforms offer passive video content without any form of personalized real-time feedback. This motivated us to explore how we could combine the power of computer vision and AI to offer something more dynamic, interactive and user-specific. \\
+ 
+ \noindent
+ Also, the educational nature of this project contributed to its development. Being computer science and engineering students at the final year, we viewed this project as a way to implement our theoretical knowledge of AI and image processing practically and meaningfully. BioMimic gives us the freedom to experiment with the latest technologies such as MediaPipe to develop our software engineering capabilities and work in a field with practical applications. 
+}
+
+\section{Problem Statement}
+{\fontsize{12}{14}\selectfont
+Physical fitness is crucial for a healthy lifestyle but poor posture and form while exercising frequently results in injury, muscle tension and health problems in the long run. Most people, particularly new trainers, are not well familiar with exercise options' biomechanics and thus execute exercise improperly without even knowing it. The issue is further exaggerated in personal or home-based workout environments where there is no professional monitoring. \\
+
+\noindent
+In contemporary fitness gyms, while personal trainers exist, they might not be present all the time because of cost, availability or congestion. Online fitness websites try to bridge this gap but are limited in providing end-users with real-time personalized feedback. Generic workout videos or static tutorials do not address specific needs and cannot change dynamically based on a user's stance or performance. As a result, users are left to rely on their perception of correctness which is often flawed. \\
+
+\noindent
+The absence of affordable, accessible and intelligent real-time posture monitoring systems creates a significant gap in the personal fitness domain. Hence, there is a pressing need for a system that can act as a virtual trainer - capable of tracking body movements, analysing joint angles and providing immediate feedback during workouts. Our project, BioMimic, aims to address this gap by utilizing real-time pose estimation techniques and integrating them into a user-friendly intelligent fitness assistant. \\
+
+}
+\section{Objectives}
+{\fontsize{12}{14}\selectfont
+    The main goal of BioMimic is to create a system which is capable of tracking and analysing human body poses in real time and specifically optimized for gym exercises. This involves detecting important landmarks on the body, computing joint angles and comparing them with pre-defined ideal ranges to evaluate posture correctness. The system should be able to process real-time video feeds and perform all these functions efficiently without needing substantial hardware resources. \\
+
+    \noindent
+    Another central goal is to monitor repetitions and check if each repetition is correct or not. In case of exercises like squats or bicep curls, the system needs to recognize when a rep is starting and ending, record the amount of joint movement involved and verify if the movement lies in the predicted biomechanical range. The system should further keep a log or a count of correct versus incorrect reps and give users concrete feedback. \\
+
+    User ease of use and accessibility are also critical goals. The system needs to be simple to employ for non-technical exercise enthusiasts. The interface and functionality need to be easy to use, with only a standard webcam needed to operate. In the long term, we also want to have the system be scalable and thus, the system could potentially be offered as a desktop application or incorporated into mobile platforms for even wider distribution. \\
+}
+
+\section{Scope of the Project}
+{\fontsize{12}{14}\selectfont
+    The reach of BioMimic is consciously set to target a few, frequently encountered gym exercises that cover various movement patterns. During this first phase, the system will assist in exercising squats, lunges and bicep curls - each for their dependency on proper form as well as for their role in a balanced workout routine. This scope allows us to design, implement and refine the system efficiently within the time and limits of an undergraduate project.  \\
+
+    \noindent
+    Technologically, the system will be using Python, OpenCV and MediaPipe to detect and interpret the user's movements. The pose estimation model will be limited to single-person detection via a normal webcam to make it open and simple to utilize at home and in gym settings. Real-time response is an essential need and therefore we hope to optimize the code to execute it quickly and deliver smooth feedback. \\
+
+    \noindent
+    But there are a number of intentional constraints on this iteration of the project. The system will not support multiple users at once nor will it support challenging multi-angle perspectives or camera positioning changes. Furthermore, it will not give voice response nor dynamically adjust based upon user height, flexibility or other physical characteristics. These constraints provide the basis for future growth as the system expands outside of its current framework. \\
+}

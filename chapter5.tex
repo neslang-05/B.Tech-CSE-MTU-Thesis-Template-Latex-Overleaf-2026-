@@ -1,0 +1,424 @@
+{\fontsize{12}{14}\selectfont
+    The testing of the BioMimic was done in a simulated setting via a set of test cases derived from actual gym exercises. The test was aimed at thoroughly reviewing the system's accuracy, responsivity and reliability in detecting and tracking human poses while performing exercise routines. This chapter records the test cases in detail, contains actual output, tests performance and accuracy, touches on challenges faced and finally presents the limitations of the current implementation of the system. All these assessments together prove the feasibility and scope for improvement for BioMimic as a full-fledged AI-powered gym posture guidance tool.
+}
+\section{Test Cases}
+{\fontsize{12}{14}\selectfont
+    he platform for the evaluation strategy was developed using six popular and widely utilized exercises that target various muscle groups and cover a broad range of postural demands. The exercises used were:
+    \begin{enumerate}
+        \item Bicep Curls
+        \item Lateral Raise
+        \item Shoulder Press
+        \item Dumbbell Rows
+        \item Squats
+        \item Push-Ups
+    \end{enumerate}
+These exercises were selected since they cover both the upper and lower body movements, compound and isolation movements and demand exact form for effectiveness and injury avoidance. Every exercise was assessed singly and in detail to make certain that the system was able to accommodate different postural complexities, angle changes, joint positioning and repetition monitoring in real-time. 
+\subsection{Bicep Curls}
+Bicep curls are a basic isolation exercise intended to engage the biceps brachii muscle group of the upper arm. The motion is fairly simple but must be executed with correct form to keep other muscle groups from engaging or momentum from being introduced which dilutes the efficacy of the workout. \\
+Expected Form: 
+\begin{itemize}
+    \item The elbows must be kept close to the torso.
+    \item The shoulders should remain relaxed and firm.
+    \item The forearms and wrists should be parallel to each other.
+    \item The motion should be limited to the flexion and extension of the elbow joint alone.
+    \item The torso must be straight with no leaning or swaying.
+\end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Bicep Relaxed_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Bicep Curl in a relaxed front position.]{Bicep Curl in a relaxed front position.}
+    \label{fig:bicep_relaxed_front}
+    \end{figure}
+    
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Bicep Side One_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Bicep Curl in a relaxed right-side position]{Bicep Curl in a relaxed right-side position.}
+    \label{fig:bicep_relaxed_right}
+    \end{figure}
+    
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Bicep Side Two_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Bicep Curl in a relaxed left-side position]{Bicep Curl in a relaxed left-side position.}
+    \label{fig:bicep_relaxed_left}
+    \end{figure}
+    
+   
+
+BioMimic Evaluation: \\
+BioMimic tracks the wrist, elbow and shoulder joint angles with MediaPipe's holistic model. For bicep curls, the elbow angle is being computed at all times. A good curl would cut the angle to around 45 - 50 degrees during flexion followed by a phase of extension up to about 160 - 170 degrees. \\
+
+The AI consistently tallied repetitions only when the full range of motion was executed with minimal angular drift. Poor form like swinging the weight or flaring elbows were not counted as successful execution. BioMimic recorded high accuracy in distinguishing good versus bad reps across a series of test sessions with various users. 
+
+Challenges Noted:\\
+Variation in wrist movement and motion speed had a marginal effect on pose detection accuracy. This was resolved by establishing a minimum time interval between repetitions. \\
+
+\subsection{Lateral Raise}
+Lateral raises are an isolation movement where the main target is the lateral deltoid muscles. The movement is misleadingly easy but demands strict form to be effective. \\
+
+Expected Form:
+\begin{itemize}
+    \item Arms need to be raised to shoulder level with elbows mildly bent.
+    \item Arms need to move symmetrical and not go beyond shoulder level.
+    \item The back should be kept straight with no rotation of the torso or leaning of the spine.
+    \item The movement should be slow and controlled.
+\end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Lateral Relaxed_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Lateral Raise in a relaxed position]{Lateral Raise in a relaxed position}
+    \label{fig:lateral_relaxed}
+    \end{figure}
+
+BioMimic Evaluation: \\
+Landmark tracking is centered on the shoulder, elbow and wrist joints. The arm's elevation angle is tracked in real-time by the system. A good rep should achieve a rough angle of 90° relative to the torso. \\
+
+Based on vector math, BioMimic calculates if the arms are being lifted symmetrically and also tracks spine alignment through the shoulder-hip distance. \\
+
+Performance: \\
+The test cases of the lateral raise ended with uniform accuracy. The system effectively detected arm symmetry within ± 5°, shoulder height and body posture alignment.  \\
+
+Challenges Identified: \\
+A major challenge was that it was difficult to differentiate a bent elbow from a dropped shoulder. With certain camera views, this resulted in incorrect detection which was overcome by dynamically modifying the reference points and tolerances. \\
+
+\subsection{ Shoulder Press}
+The shoulder press is a compound vertical pushing action that targets the deltoids, triceps and upper chest. 
+Expected Form:
+\begin{itemize}
+    \item The user begins with dumbbells at shoulder level.
+    \item The elbows must be flexed to about 90°.
+    \item The arms must be pressed vertically until completely extended.
+    \item The spine must remain neutral with no arching or leaning.
+\end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Shoulder Press Rep Start_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Shoulder Press in a relaxed position]{Shoulder Press in a relaxed position}
+    \label{fig:shoulder_relaxed}
+    \end{figure}
+    
+BioMimic Evaluation: \\
+The system monitors wrist - elbow - shoulder axis to find the path of motion. It computes vertical displacement of wrists and elbow angles to ensure correct form. Additionally, the alignment of the hip, shoulder, and elbow is tracked to assess torso stability and detect any backward lean or compensation during overhead pressing.   \\
+
+Performance: \\
+The system demonstrated a good ability to monitor vertical motion, accurately reporting poor alignment, shallow reps or too much lumbar arching.  \\
+
+Challenges Noted: \\
+Detection of full arm extension was challenging in taller subjects because of frame cropping at some camera angles. Calibration and framing corrections were required. \\
+
+\subsection{Dumbbell Rows}
+Dumbbell rows exercise the middle and upper back and are done in a bent-over stance, which is a complex movement for pose detection. \\
+Expected Form:
+\begin{itemize}
+    \item Back needs to be kept flat and parallel to the ground.
+    \item Pulling movement is done with one arm while the other balances the body.
+    \item Hips need to be kept stable.
+    \item The elbow must pull back straight, close to the torso.
+\end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/DB Row Left_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Dumbbell Row in a relaxed right-side position]{Dumbbell Row in a relaxed right-side position}
+    \label{fig:db_relaxed_right}
+    \end{figure}
+    
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/DB Row Right_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Dumbbell Row in a relaxed left-side position]{Dumbbell Row in a relaxed left-side position}
+    \label{fig:db_relaxed_left}
+    \end{figure}
+
+BioMimic Assessment: \\
+The shoulder-elbow-wrist tracking and the calculation of spine angle are used in the system and torso evaluation is conducted by examining the shoulder, hip, and knee joint alignment and angles to assess posture stability and identify leaning or misalignment. \\
+
+Performance: \\
+Even with partial occlusion (one arm tends to be behind the torso), BioMimic could sense good form with angle inference.  \\
+
+Challenges Identified: \\
+Landmark visibility decreased in this position, so landmark smoothing and multi-frame prediction were used to sustain accuracy. \\
+
+\subsection{Squats}
+Squats involve a compound movement of the hip, knee and ankle joints. Squats need to be performed with cautious balance and flexibility. \\
+
+Expected Form: 
+\begin{itemize}
+    \item The spine should remain straight.
+    \item Knees should not move past the toes.
+    \item The hips must drop to at least knee height.
+\end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Squat Normal_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Squat in a relaxed position]{Squat in a relaxed position}
+    \label{fig:squat_relaxed}
+    \end{figure}
+
+BioMimic Evaluation: \\
+Knee and hip angles were monitored. Full squat was identified when knee flexion hit 90° or lower and the hip angle was also assessed to ensure the back remained straight, helping detect excessive forward lean or rounding of the lower back during the descent. \\
+
+Performance: \\
+BioMimic performed well in identifying wrong depth, inward knee collapse or forward trunk lean. Such mishaps were not counted as a successful execution of the exercise. \\
+
+Challenges Noted: \\
+Foot and toe placement was beyond the camera frame, so compensatory adjustments based on hip width and symmetry had to be assumed. \\
+
+\subsection{Push-Ups}
+\begin{itemize}
+    \item Push-ups are a traditional bodyweight exercise involving whole-body coordination.
+    \item Expected Form:
+    \item Body to be in a straight line from head through to heels.
+    \item Elbows to bend to a minimum of 90°.
+    \item Chest has to get near the ground without making contact.
+\end{itemize}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Push Up Ready_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Push-Up in a relaxed position]{Push-Up in a relaxed position}
+    \label{fig:pushup_relaxed}
+    \end{figure}
+
+BioMimic Evaluation:\\
+Elbow and shoulder joint angle were tracked. Shoulder, hip and ankle alignment also defined body plank posture while the angle of the hips created by the shoulder, hip and knee was employed to assess torso stability and identify sagging or overarched conditions throughout the push-up motion. \\
+
+Performance: \\
+The system effectively identified flawed reps like incomplete descent, sagging hips or asymmetrical arm extension. \\
+
+Challenges Noted: \\
+Rapid push-up reps caused frame drops. Temporal filtering was applied to solve the problem. \\
+
+\section{Output Samples}
+A number of sample outputs were taken during the testing. Screenshots depict: 
+\begin{itemize}
+    \item Real-time joint mapping by landmark overlay.
+    \item Elbow, knee and hip angles on the screen.
+    \item Rep counters for each exercise.
+\end{itemize}
+These pictures not only confirm system performance but also show the friendly design for real-time feedback.
+
+\subsection{Bicep Curls}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Bicep Single One_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Alternate Bicep Curl showing Left Bicep Curl]{Alternate Bicep Curl showing Left Bicep Curl}
+    \label{fig:alt_bicep-left}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Bicep Single Two_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Alternate Bicep Curl showing Right Bicep Curl]{Alternate Bicep Curl showing Right Bicep Curl}
+    \label{fig:bicep-right}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Bicep Double_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Double Bicep Curl]{Double Bicep Curl}
+    \label{fig:double_bicep_curl}
+    \end{figure}
+
+\subsection{Lateral Raise}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Lateral Raised_1.1.2.png}
+    \captionsetup{justification=centering}
+    \caption[Lateral Raise in up-position]{Lateral Raise in up-position}
+    \label{fig:lateral_raised}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Lateral Down_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Lateral Raise in down-position]{Lateral Raise in down-position}
+    \label{fig:lateral_down}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Lateral Error_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Incorrect Lateral Raise form]{Incorrect Lateral Raise form}
+    \label{fig:lateral_error}
+    \end{figure}
+    
+\subsection{Shoulder Press}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Shoulder Press Rep Start_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Shoudler Press in down-position]{Shoulder Press in down-position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Shoulder Press Rep End_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Shoulder Press in up-position]{Shoulder Press in up-position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Shoulder Press Error_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Incorrect Shoulder Press form]{Incorrect Shoulder Press form}
+    \label{fig:lateral_error}
+    \end{figure}
+
+
+\subsection{Dumbbell Rows}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/DB Row Right Up_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Dumbbell Row in left-up position]{Dumbbell Row in left-up position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/DB Row Right Down_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Dumbbell Row in left-down position]{Dumbbell Row in left-down position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/DB Row Left Up_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Dumbbell Row in right-up position]{Dumbbell Row in right-up position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/DB Row Left Down_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Dumbbell Row in right-down position]{Dumbbell Row in right-down position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+\subsection{Squats}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Squat Up_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Squat in up position]{Squat in up position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Squat Down_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Squat in down position]{Squat in down position}
+    \label{fig:lateral_error}
+    \end{figure}
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Squat Error_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Incorrect squat form]{Incorrect squat form}
+    \label{fig:lateral_error}
+    \end{figure}
+
+
+\subsection{Push-Ups}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Push Up Up_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Push-up in up position]{Push-up in up position}
+    \label{fig:lateral_error}
+    \end{figure}
+    
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/bioMimic-ss/Push Up Down_1.1.1.png}
+    \captionsetup{justification=centering}
+    \caption[Push-up in down position]{Push-up in down position}
+    \label{fig:lateral_error}
+    \end{figure}
+    
+
+\section{Accuracy and Performance }
+The accuracy and responsiveness of the BioMimic system were evaluated in various aspects i.e. pose estimation precision, rep counting reliability, system responsiveness and robustness in different user and environment conditions. \\
+
+\begin{table}[h!]
+    \centering
+    \caption{Comparison of Pose Estimation Systems}
+    \begin{tabular}{lll}
+    \toprule
+    \textbf{Feature} & \textbf{Others} & \textbf{BioMimic} \\
+    \midrule
+    Real-time Feedback & \faCheck & \faCheck\\
+    Rep Counting & \faClose & \faCheck \\
+    Posture Correction Feedback & \faClose & \faCheck \\
+    Customizability & Low/Medium & High \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\subsection{Pose Estimation Accuracy}
+With MediaPipe's full-body model, BioMimic attained a mean pose estimation accuracy of 94.2\% for all exercises. This was measured against correct identification of joint position in comparison to ground truth form obtained through manual annotation. The landmark detection remained very stable in rich illumination, static environments but would vary slightly with high-speed motion or low light. \\
+
+In over 1,000 total repetitions across various individuals, BioMimic exhibited a 96.8\% accuracy in tracking valid reps. The discrepancies were generally caused by motion blur, frame skips or users initiating movements prior to system initialization completion. \\
+
+\subsection{ Real-Time Feedback Latency}
+Delay of feedback was 120 - 150 milliseconds on average, close to real-time for human perception. The delay was variable with the resolution of the camera and computational load. This enabled users to remain aware of their successful repetitions without significant disturbance to their form or rhythm. \\
+
+\subsection{Frame Processing Rate}
+On standard mid-range hardware ( for instance: Intel i5, 8GB RAM, integrated GPU or its equivalent), the frame rate was sustained between 24 to 30 FPS. This frame rate was enough to provide smooth pose detection and continuous feedback but high-speed movements such as aggressive push-ups could at times overwhelm the processing bandwidth. \\
+
+\subsection{Test Environment Variables}
+Tests were performed in a wide range of conditions: natural light, artificial indoor lighting, high-contrast backgrounds and with different camera poses (front \& side). The system was resilient in most of these settings, but low-lit environments produced minor jitter in landmark stability. \\
+
+Overall, BioMimic provides high accuracy pose estimation and repetition tracking under normal home or gym environments. Its real-time processing and accuracy in pose analysis make it ideal for beginner to intermediate users who want to enhance workout form.  \\
+
+\section{Challenges Encountered}
+During development and testing, several major challenges arose that necessitated technical approaches and workarounds: 
+\begin{enumerate}
+    \item Partial Joint Occlusion: Exercises such as squats or dumbbell rows tended to occlude parts of the body (particularly the arms) partially from the camera view. In compensation, we created inference techniques based on vector angles and neighbouring joints for estimating occluded joints, particularly the elbows and knees.
+    \item Lighting Sensitivity: Lighting changes caused landmark flickering or loss. We mitigated this by applying frame averaging and contrast enhancement methods that enhanced detection stability in low-light or changing-light environments.
+    \item Real-Time Constraints: Keeping approximately real-time performance on average laptops necessitated compromises. We lowered input resolution, optimized skip strategies for frames and computation on only relevant landmarks rather than the full-body mesh. 
+    \item User Calibration: Users of varying heights, body structure or limb length resulted in minute variations in anticipated joint angles. A calibration phase needed to be added where the system calibrated angular thresholds for each user upon initial use.
+    \item Lack of Standardized Datasets: Most pose estimation datasets available are specific to general postures or yoga. Gym-related, labelled datasets did not exist, so exercise-specific form validations needed to be written by hand, tested and iteratively updated based on real-world form samples.
+\end{enumerate}
+
+\section{Known Limitations in the Current System}
+Even with its success, the current implementation of BioMimic has a number of known limitations that need to be addressed in future versions: 
+\begin{enumerate}
+    \item Single-Camera Perspective: Having only one 2D camera view lessens spatial awareness. Depth movements (e.g., lunges toward/away from the camera) are more difficult to assess reliably.
+    \item Exercise Scalability: Each new exercise has to be hand-programmed with its own list of angle thresholds and posture rules which decelerates growth and restricts wider acceptance.
+    \item Performance in Poor Lighting or Cluttered Backgrounds: Lighting conditions with disparate light levels or excessive visual clutter result in a decline in landmark stability, impacting feedback precision.
+    \item Lack of Progress Tracking: No historical tracking of user performance exists, nor progress reports, nor analytics dashboard for long-term improvement.
+    \item No Injury Adaptation or Personalization: The system presently does not accommodate individuals with existing injuries, joint limitations or fluctuating range of motion, confining the system's use to special populations.
+\end{enumerate}
+In general, the findings and assessments outlined in this chapter confirm that BioMimic is a technically feasible and operationally effective tool for real-time pose tracking in gyms and home workouts. Despite some issues, the system has demonstrated good performance in terms of accuracy, responsiveness and usability. Not only do these findings confirm its existing functionality but they also leave no doubt about future directions for further improvement and wider application. \\
+ 
+}

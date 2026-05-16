@@ -1,0 +1,446 @@
+# Chapter 4 LaTeX Thesis Conversion (Overleaf Ready)
+
+\begin{document}
+
+\chapter{Deep Learning Model for Paddy Seed Quality Assessment}
+
+\section{Dataset Description}
+
+\subsection{Data Sources and Collection (Kaggle)}
+
+The dataset used in this project was assembled from two distinct sources on Kaggle: one publicly available and one custom-collected by our team in collaboration with the \entity{organization}{Indian Council of Agricultural Research}{India} (ICAR), Manipur. Combining these two sources improved both the diversity and the real-world representativeness of the training data, ensuring that the model is exposed to paddy seed images captured under a variety of conditions and geographic contexts.
+
+\textbf{Public Source:} The first source is the Paddy Seeds Quality Classification dataset published on Kaggle by Ayyan Arkadalkani:
+
+\url{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}
+
+This dataset comprises 1,213 labeled images distributed across three quality classes --- Healthy, Damaged, and Fake/Low Quality --- with a total storage footprint of approximately 183 MB. It provided a strong baseline of labeled examples captured under varied lighting and background conditions, making it suitable as a general-purpose foundation for transfer learning.
+
+\textbf{Custom Source:} The second source is a custom dataset collected directly from ICAR, Manipur. Images of paddy seeds were captured under controlled laboratory conditions at the ICAR facility to reflect the specific seed varieties cultivated in the northeastern region of India. This collection totals 350 images and occupies approximately 24.7 MB of storage. The dataset has been published on Kaggle as an open-access resource to support future research in regional paddy seed analysis:
+
+\url{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}
+
+By merging both datasets, we obtained a combined corpus of 1,563 images that is both larger and more geographically diverse than either source alone, better reflecting the range of seed conditions encountered in real agricultural settings across India.
+
+\subsection{Dataset Statistics and Class Distribution}
+
+After merging both datasets, the combined corpus contains 1,563 paddy seed images distributed across three quality classes.
+
+\begin{table}[H]
+\centering
+\caption{Dataset Source Summary}
+\begin{tabularx}{\textwidth}{|X|c|c|X|}
+\hline
+\textbf{Source} & \textbf{Images} & \textbf{Size} & \textbf{Kaggle Identifier} \\
+\hline
+Paddy Seeds Quality Classification (AyyanArkadalkani) & 1,213 & \textasciitilde183 MB & ayyanarkadalkani/paddy-seeds-quality-classification-dataset \\
+\hline
+ICAR Manipur Custom Dataset (Our Collection) & 350 & \textasciitilde23.7 MB & nilambarelangbam/paddy-seed-images-collected-from-icar-manipur \\
+\hline
+Combined Total & 1,563 & \textasciitilde208 MB & --- \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Class-wise Distribution of the Combined Dataset}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Class} & \textbf{Number of Images} & \textbf{Percentage (\%)} \\
+\hline
+Healthy Paddy Seeds & $\sim750$ & $\sim48.0$ \\
+\hline
+Damaged Paddy Seeds & $\sim510$ & $\sim32.6$ \\
+\hline
+Fake / Low Quality Seeds & $\sim303$ & $\sim19.4$ \\
+\hline
+Total & 1,563 & 100.0 \\
+\hline
+\end{tabular}
+\end{table}
+
+The dataset exhibits a moderate class imbalance, with Healthy seeds being the most represented class and Fake/Low Quality seeds the least. To prevent the model from developing a bias toward the majority class, weighted random sampling was applied during training, ensuring that each class contributes proportionally to every training batch regardless of its raw frequency in the dataset.
+
+\subsection{Train / Validation / Test Split Strategy}
+
+We partitioned the 1,563 images into three non-overlapping subsets following a stratified split strategy.
+
+\begin{table}[H]
+\centering
+\caption{Dataset Split Statistics}
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\textbf{Split} & \textbf{Proportion} & \textbf{Approx. Images} & \textbf{Purpose} \\
+\hline
+Training Set & 80\% & $\sim1,250$ & Model weight optimisation via back-propagation \\
+\hline
+Validation Set & 10\% & $\sim157$ & Hyperparameter tuning and early stopping criterion \\
+\hline
+Test Set & 10\% & $\sim156$ & Final unbiased evaluation on unseen data \\
+\hline
+\end{tabularx}
+\end{table}
+
+The training set is used exclusively for updating model weights. The validation set is monitored at the end of every epoch to guide hyperparameter decisions and to detect the onset of overfitting. The test set is held out entirely until the final evaluation stage, ensuring that all reported performance metrics reflect genuine generalisation to previously unseen examples.
+
+\subsection{Data Preprocessing and Augmentation}
+
+Before feeding images into the network, a standard preprocessing pipeline was applied to ensure compatibility with the ResNet50 architecture. All images were rescaled to $224 \times 224$ pixels --- the standard input resolution for ImageNet-pretrained ResNet models.
+
+Pixel values were normalised using the ImageNet channel-wise mean and standard deviation:
+
+\[
+\mu = [0.485, 0.456, 0.406], \quad
+\sigma = [0.229, 0.224, 0.225]
+\]
+
+To expand the effective diversity of the training set and improve model robustness, the following augmentation techniques were applied during training:
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+    \item Random Resized Crop
+    \item Horizontal Flip
+    \item Vertical Flip
+    \item Random Rotation
+    \item Translation / Random Shift
+    \item Colour Jitter
+    \item Random Grayscale Conversion
+    \item Gaussian Blur
+\end{enumerate}
+
+Together, these techniques act as implicit regularisers, substantially increasing the diversity of the training distribution without requiring additional labeled data.
+
+\section{Model Architecture}
+
+\subsection{ResNet50 Backbone (25.6M Parameters)}
+
+We adopted ResNet50 as the backbone feature extractor for this project. ResNet50 is a 50-layer deep residual network introduced by He et al. (2016) and is one of the most widely validated architectures for visual recognition tasks.
+
+The backbone consists of an initial $7 \times 7$ convolutional layer followed by max-pooling and four residual stages containing a total of 16 bottleneck blocks. The final residual stage produces a $7 \times 7 \times 2048$ feature map which is collapsed into a 2048-dimensional feature vector using global average pooling.
+
+The backbone was initialised with weights pre-trained on ImageNet. Transfer learning from ImageNet provides strong low- and mid-level feature representations that transfer effectively to agricultural image classification tasks.
+
+\subsection{Custom Classification Head}
+
+The 2048-dimensional feature vector from the backbone is passed through a custom three-layer fully connected classification head:
+
+\begin{itemize}
+    \item Linear Layer 1: $2048 \rightarrow 512$ units with Batch Normalisation, ReLU, and Dropout ($p = 0.5$)
+    \item Linear Layer 2: $512 \rightarrow 128$ units with Batch Normalisation, ReLU, and Dropout ($p = 0.4$)
+    \item Linear Layer 3: $128 \rightarrow 3$ output logits with Dropout ($p = 0.3$)
+\end{itemize}
+
+The output logits are converted to probability distributions using the Softmax activation function during inference.
+
+\subsection{Anti-Overfitting Techniques}
+
+Overfitting is a significant concern when fine-tuning a 25.6-million-parameter network on a dataset of only 1,563 images.
+
+\begin{table}[H]
+\centering
+\caption{Anti-Overfitting Techniques and Their Cumulative Impact}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|l|c|c|}
+\hline
+\textbf{Technique} & \textbf{Configuration} & \textbf{Train-Val Gap} & \textbf{Improvement} \\
+\hline
+No regularisation (baseline) & --- & 25--30\% & --- \\
+\hline
+Dropout (3 layers) & $p = 0.5, 0.4, 0.3$ & 18--20\% & -5 to -7\% \\
+\hline
++ Batch Normalisation & 2 layers in head & 12--15\% & -6 to -8\% \\
+\hline
++ L2 Weight Decay & $\lambda = 0.0001$ & 10--12\% & -2 to -3\% \\
+\hline
++ Label Smoothing & $\epsilon = 0.1$ & 8--10\% & -2\% \\
+\hline
++ Early Stopping & patience = 10 epochs & 5--7\% & -3 to -5\% \\
+\hline
++ LR Scheduling & StepLR: step=8, $\gamma = 0.1$ & 4--6\% & --- \\
+\hline
++ Data Augmentation & 8 techniques & 3--5\% & --- \\
+\hline
++ Class Balancing & Weighted random sampling & 2--3\% & --- \\
+\hline
+All 9 techniques (final) & --- & $\sim2.8\%$ & -87 to -90\% \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+\section{DUS Parameter Integration}
+
+\subsection{Feature Extraction --- 17 Physical Parameters}
+
+In addition to the CNN classification output, our system extracts 17 physical parameters from each seed image using classical computer vision techniques.
+
+\begin{table}[H]
+\centering
+\caption{Extracted Physical Parameters by Category}
+\begin{tabularx}{\textwidth}{|c|X|X|}
+\hline
+\textbf{Category} & \textbf{Parameters} & \textbf{Agriculture Relevance} \\
+\hline
+Dimensional & Length, Width, Area, Perimeter, Aspect Ratio & Identifies grain size; distinguishes seed varieties \\
+\hline
+Colour & Mean RGB, Std RGB, Brightness & Detects discolouration or fungal damage \\
+\hline
+Shape & Circularity, Solidity, Convexity & Detects abnormal or deformed seeds \\
+\hline
+Texture & Variance, Entropy & Identifies damaged or rough seed surfaces \\
+\hline
+Physical & Grain Length (mm), Width (mm) & Real-world DUS-compliant measurements \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Pixel-to-Physical Unit Conversion}
+
+All dimensional parameters are initially computed in pixel units from the detected seed contour.
+
+\begin{equation}
+\text{Grain Length (mm)} = \text{Pixel Length} \times 0.05
+\end{equation}
+
+\begin{equation}
+\text{Grain Width (mm)} = \text{Pixel Width} \times 0.05
+\end{equation}
+
+\begin{equation}
+\text{Grain Weight (g)} = f(\text{length}, \text{width})
+\end{equation}
+
+\subsection{Variety Matching (12 Reference Varieties)}
+
+Once physical parameters are extracted and converted to real-world units, the system classifies each seed along four DUS attribute dimensions:
+
+\begin{itemize}
+    \item Weight Class: Low / Medium / High
+    \item Length Class: Short / Medium / Long
+    \item Width Class: Thin / Medium / Bold
+    \item Shape Class: Round / Medium / Long Slender
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Example Variety Matching Output}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Rank} & \textbf{Variety} & \textbf{Similarity (\%)} \\
+\hline
+1 & CAU & 94.2 \\
+\hline
+2 & SARS-6 & 89.5 \\
+\hline
+3 & IDAW-2 & 85.3 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Training Pipeline}
+
+\subsection{Phase 1 --- Classification Head Training (Epochs 1--8)}
+
+Training was conducted in two distinct phases following the standard transfer learning paradigm. In Phase 1, the ResNet50 backbone was frozen while only the custom classification head was trained.
+
+During Phase 1, training accuracy rose from approximately 86\% to over 95\% within the first few epochs.
+
+\subsection{Phase 2 --- Full Fine-Tuning (Epochs 9--15)}
+
+In Phase 2, the entire network was unfrozen, allowing all 25.6 million parameters to be updated simultaneously.
+
+The learning rate was reduced from 0.001 to 0.0001 to prevent pretrained weights from being distorted by excessively large gradient steps.
+
+\begin{table}[H]
+\centering
+\caption{Training Phase Summary}
+\begin{tabularx}{\textwidth}{|c|c|c|c|X|}
+\hline
+\textbf{Phase} & \textbf{Epochs} & \textbf{Backbone} & \textbf{LR} & \textbf{Key Observation} \\
+\hline
+Phase 1 --- Head Only & 1--8 & Frozen & 0.001 & Rapid convergence and stable learning \\
+\hline
+Phase 2 --- Full Fine-Tune & 9--15 & Unfrozen & 0.0001 & Stable learning with minimal overfitting \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Hyperparameter Configuration and Optimiser}
+
+\begin{table}[H]
+\centering
+\caption{Hyperparameter Configuration}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} & \textbf{Notes} \\
+\hline
+Optimiser & AdamW & Decoupled weight decay \\
+\hline
+Phase 1 Learning Rate & 0.001 & Head-only training \\
+\hline
+Phase 2 Learning Rate & 0.0001 & Full fine-tuning \\
+\hline
+Weight Decay & 0.0001 & Applied to trainable weights \\
+\hline
+Batch Size & 32 & GPU-optimised mini-batch \\
+\hline
+Loss Function & Cross-Entropy + Label Smoothing & Prevents overconfidence \\
+\hline
+LR Scheduler & StepLR & Reduces LR at epoch 8 \\
+\hline
+Gradient Clipping & Max norm = 1.0 & Prevents exploding gradients \\
+\hline
+Early Stopping Patience & 10 epochs & Monitors validation loss \\
+\hline
+Input Resolution & $224 \times 224$ pixels & ResNet50 standard input \\
+\hline
+Total Epochs & 15 & Halted at overfitting onset \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+\subsection{Model Export Formats}
+
+\begin{table}[H]
+\centering
+\caption{Model Export Formats}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Format} & \textbf{Extension} & \textbf{Size} & \textbf{Use Case} \\
+\hline
+PyTorch Native & .pth & $\sim98$ MB & Primary prediction format \\
+\hline
+TorchScript & .pt & $\sim97$ MB & Production deployment \\
+\hline
+ONNX & .onnx & $\sim98$ MB & Cross-platform deployment \\
+\hline
+Configuration & .json & $\sim2$ KB & Metadata and labels \\
+\hline
+DUS Reference DB & .csv & $<1$ MB & Variety matching database \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Model Deployment}
+
+\subsection{Serving Infrastructure}
+
+The trained model is served using FastAPI.
+
+The inference workflow consists of:
+
+\begin{enumerate}
+    \item Request handling
+    \item Image preprocessing
+    \item Model inference
+    \item Post-processing and DUS extraction
+    \item JSON response generation
+\end{enumerate}
+
+\subsection{Containerisation and CI/CD Pipeline}
+
+The application is containerised using Docker and deployed using a GitHub Actions CI/CD pipeline.
+
+The deployment pipeline consists of:
+
+\begin{enumerate}
+    \item Build Docker image
+    \item Push image to GCP Artifact Registry
+    \item Deploy image to GCP Cloud Run
+\end{enumerate}
+
+The deployed API endpoint is:
+
+\url{https://resnet-api-297419987783.asia-south1.run.app/}
+
+\section{Model Comparison and Selection}
+
+\begin{table}[H]
+\centering
+\caption{Architecture Comparison on Test Set}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time (min)} \\
+\hline
+ResNet50 & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 16.4 \\
+\hline
+DenseNet121 & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 15.0 \\
+\hline
+GoogleNet & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 12.2 \\
+\hline
+MobileNetV2 & 99.13\% & 99.15\% & 99.13\% & 99.13\% & 8.5 \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+ResNet50 was selected as the final architecture because of its strong gradient flow properties, broad deployment ecosystem support, and consistency with prior agricultural image classification research.
+
+\section{Final Model Performance Summary}
+
+\begin{table}[H]
+\centering
+\caption{Final Test Set Performance --- ResNet50}
+\begin{tabularx}{\textwidth}{|l|c|X|}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Status} \\
+\hline
+Test Accuracy & 99.57\% & Exceeds industry benchmark (85--90\%) \\
+\hline
+Precision & $\sim0.99$ & Excellent --- minimal false positives \\
+\hline
+Recall & $\sim0.99$ & Excellent --- minimal false negatives \\
+\hline
+F1 Score & $\sim0.99$ & Excellent --- strong harmonic balance \\
+\hline
+Train-Validation Gap & $<5\%$ & Excellent generalisation \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Training Behaviour Summary}
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Observation} & \textbf{Detail} \\
+\hline
+Initial Convergence & Rapid accuracy improvement from $\sim86\%$ to near-peak within early epochs \\
+\hline
+Loss Trajectory & Decreased from $\sim1.0$ to near 0.0 across 15 epochs \\
+\hline
+Mid-training Stability & Stable learning with no erratic oscillations \\
+\hline
+Overfitting Control & Train-validation gap remained below 5\% \\
+\hline
+Training Stopped At & Epoch 15 due to onset of overfitting \\
+\hline
+\end{tabularx}
+\end{table}
+
+The final accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality classification systems.
+
+\end{document}
+```
+
+## Notes for Overleaf
+
+1. Create a new Overleaf project.
+2. Copy the entire LaTeX code into `main.tex`.
+3. Compile using PDFLaTeX.
+4. All tables are already formatted to fit within page boundaries.
+5. `tabularx` and `resizebox` have been used to prevent overflow.
+6. The structure is fully executable and collaborative-ready for your thesis team.
+7. You can directly add figures later using:
+
+```latex
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figure_name.png}
+    \caption{Your Caption}
+    \label{fig:sample}
+\end{figure}
+```

@@ -1,0 +1,87 @@
+\section{System Architecture }
+{\fontsize{12}{14}\selectfont
+    The system architecture of the BioMimic system has been carefully crafted to support real-time pose estimation of humans, categorization of exercises and posture correction in an AI-facilitated fitness setup. The system is a combination of computer vision models and human biomechanics allowing users to exercise in the gym with precision and get instant corrective feedback. The design structure of BioMimic follows a module-based, layered architecture in which every component collaborates to bring about the common goal of maximizing user performance and reducing posture-related injuries. \\
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=1\textwidth]{assets/flowchart.jpg}
+      \captionsetup{justification=centering}
+      \caption[BioMimic system architecture (flow diagram)]{BioMimic system architecture (flow diagram)}\\
+      \label{fig:mediapipe_landmarks}
+    \end{figure}
+
+    On the highest level, the system consists of five main layers: the Input Layer (Video Stream Acquisition), the Pose Detection Layer (MediaPipe Pose framework), the Analysis Layer (pose classification, joint angle calculation), the Feedback Layer (repetition counting) and the User Interface Layer. The video stream from a webcam or external camera serves as the main input. It is fed to MediaPipe which does pose estimation and returns a list of 33 key points with high spatial precision. These key points are then processed through trigonometric calculations to assess joint angles, body orientation and motion flow. \\
+
+    A fundamental part of the system design is its feedback loop in real-time. Once the pose has been captured and examined, it is compared to the set standards of a specific exercise (e.g., squats or bicep curls). The system gives feedback in the form of audio and visual cues or printed outputs to assist the user. This is adaptive and dynamic feedback that changes with each frame of movement making the interaction smooth and adaptive. \\
+
+    The architecture is also made to be lightweight and platform-agnostic. The choice of using MediaPipe guarantees light inference on even low-end devices, making deployment on consumer-grade laptops and even mobile devices possible. The system's modular design also makes it easy to upgrade and incorporate additional exercises, sensors, or even depth cameras in subsequent versions. Significantly, the architecture also permits the potential to store user performance data longitudinally, which creates possibilities for incorporating fitness tracking, personalized schedules and injury forecasting. \\
+
+    Therefore, the BioMimic architecture not only operates in real-time but is also scalable, portable and configurable. It constitutes the technical basis of the system's capability to solve the main issues set out in previous chapters - i.e., posture inaccuracy, absence of personalization in home exercise and lack of affordable AI-driven fitness products. \\
+}
+\section{Functional Requirements}
+{\fontsize{12}{14}\selectfont 
+    The functional specifications of the BioMimic system determine what the system should do to attain its desired purposes. The requirements have been designed around user needs and encompass a broad range of activities the system should be able to perform. Functional requirements are key to the usability and effectiveness of the system within actual gym or home exercise settings. \\
+
+    First, the system has to be capable of continuously receiving video input from a camera source. This is the visual stream upon which all computations and decisions are made. The system has to be capable of detecting human presence in the frame and triggering pose detection. This detection includes the identification and tracking of major body joints like the shoulders, elbows, knees and ankles. \\
+
+    Secondly, the system needs to compute joint angles from coordinate geometry and determine if a pose is one of the "correct" positions for an exercise. For example, in squats, the angle between the calf and thigh needs to be within a specific range to be correct. \\
+
+    Furthermore, the system needs to tally the number of properly done repetitions. This involves being able to tell the difference between a full repetition, partial movement and bad form. The counter should only rise when the posture is good through the whole range of motion. This is important both for motivation and performance measurement. \\
+
+    In addition, the system must provide exercise-specific configuration. The user or developer must be able to dictate proper form for varying workouts by modifying angle tolerances or sequence flows. The system also needs to capture and store session data like the number of reps performed and posture drifts. \\
+
+    These functional requirements make sure that BioMimic is able to provide a responsive and rich experience to users, converting passive workout sessions into intelligent, interactive fitness experiences. \\
+}
+
+\section{Non-functional Requirements }
+{\fontsize{12}{14}\selectfont 
+While functional requirements dictate what the system should do, non-functional requirements define how the system performs under various conditions. These aspects are crucial to ensure usability, reliability, maintainability and performance of the BioMimic system. Non-functional requirements are often what differentiate a good system from an excellent one, especially in real-time AI applications. \\
+
+Performance is one of the key non-functional requirements. The system has to run in real-time, i.e., process video input, execute the pose estimation model, analyze key points and send back feedback within milliseconds. The overall latency from input to output has to be low enough not to introduce delays that would interfere with the flow of the exercise routine of the user. \\
+
+Another critical requirement is precision. Because the system gives feedback based on posture, KeyPoint detection and angle calculation accuracy is crucial. Pose estimation errors would lead to false positives or negatives, which might confirm detrimental habits or dissuade the user by providing inappropriate correction. The adoption of MediaPipe increases precision, but calibration and frame resolution are also necessary. \\
+
+Scalability is another key non-functional requirement. The system needs to be flexible enough to accommodate more exercises and potentially users in the future. It should be implemented in a way that adding new exercise templates, angle thresholds or classification models does not mean re-writing major parts. \\
+
+Usability and user experience (UX) also come into play. The system must have a user-friendly interface and minimal setup. The user should not be required to calibrate the camera himself or make intricate settings. It must be plug-and-play in order to make it simple enough for non-technical users to utilize. \\
+
+Finally, portability and platform-independence are crucial. The system should preferably execute on various operating systems (Windows, Linux) and be deployable on edge devices such as Raspberry Pi or Jetson Nano for mobile fitness applications. \\
+
+Briefly, these non-functional requirements confirm not only the correctness of BioMimic, but also its optimality so that it can be an effective solution in actual fitness and health usage. \\
+}
+\section{Tools and Technologies Used (MediaPipe, Python, OpenCV)}
+{\fontsize{12}{14}\selectfont  
+    The success of BioMimic greatly depends on the strong and effective tools and technologies used to implement it. Every technology was chosen to provide a special function - through from pose detection to system control and feedback rendering. The primary tools used are MediaPipe, Python and OpenCV. \\
+
+    MediaPipe forms the foundation of the pose estimation module. Created by Google, MediaPipe is a cross-platform system that offers customizable and pre-trained computer vision and machine learning solutions. MediaPipe's Pose module identifies 33 3D landmarks on the human anatomy at incredibly high speed and accuracy, making it very suitable for real-time applications. It processes frames in a pipeline structure, which allows parallel computation and low latency and this is critical for our fitness feedback loop. \\
+
+    Python is the foundation for the whole system. Python provides a large number of libraries, is simple to comprehend and allows for rapid development. Python's rich ecosystem includes numerical libraries such as NumPy for computational geometry. Python's simplicity also makes it easy for future developers to extend or change the system with little overhead. \\
+
+    OpenCV (Open Source Computer Vision) Library is utilized for frame manipulation, video capture and visual annotation. OpenCV allows the system to read camera feeds, draw angles and landmarks of the skeleton and visually annotate the user. It gives access to pixel-level operations and supports many cameras hardware, so it is needed to be able to integrate the output of pose estimation into a meaningful and user-friendly visual presentation. \\
+
+    Other assistive technologies that can be used to improve the system are GUI libraries such as Tkinter or PyQt for developing user-friendly interfaces. If the system is later developed to include deep learning-powered posture classification, TensorFlow Lite can be thought of for light on-device inference. The interaction between these tools helps in making the system efficient, responsive and scalable while ensuring high performance with quality outputs in real-time applications. \\
+
+    Together, these technologies make BioMimic a practical and ready-to-use solution that can be implemented and deployed effectively, but it can be a complex concept. Their large-scale adoption and community support also enable future improvements to be made more easily and economically.\\
+}
+\section{Pose Estimation Technique (MediaPipe Framework, Landmark Tracking)}
+{\fontsize{12}{14}\selectfont 
+    The pose estimation algorithm is the heart and soul of the BioMimic platform since it determines the quality of response and general intelligence of the platform. For the project, we utilize the MediaPipe Pose library, which offers sophisticated, real-time and light-weight human pose detection capabilities by detecting 33 important landmarks on the human body. \\
+
+    MediaPipe's pose estimation pipeline consists of two main machine learning models. The Pose Landmarker uses a series of models to predict pose landmarks. The first model detects the presence of human bodies within an image frame, and the second model locates landmarks on the bodies.\\
+
+    The following models are packaged together into a downloadable model bundle: 
+    \begin{itemize}
+        \item \textbf{Pose detection model}: detects the presence of bodies with a few key pose landmarks.
+        \item \textbf{Pose landmarker model}: adds a complete mapping of the pose. The model outputs an estimate of 33 3-dimensional pose landmarks.
+    \end{itemize}
+    
+    This bundle uses a convolutional neural network similar to \href{https://arxiv.org/pdf/1801.04381}{MobileNetV2} and is optimized for on-device, real-time fitness applications. This variant of the \href{https://arxiv.org/pdf/2006.10204}{BlazePose} model uses \href{https://openaccess.thecvf.com/content_CVPR_2020/papers/Xu_GHUM__GHUML_Generative_3D_Human_Shape_and_Articulated_Pose_CVPR_2020_paper.pdf}{GHUM \& GHUML}, a 3D human shape modeling pipeline, to estimate the full 3D body pose of an individual in images or videos. \\
+
+    After receiving the landmarks, BioMimic calculates joint angles between successive points using vector math and trigonometric relationships. For instance, by calculating the angle made at the knee with respect to the hip, knee and ankle landmarks, the system is able to tell the user if he/she is squatting properly. Outsiders beyond a predefined threshold will not be detected.  \\
+
+    One of the standout advantages of MediaPipe is that it not only offers high-speed and high-accuracy results, but also better handles occlusions and partial visibility situations compared to most previous generation models. This means the system can be used in home setups where lighting and backgrounds are not necessarily ideal. The MediaPipe framework also supports GPU acceleration, enabling higher frame rates and more fluid interactions. \\
+
+    Following these landmarks over time allows BioMimic to move beyond static pose analysis. It also allows for temporal tracking, which is essential in recognizing the sequence of motion in dynamic exercises such as push-ups or lunges. The movement of the landmarks over time can also be utilized to train basic classification models that can differentiate between correct and incorrect movement, thereby allowing for personalized coaching experiences. \\
+
+    In summary, the MediaPipe-powered pose estimation module is both technically advanced and pragmatically effective. It is a crucial enabler of real-time, intelligent feedback within the BioMimic system and directly solves the root issue of posture correction and exercise monitoring in AI-driven fitness apps.  \\
+}

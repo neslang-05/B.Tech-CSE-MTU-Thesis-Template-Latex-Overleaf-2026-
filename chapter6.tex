@@ -1,0 +1,48 @@
+\section{Summary of Work}
+{\fontsize{12}{14}\selectfont
+The BioMimic project was initiated and designed with the goal of creating an intelligent, real-time posture monitoring and correction solution for fitness training through pose estimation. Utilizing MediaPipe, Python and OpenCV, we were able to complete a system that can detect and interpret human body postures via the camera, compare them with optimal reference poses and provide feedback on correctness. \\
+
+The system at its core works by taking a real-time video feed, parsing important body landmarks with the pose detection model from MediaPipe and monitoring joint angles to check if the user is executing an exercise properly. A modular approach was taken so that flexibility in expanding the system to accommodate several exercises and enhancing the algorithm's versatility for different body types and fitness regimes was ensured. \\
+
+The project comprised several phases ranging from the development of the problem and literature survey to technology research, system design, implementation and assessment. We conducted thorough testing of simple exercises such as squats and bicep curls to confirm the system's effectiveness. The outcomes show that the system can function and is accurate enough to be used as a core device for AI-based gym training - particularly for those with no access to expert trainers. \\
+}
+
+\section{Key Learnings}
+{\fontsize{12}{14}\selectfont
+This project offered profound insights in a number of interdisciplinary fields, combining computer vision, machine learning, software engineering and biomechanics. The foremost takeaway was the flexibility and strength of MediaPipe, particularly for pose estimation. Learning to appreciate how body landmarks may be used to estimate human movement was not only mentally enriching but also opened up a broad range of applications in areas including healthcare, sports, robotics and physiotherapy. \\
+
+One other key learning was struggling with dealing with real-time data. Poses detected frame-by-frame required optimizations in decision logic and frame processing for consistent performance. We also recognized the value of usability and feedback mechanisms - how a minor on-screen indicator could make such a huge difference in user experience and learning in fitness spaces. \\
+
+Additionally, team work allowed us to gain valuable collaborative and project management skills. From initial planning and documentation to version management and debugging, the experience was as close to real-world software development as possible. It taught us how to decompose a large, tricky problem into discrete chunks, do productive research and be technically disciplined using rigorous design and testing. \\
+}
+
+\section{Future Enhancements}
+{\fontsize{12}{14}\selectfont
+Although the existing deployment of BioMimic demonstrates robust proof of concept, there is significant scope for development in the future to make it a full-fledged fitness assistant.  \\
+
+A few prominent future improvements are: 
+
+\begin{enumerate}
+\item Integration of Mobile Application \\
+One of the most effective next steps would be to port the system over to a mobile platform. A stand-alone Android or iOS app would make the system much more accessible and convenient for use. The mobile app would be able to provide features such as workout logging, progress monitoring, audio cues and push notifications for reminder workouts. Integration with smartphone sensors and wearable technology could also provide enhancements to the system's tracking capabilities. \\
+
+\item Machine Learning-Based Feedback System \\
+Presently, the system is based on pre-established thresholds and logic for detecting angles. A future implementation can employ machine learning to train on user performance over a period of time. By gathering labelled datasets, we can train a classification model to identify not just correctness but also particular posture errors and provide customized corrective recommendations. \\
+
+\item Enhanced Exercise Library \\
+The present system only covers a handful of typical exercises. With future development, we plan to accommodate more types of workouts such as yoga positions, core exercises and rehab exercises. This would mean developing a diverse set of reference data and customizing angle calculations for every movement. \\
+
+\item Cloud-Based Progress Tracking \\
+Adding cloud storage would enable history of workouts to be stored, allow sessions to be compared and monitor progress over time. Graphs, charts and statistical reviews could be used as motivation and an analysis of the user's progress. \\
+
+\item Multi-user and Trainer Dashboard \\
+The application can be enhanced to enable multi-user access through trainer dashboards where trained fitness professionals can view posture recordings of their clients and make professional recommendations remotely. It provides opportunities for AI-powered remote fitness consultation. \\
+\end{enumerate}
+}
+
+\section{Conclusion}
+{\fontsize{12}{14}\selectfont 
+The BioMimic project is a tremendous leap towards conjoining artificial intelligence with individual fitness training. It caters to the contemporary requirement of intelligent, inexpensive and accessible fitness tracking tools, particularly in an era where health and well-being become rapidly more important. By leveraging computer vision and pose estimation, BioMimic presents a new approach towards directing and correcting individuals in real time, filling the gap between technology and physical fitness. \\
+
+While still in its early stage, the potential for scaling and enhancing the system is immense. With further development, BioMimic could evolve into a smart digital fitness companion capable of transforming how people train, learn and stay motivated on their fitness journeys. It is our hope that this project inspires continued research and innovation in the domain of AI-driven health applications. \\
+}
