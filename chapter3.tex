@@ -59,36 +59,27 @@ At the highest level, the platform comprises three major subsystems:
 
 \subsection{Backend Architectural Layers}
 
-The backend follows the four-layer Onion model, each layer encapsulating a
-distinct concern:
+The backend follows the four-layer Onion model, each layer encapsulating a distinct concern as outlined in Table~\ref{tab:backend_layers}.
 
-\begin{description}
-  \item[Domain Layer] Contains core entities (\texttt{User},
-        \texttt{Verification\-History}, \texttt{ProductComplaint}), value
-        objects, enumerations (\texttt{UserRole}, \texttt{VerificationStatus},
-        \texttt{ComplaintStatus}), and domain exceptions. This layer carries no
-        dependency on any external framework or service.
-
-  \item[Application Layer] Orchestrates business workflows through application
-        services (\texttt{VerificationService}, \texttt{UserService},
-        \texttt{ComplaintService}), defines Data Transfer Objects (DTOs),
-        AutoMapper profiles, and FluentValidation rules. It depends only on the
-        Domain layer.
-
-  \item[Infrastructure Layer] Provides concrete implementations for interfaces
-        declared in the Application layer: Entity Framework Core repositories,
-        the \texttt{ApplicationDbContext}, Azure service wrappers
-        (\texttt{CustomVisionService}, \texttt{ComputerVisionService},
-        \texttt{OpenAIService}, \texttt{BlobStorageService}), and migration
-        management. This layer bridges the application to external systems
-        without surfacing implementation details to upper layers.
-
-  \item[API Layer] Hosts ASP.NET Core controllers
-        (\texttt{AuthController}, \texttt{VerificationController},
-        \texttt{ComplaintController}, \texttt{AdminController}), the JWT
-        middleware pipeline, Swagger/OpenAPI documentation, and the global
-        exception handling middleware.
-\end{description}
+\begin{table}[H]
+  \centering
+  \caption{Backend Architectural Layers and Responsibilities}
+  \label{tab:backend_layers}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l X @{}}
+    \toprule
+    \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
+    \midrule
+    \textbf{Domain Layer} & Contains core entities (\texttt{User}, \texttt{VerificationHistory}, \texttt{ProductComplaint}), value objects, enumerations (\texttt{UserRole}, \texttt{VerificationStatus}, \texttt{ComplaintStatus}), and domain exceptions. This layer carries no dependency on any external framework or service. \\
+    \addlinespace
+    \textbf{Application Layer} & Orchestrates business workflows through application services (\texttt{VerificationService}, \texttt{UserService}, \texttt{ComplaintService}), defines Data Transfer Objects (DTOs), AutoMapper profiles, and FluentValidation rules. It depends only on the Domain layer. \\
+    \addlinespace
+    \textbf{Infrastructure Layer} & Provides concrete implementations for interfaces declared in the Application layer: Entity Framework Core repositories, the \texttt{ApplicationDbContext}, Azure service wrappers (\texttt{CustomVisionService}, \texttt{ComputerVisionService}, \texttt{OpenAIService}, \texttt{BlobStorageService}), and migration management. This layer bridges the application to external systems without surfacing implementation details to upper layers. \\
+    \addlinespace
+    \textbf{API Layer} & Hosts ASP.NET Core controllers (\texttt{AuthController}, \texttt{VerificationController}, \texttt{ComplaintController}, \texttt{AdminController}), the JWT middleware pipeline, Swagger/OpenAPI documentation, and the global exception handling middleware. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 % ──────────────────────────────────────────────────────────────
 \section{Functional Requirements}
@@ -96,74 +87,66 @@ distinct concern:
 
 The functional requirements presented below were derived from stakeholder
 analysis involving farmers, agricultural officers, and domain experts. They
-form the contractual basis for all implementation decisions.
+form the contractual basis for all implementation decisions across the platform.
 
-\subsection{FR-01: User Registration and Authentication}
-\begin{itemize}
-  \item Farmers must register using their name, email address, state, and
-        district, and authenticate via an email--password credential pair.
-  \item Agricultural officers must authenticate using an officer ID and a
-        time-based one-time password (TOTP) as a second authentication factor.
-  \item Administrator accounts are provisioned through database seeding;
-        credentials are managed by the platform.
-  \item The system must issue JWT access tokens and refresh tokens upon
-        successful login, and must invalidate both on logout.
-\end{itemize}
+\begin{longtable}{@{} p{2.0cm} p{3.2cm} p{8.2cm} @{}}
+\caption{Comprehensive Functional Requirements Specification}
+\label{tab:functional_requirements} \\
+\toprule
+\textbf{Req ID} & \textbf{Module / Role} & \textbf{Functional Specification} \\
+\midrule
+\endfirsthead
 
-\subsection{FR-02: Seed Verification}
-\begin{itemize}
-  \item Authenticated farmers must be able to upload front and back images of
-        seed packaging for AI-powered authenticity analysis.
-  \item The system must perform parallel inference using Azure Custom Vision for
-        image classification, Azure AI Vision for OCR text extraction, and Azure
-        OpenAI for contextual report synthesis.
-  \item A confidence score, a verification status (Genuine / Counterfeit /
-        Suspicious), extracted OCR text, and a natural-language summary must be
-        returned to the caller and persisted to the database.
-  \item An anonymous public verification endpoint must be available to
-        unauthenticated users.
-\end{itemize}
+\multicolumn{3}{c}%
+{{\bfseries Table \thetable\ continued from previous page}} \\
+\toprule
+\textbf{Req ID} & \textbf{Module / Role} & \textbf{Functional Specification} \\
+\midrule
+\endhead
 
-\subsection{FR-03: Complaint Management}
-\begin{itemize}
-  \item Authenticated farmers must be able to file complaints against seed
-        batches, specifying issue type, affected district, severity level, and
-        optional image evidence.
-  \item Officers must be able to view assigned complaints, update their status
-        (Open / Under Investigation / Resolved / Closed), and record
-        investigation actions with timestamps.
-  \item Administrators must be able to view all complaints, filter by district
-        and status, and assign unassigned complaints to available officers.
-\end{itemize}
+\midrule
+\multicolumn{3}{r}{{\itshape Continued on next page}} \\
+\endfoot
 
-\subsection{FR-04: Role-Based Dashboards}
-\begin{itemize}
-  \item Farmers must have access to a personal dashboard displaying their
-        verification history, complaint status, and summary metrics.
-  \item Officers must be able to view a complaint queue, perform batch risk
-        assessments, and access officer-level analytics.
-  \item Administrators must have access to platform-wide analytics, user
-        management controls, and reference data configuration.
-\end{itemize}
+\bottomrule
+\endlastfoot
 
-\subsection{FR-05: Batch Risk Registry}
-\begin{itemize}
-  \item The system must maintain a \texttt{BatchRiskRegistry} that aggregates
-        complaint statistics per batch number, tracks affected districts,
-        computes average severity scores, and assigns categorical risk levels.
-\end{itemize}
-
-\subsection{FR-06: Deep Learning Model Inference}
-\begin{itemize}
-  \item The ResNet-50 microservice must accept seed images, apply the
-        224\,×\,224 preprocessing pipeline, perform forward inference, and return
-        class probabilities alongside 17 extracted DUS (Distinctness,
-        Uniformity, and Stability) physical parameters such as length, width,
-        colour, texture, and shape metrics.
-  \item The microservice must perform variety matching against a reference
-        database of 12 registered paddy varieties and return the top-3 matches
-        with their similarity percentages.
-\end{itemize}
+\textbf{FR-01.1} & \textbf{Farmers (Auth)} & Must register using their name, email address, state, and district, and authenticate via an email--password credential pair. \\
+\addlinespace
+\textbf{FR-01.2} & \textbf{Officers (Auth)} & Must authenticate using an officer ID and a time-based one-time password (TOTP) as a second authentication factor. \\
+\addlinespace
+\textbf{FR-01.3} & \textbf{Administrators} & Accounts are provisioned through database seeding; credentials are managed directly by the platform. \\
+\addlinespace
+\textbf{FR-01.4} & \textbf{Session Control} & The system must issue JWT access tokens and refresh tokens upon successful login, and must invalidate both upon logout. \\
+\midrule
+\textbf{FR-02.1} & \textbf{Image Submission} & Authenticated farmers must be able to upload front and back images of seed packaging for AI-powered authenticity analysis. \\
+\addlinespace
+\textbf{FR-02.2} & \textbf{AI Inference} & The system must perform parallel inference using Azure Custom Vision for image classification, Azure AI Vision for OCR text extraction, and Azure OpenAI for contextual report synthesis. \\
+\addlinespace
+\textbf{FR-02.3} & \textbf{Result Output} & A confidence score, a verification status (Genuine / Counterfeit / Suspicious), extracted OCR text, and a natural-language summary must be returned to the caller and persisted to the database. \\
+\addlinespace
+\textbf{FR-02.4} & \textbf{Public Access} & An anonymous public verification endpoint must be available to unauthenticated users. \\
+\midrule
+\textbf{FR-03.1} & \textbf{Farmers (Complaints)} & Must be able to file complaints against seed batches, specifying issue type, affected district, severity level, and optional image evidence. \\
+\addlinespace
+\textbf{FR-03.2} & \textbf{Officers (Complaints)} & Must be able to view assigned complaints, update their status (Open / Under Investigation / Resolved / Closed), and record investigation actions with timestamps. \\
+\addlinespace
+\textbf{FR-03.3} & \textbf{Admin (Complaints)} & Must be able to view all complaints, filter by district and status, and assign unassigned complaints to available officers. \\
+\midrule
+\textbf{FR-04.1} & \textbf{Farmer Dashboard} & Must have access to a personal dashboard displaying their verification history, complaint status, and summary metrics. \\
+\addlinespace
+\textbf{FR-04.2} & \textbf{Officer Dashboard} & Must be able to view a complaint queue, perform batch risk assessments, and access officer-level analytics. \\
+\addlinespace
+\textbf{FR-04.3} & \textbf{Admin Dashboard} & Must have access to platform-wide analytics, user management controls, and reference data configuration. \\
+\midrule
+\textbf{FR-05.1} & \textbf{Data Aggregation} & The system must maintain a \texttt{BatchRiskRegistry} that aggregates complaint statistics per batch number. \\
+\addlinespace
+\textbf{FR-05.2} & \textbf{Risk Analytics} & Must track affected districts, compute average severity scores, and assign categorical risk levels. \\
+\midrule
+\textbf{FR-06.1} & \textbf{Feature Inference} & The ResNet-50 microservice must accept seed images, apply the 224\,×\,224 preprocessing pipeline, perform forward inference, and return class probabilities alongside 17 extracted DUS (Distinctness, Uniformity, and Stability) physical parameters such as length, width, colour, texture, and shape metrics. \\
+\addlinespace
+\textbf{FR-06.2} & \textbf{Variety Matching} & The microservice must perform variety matching against a reference database of 12 registered paddy varieties and return the top-3 matches with their similarity percentages. \\
+\end{longtable}
 
 % ──────────────────────────────────────────────────────────────
 \section{Non-Functional Requirements}
@@ -172,59 +155,42 @@ form the contractual basis for all implementation decisions.
 Non-functional requirements govern the quality attributes of the system and
 are treated as first-class design constraints throughout the implementation.
 
-\begin{description}
-  \item[NFR-01 — Performance]
-        The end-to-end verification pipeline (image upload $\rightarrow$ AI
-        orchestration $\rightarrow$ database write $\rightarrow$ response) must
-        complete within a latency budget suitable for interactive web use.
-        Parallel execution of OCR and Custom Vision calls via
-        \texttt{Task.WhenAll} is mandated to reduce blocking latency. The
-        FastAPI microservice must serve single-image inference in sub-second
-        wall-clock time on GCP Cloud Run hardware.
+\begin{longtable}{@{} p{2.0cm} p{3.2cm} p{8.2cm} @{}}
+\caption{Comprehensive Non-Functional Requirements Specification}
+\label{tab:non_functional_requirements} \\
+\toprule
+\textbf{Req ID} & \textbf{Quality Attribute} & \textbf{Architectural Constraint \& Target Specification} \\
+\midrule
+\endfirsthead
 
-  \item[NFR-02 — Scalability]
-        The backend must be stateless and deployable as a Dockerised container,
-        enabling horizontal scaling without code changes~\cite{docker2023docs}.
-        The Next.js frontend must support server-side rendering and edge
-        caching.
+\multicolumn{3}{c}%
+{{\bfseries Table \thetable\ continued from previous page}} \\
+\toprule
+\textbf{Req ID} & \textbf{Quality Attribute} & \textbf{Architectural Constraint \& Target Specification} \\
+\midrule
+\endhead
 
-  \item[NFR-03 — Security]
-        All HTTP traffic must be served over TLS (HTTPS). JWT access tokens must
-        carry minimal claims and expire within a configurable time-to-live
-        (TTL). Passwords must be stored as cryptographic hashes using PBKDF2 or
-        bcrypt. Sensitive credentials (Azure keys, database connection strings,
-        and API keys) must reside in environment variables and must never be
-        hard-coded. Role-based endpoint protection must be enforced through
-        ASP.NET Core \texttt{[Authorize]} policies~\cite{owasp2021top10}.
+\midrule
+\multicolumn{3}{r}{{\itshape Continued on next page}} \\
+\endfoot
 
-  \item[NFR-04 — Reliability and Data Integrity]
-        All grouped repository operations must execute within a Unit of Work
-        transaction with atomic commit-or-rollback semantics. Soft-delete
-        functionality must be implemented for complaint and verification records
-        to support future legal auditing. Health check endpoints
-        (\texttt{/health} and \texttt{/api/health}) must expose the connectivity
-        status of all critical dependencies.
+\bottomrule
+\endlastfoot
 
-  \item[NFR-05 — Maintainability]
-        The codebase must adhere to Clean Architecture layering with clear
-        separation of concerns. Infrastructure services must be registered
-        through an \texttt{InfrastructureServiceCollectionExtensions} extension
-        class rather than inline in \texttt{Program.cs}. All public API
-        endpoints must be documented via Swagger/OpenAPI~3.0.
-
-  \item[NFR-06 — Usability and Accessibility]
-        The frontend must deliver a responsive layout usable on both desktop
-        browsers and mobile devices, supporting farmers who access the platform
-        via smartphones. The UI must provide immediate loading feedback through
-        skeleton placeholders and toast notifications for asynchronous
-        operations.
-
-  \item[NFR-07 — Portability]
-        The deep learning microservice must be exported in multiple formats
-        (\texttt{.pth}, TorchScript \texttt{.pt}, and ONNX \texttt{.onnx}) to
-        support deployment across heterogeneous runtime environments. The entire
-        application stack must be containerisable via Docker.
-\end{description}
+\textbf{NFR-01} & \textbf{Performance} & The end-to-end verification pipeline (image upload $\rightarrow$ AI orchestration $\rightarrow$ database write $\rightarrow$ response) must complete within a latency budget suitable for interactive web use. Parallel execution of OCR and Custom Vision calls via \texttt{Task.WhenAll} is mandated to reduce blocking latency. The FastAPI microservice must serve single-image inference in sub-second wall-clock time on GCP Cloud Run hardware. \\
+\addlinespace
+\textbf{NFR-02} & \textbf{Scalability} & The backend must be stateless and deployable as a Dockerised container, enabling horizontal scaling without code changes~\cite{docker2023docs}. The Next.js frontend must support server-side rendering and edge caching to handle high concurrent client traffic efficiently. \\
+\addlinespace
+\textbf{NFR-03} & \textbf{Security} & All HTTP traffic must be served strictly over TLS (HTTPS). JWT access tokens must carry minimal claims and expire within a configurable time-to-live (TTL). Passwords must be stored as cryptographic hashes using robust key derivation functions such as PBKDF2 or bcrypt. Sensitive credentials (Azure keys, database connection strings, and API keys) must reside in environment variables and must never be hard-coded. Role-based endpoint protection must be strictly enforced through ASP.NET Core \texttt{[Authorize]} policies~\cite{owasp2021top10}. \\
+\addlinespace
+\textbf{NFR-04} & \textbf{Reliability \& Data Integrity} & All grouped repository operations must execute within a Unit of Work transaction with atomic commit-or-rollback semantics. Soft-delete functionality must be implemented for complaint and verification records to support future legal auditing. Health check endpoints (\texttt{/health} and \texttt{/api/health}) must expose the connectivity status of all critical dependencies. \\
+\addlinespace
+\textbf{NFR-05} & \textbf{Maintainability} & The codebase must adhere to Clean Architecture layering with clear separation of concerns. Infrastructure services must be registered through an \texttt{InfrastructureServiceCollectionExtensions} extension class rather than inline in \texttt{Program.cs}. All public API endpoints must be fully documented via the Swagger/OpenAPI~3.0 specification. \\
+\addlinespace
+\textbf{NFR-06} & \textbf{Usability \& Accessibility} & The frontend must deliver a responsive layout usable on both desktop browsers and mobile devices, supporting farmers who access the platform via smartphones. The UI must provide immediate loading feedback through skeleton placeholders and toast notifications for asynchronous operations. \\
+\addlinespace
+\textbf{NFR-07} & \textbf{Portability} & The deep learning microservice must be exported in multiple formats (\texttt{.pth}, TorchScript \texttt{.pt}, and ONNX \texttt{.onnx}) to support deployment across heterogeneous runtime environments. The entire application stack must be fully containerisable via Docker. \\
+\end{longtable}
 
 % ──────────────────────────────────────────────────────────────
 \section{Tools and Technologies}

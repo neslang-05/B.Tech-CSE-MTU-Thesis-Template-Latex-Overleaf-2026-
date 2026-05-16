@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.5.17)  17 MAY 2026 01:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.5.17)  17 MAY 2026 01:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1672,40 +1672,40 @@ Overfull \hbox (55.22037pt too wide) in paragraph at lines 386--390
  []
 
 [16] [17]
-Overfull \hbox (24.03398pt too wide) in paragraph at lines 504--508
+Overfull \hbox (24.03398pt too wide) in paragraph at lines 629--633
 []\T1/cmr/bx/n/12 (-20) Soft delete \T1/cmr/m/n/12 (-20) ^^V \T1/pcr/m/n/12 IsDeleted \T1/cmr/m/n/12 (-20) and \T1/pcr/m/n/12 DeletedAt \T1/cmr/m/n/12 (-20) fields on \T1/pcr/m/n/12 VerificationHistory
  []
 
 
-Overfull \hbox (12.0245pt too wide) in paragraph at lines 513--517
+Overfull \hbox (12.0245pt too wide) in paragraph at lines 638--642
 \T1/pcr/m/n/12 ProductComplaint.Status\T1/cmr/m/n/12 (-20) , and \T1/pcr/m/n/12 ProductComplaint.District \T1/cmr/m/n/12 (-20) carry
  []
 
-) [18] [19]
+) [18] [19] [20]
 Chapter 4.
-(./chapter4.tex [20
+(./chapter4.tex [21
 
 ]
 Overfull \hbox (71.80916pt too wide) in paragraph at lines 33--46
  [][] 
  []
 
-[21]
+[22]
 Overfull \hbox (113.73766pt too wide) in paragraph at lines 77--88
  [][] 
  []
 
-[22] [23] [24] [25]
+[23] [24] [25] [26]
 Overfull \hbox (88.07796pt too wide) in paragraph at lines 209--236
  [][] 
  []
 
-[26]
+[27]
 Overfull \hbox (44.46443pt too wide) in paragraph at lines 248--263
  [][] 
  []
 
-[27] [28] [29]
+[28] [29] [30]
 Overfull \hbox (1.75508pt too wide) in paragraph at lines 341--356
  [][] 
  []
@@ -1715,21 +1715,21 @@ Overfull \hbox (164.20758pt too wide) in paragraph at lines 362--377
  [][] 
  []
 
-) [30]
+) [31]
 Chapter 5.
-(./chapter5.tex [31
+(./chapter5.tex [32
 
-] [32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42]) [43] [44]
+] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43]) [44] [45]
 Chapter 6.
 (./chapter6.tex
-<figures/frontend_architecture.png, id=1865, 715.473pt x 570.933pt>
+<figures/frontend_architecture.png, id=1869, 715.473pt x 570.933pt>
 File: figures/frontend_architecture.png Graphic file (type png)
 <use figures/frontend_architecture.png>
 Package pdftex.def Info: figures/frontend_architecture.png  used on input line 21.
 (pdftex.def)             Requested size: 355.51974pt x 283.69731pt.
- [45
+ [46
 
-] [46 <./figures/frontend_architecture.png>]
+] [47 <./figures/frontend_architecture.png>]
 Overfull \hbox (85.51231pt too wide) in paragraph at lines 84--85
 \T1/cmr/m/n/12 (-20) not ap-pear in the pub-lic URL, so a file at \T1/pcr/m/n/12 src/app/(farmer)/farmer/dashboard/page.tsx
  []
@@ -1739,12 +1739,12 @@ Overfull \hbox (203.37148pt too wide) in paragraph at lines 84--85
 \T1/cmr/m/n/12 (-20) re-solves cleanly to \T1/pcr/m/n/12 /farmer/dashboard\T1/cmr/m/n/12 (-20) . A catch-all proxy han-dler at \T1/pcr/m/n/12 src/app/api/proxy/[...path]/route.ts
  []
 
-<figures/folder_structure.png, id=1882, 715.473pt x 498.663pt>
+<figures/folder_structure.png, id=1887, 715.473pt x 498.663pt>
 File: figures/folder_structure.png Graphic file (type png)
 <use figures/folder_structure.png>
 Package pdftex.def Info: figures/folder_structure.png  used on input line 88.
 (pdftex.def)             Requested size: 313.69164pt x 218.62866pt.
-[47] [48 <./figures/folder_structure.png>]
+[48] [49 <./figures/folder_structure.png>]
 Overfull \hbox (89.40703pt too wide) in paragraph at lines 107--108
 []\T1/pcr/m/n/12 /farmer/dashboard\T1/cmr/m/n/12 (-20) , \T1/pcr/m/n/12 /farmer/verify\T1/cmr/m/n/12 (-20) , \T1/pcr/m/n/12 /farmer/history\T1/cmr/m/n/12 (-20) , \T1/pcr/m/n/12 /farmer/complaints
  []
@@ -1755,17 +1755,17 @@ Overfull \hbox (69.372pt too wide) in paragraph at lines 109--110
  []
 
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 130.
-[49] [50] [51]
+[50] [51] [52]
 Overfull \hbox (48.22922pt too wide) in paragraph at lines 191--192
 []\T1/cmr/m/n/12 (-20) The Zu-s-tand store ex-poses four state fields ^^V \T1/pcr/m/n/12 user\T1/cmr/m/n/12 (-20) , \T1/pcr/m/n/12 token\T1/cmr/m/n/12 (-20) , \T1/pcr/m/n/12 role\T1/cmr/m/n/12 (-20) , and \T1/pcr/m/n/12 isAuthenticated
  []
 
-[52]
+[53]
 Overfull \hbox (80.51665pt too wide) in paragraph at lines 231--232
 \T1/cmr/m/n/12 (-20) quest has not al-ready been re-tried, posts the stored re-fresh to-ken to \T1/pcr/m/n/12 /api/proxy/auth/refresh\T1/cmr/m/n/12 (-20) .
  []
 
-<figures/auth_flow.png, id=1960, 787.743pt x 498.663pt>
+<figures/auth_flow.png, id=1965, 787.743pt x 498.663pt>
 File: figures/auth_flow.png Graphic file (type png)
 <use figures/auth_flow.png>
 Package pdftex.def Info: figures/auth_flow.png  used on input line 235.
@@ -1775,7 +1775,7 @@ Overfull \hbox (31.756pt too wide) in paragraph at lines 246--247
 \T1/cmr/m/n/12 (-20) is set to \T1/pcr/m/n/12 /api/proxy\T1/cmr/m/n/12 (-20) . A re-quest in-ter-cep-tor reads the ac-cess to-ken from \T1/pcr/m/n/12 localStorage
  []
 
-[53 <./figures/auth_flow.png>]
+[54 <./figures/auth_flow.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 313--313
 []|\T1/pcr/m/n/12 /verification/upload \T1/cmr/m/n/12 (+20) ^^V
  []
@@ -1835,7 +1835,7 @@ Underfull \hbox (badness 3579) in paragraph at lines 360--360
 []|\T1/pcr/m/n/12 /reference/states \T1/cmr/m/n/12 (+20) ^^V pub-lic
  []
 
-[54] [55] [56] [57]
+[55] [56] [57] [58]
 Overfull \hbox (27.59242pt too wide) in paragraph at lines 377--378
 []\T1/cmr/m/n/12 (-20) The repos-i-tory in-cludes a com-pact lo-cal com-po-nent li-brary un-der \T1/pcr/m/n/12 src/components/ui\T1/cmr/m/n/12 (-20) .
  []
@@ -1845,84 +1845,84 @@ Underfull \hbox (badness 4416) in paragraph at lines 402--402
 []|\T1/cmr/m/n/12 (+20) Context-driven wrap-per around na-tive
  []
 
-[58] [59]) [60]
+[59] [60]) [61]
 Chapter 7.
-(./chapter7.tex [61
+(./chapter7.tex [62
 
-] [62] [63] [64]
+] [63] [64] [65]
 Overfull \hbox (4.85182pt too wide) in paragraph at lines 143--144
 []\T1/cmr/m/n/12 (-20) Specifies avail-able AI al-go-rithms (Cus-tom Vi-sion, ResNet,
  []
 
-[65] [66] [67] [68]
+[66] [67] [68] [69]
 Overfull \hbox (2.28981pt too wide) in paragraph at lines 284--285
 []\T1/cmr/m/n/12 (-20) Provides custom-trained deep learn-ing model
  []
 
-[69] [70]
+[70] [71]
 Overfull \hbox (4.8571pt too wide) in paragraph at lines 334--335
 []\T1/cmr/m/n/12 (-20) Processes seed packet im-ages through mul-ti-ple AI pipelines,
  []
 
-[71] [72]
+[72] [73]
 Overfull \hbox (0.56967pt too wide) in paragraph at lines 406--407
 []\T1/cmr/m/n/12 (-20) Validates email for-mat, 12-digit of-fi-cer ID pat-tern, phone
  []
 
-[73] [74] [75]
+[74] [75] [76]
 Overfull \hbox (3.75868pt too wide) in paragraph at lines 552--553
 [] [] |\T1/cmr/bx/n/12 (-20) 7.3.4.2.2  Re-quest-Log-ging-Mid-dle-ware.cs[] \T1/cmr/m/n/12 (-20) Im-ple-ments com-pre-hen-sive request-
  []
 
-[76] [77] [78] [79]) [80]
+[77] [78] [79] [80]) [81]
 Chapter 8.
-(./chapter8.tex [81
+(./chapter8.tex [82
 
-] [82] [83] [84] [85] [86]
+] [83] [84] [85] [86] [87]
 Overfull \hbox (73.0611pt too wide) in paragraph at lines 295--296
  [][] 
  []
 
-[87] [88] [89] [90] [91] [92]
+[88] [89] [90] [91] [92] [93]
 Overfull \hbox (28.34576pt too wide) in paragraph at lines 552--553
  [][] 
  []
 
-[93]
+[94]
 Overfull \hbox (9.71532pt too wide) in paragraph at lines 558--558
 |[]\T1/cmr/bx/n/14.4 (-20) Deployment Ar-chi-tec-ture (Docker, Azure Con-tainer Apps)| 
  []
 
-[94] [95]) [96] [97]
+[95] [96]) [97] [98]
 Chapter 9.
-(./chapter9.tex [98
+(./chapter9.tex [99
 
 ]
 Overfull \hbox (124.07967pt too wide) in paragraph at lines 44--55
  [][] 
  []
 
-[99]
+[100]
 Overfull \hbox (58.43149pt too wide) in paragraph at lines 104--115
  [][] 
  []
 
-[100]
+[101]
 Overfull \hbox (6.19508pt too wide) in paragraph at lines 144--157
  [][] 
  []
 
-[101]
+[102]
 Overfull \hbox (125.22768pt too wide) in paragraph at lines 191--200
  [][] 
  []
 
-[102]
+[103]
 Overfull \hbox (220.48912pt too wide) in paragraph at lines 215--228
  [][] 
  []
 
-[103]
+[104]
 Underfull \hbox (badness 3930) in paragraph at lines 257--257
 []|\T1/cmr/m/n/12 (+20) Upload un-sup-ported
  []
@@ -1947,7 +1947,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 285--285
 []|\T1/cmr/m/n/12 (+20) Updated sta-tus re-
  []
 
-[104]
+[105]
 Underfull \hbox (badness 3471) in paragraph at lines 307--307
 []|\T1/cmr/m/n/12 (+20) Unauthorized ad-min
  []
@@ -1962,41 +1962,41 @@ Underfull \hbox (badness 3281) in paragraph at lines 313--313
 []|\T1/cmr/m/n/12 (+20) Authentication er-ror
  []
 
-[105] [106]) [107]
+[106] [107]) [108]
 Chapter 10.
-(./conclusion.tex [108
+(./conclusion.tex [109
 
-] [109] [110] [111] [112] [113]) [114] [115
+] [110] [111] [112] [113] [114]) [115] [116
 
-] [116]
-Overfull \hbox (59.20183pt too wide) in paragraph at lines 397--397
+] [117]
+Overfull \hbox (59.20183pt too wide) in paragraph at lines 383--383
 []\T1/cmr/m/n/12 (-20) OWASP Foun-da-tion, \T1/cmr/m/it/12 (-20) Ses-sion man-age-ment cheat sheet\T1/cmr/m/n/12 (-20) , [][]$\T1/pcr/m/n/12 https : / / cheatsheetseries .
  []
 
-[117] (out/main.aux)
+[118] (out/main.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.28pt have occurred.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 22D7D16D9EDBFC68E58B388EECE858F4;55037.
+(rerunfilecheck)             Checksum: 54E518771C869BA3F56753BDE4A698EB;55037.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 46114 strings out of 476034
- 885959 string characters out of 5792864
- 2046388 words of memory out of 6000000
- 64799 multiletter control sequences out of 15000+600000
- 552635 words of font info for 250 fonts, out of 8000000 for 9000
+ 46329 strings out of 476034
+ 889763 string characters out of 5792864
+ 2047388 words of memory out of 6000000
+ 65009 multiletter control sequences out of 15000+600000
+ 554092 words of font info for 254 fonts, out of 8000000 for 9000
  1137 hyphenation exceptions out of 8191
- 110i,11n,106p,1281b,2190s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1095.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1728.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx2488.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfcc1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfti1440.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfti1728.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on out/main.pdf (143 pages, 3237842 bytes).
+ 110i,13n,106p,1281b,2190s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1095.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx1728.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfbx2488.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfcc1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfti1440.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/cm-super/sfti1728.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb>
+Output written on out/main.pdf (144 pages, 3276196 bytes).
 PDF statistics:
- 2617 PDF objects out of 2984 (max. 8388607)
- 2387 compressed objects within 24 object streams
- 652 named destinations out of 1000 (max. 500000)
- 69225 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 2621 PDF objects out of 2984 (max. 8388607)
+ 2390 compressed objects within 24 object streams
+ 653 named destinations out of 1000 (max. 500000)
+ 71785 words of extra memory for PDF output out of 74296 (max. 10000000)
 

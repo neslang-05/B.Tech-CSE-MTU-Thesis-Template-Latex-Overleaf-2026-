@@ -1,6 +1,7 @@
  \documentclass[a4paper, 12pt]{report}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[T1]{fontenc}
+\usepackage{mathptmx}
 \usepackage{geometry}
 \usepackage[normalem]{ulem}
 \geometry{a4paper, top=25mm, left=38mm,bottom=25mm, right=25mm} 
@@ -358,20 +359,6 @@ backend=biber
 
 % % -----------------CHAPTER-8-----------------
  \chapter{System Integration}
-  This chapter discusses the integration architecture of the AgriVerify Fake Seed Detection
-System. The platform combines a modern Next.js frontend, ASP.NET Core backend services,
-Azure cloud infrastructure, AI-powered seed verification pipelines, and containerized cloud
-deployment. The integration workflow was designed to ensure scalability, modularity, secure
-communication, and efficient coordination between frontend interfaces, backend APIs, machine
-learning models, and cloud-based infrastructure services.
-
-The system follows a distributed layered architecture where frontend clients communicate with
-backend services through a secure proxy layer. The backend coordinates authentication,
-business logic execution, image processing workflows, AI inference pipelines, cloud storage
-operations, analytics generation, and complaint management systems. The overall integration
-design ensures reliable communication between all software components while maintaining
-clean separation of concerns and scalability for future expansion.
- 
  \input{chapter8.tex}
 % ----------------------------------
 
@@ -391,7 +378,7 @@ clean separation of concerns and scalability for future expansion.
 % --------------------REFERENCES--------------------
 \newpage
 \phantomsection
-\addcontentsline{toc}{chapter}{REFERENCES}
+\addcontentsline{toc}{chapter}{References}
 \printbibliography
 % -------------------------------------------------------
 
