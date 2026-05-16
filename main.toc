@@ -1,0 +1,265 @@
+\contentsline {chapter}{BONAFIDE CERTIFICATE}{i}{section*.1}%
+\contentsline {chapter}{DECLARATION}{ii}{section*.2}%
+\contentsline {chapter}{ACKNOWLEDGEMENT}{vi}{section*.3}%
+\contentsline {chapter}{ABSTRACT}{vii}{section*.4}%
+\contentsline {chapter}{List of Tables}{xviii}{chapter*.6}%
+\contentsline {chapter}{List of Figures}{xx}{chapter*.7}%
+\contentsline {chapter}{Symbols and Acronyms}{xxi}{section*.8}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background and Context}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Motivation}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Problem Statement}{2}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Objectives}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Scope of the Project}{3}{section.1.5}%
+\contentsline {chapter}{\numberline {2}Literature Review}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Seed Quality Assessment: Traditional Methods}{4}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Deep Learning for Agricultural Image Classification}{4}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Transfer Learning and ResNet Architectures}{5}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Farmer Feedback Systems}{6}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Web-Based Agricultural Platforms}{6}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Review of Related Work}{7}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Summary and Research Gaps}{7}{section.2.7}%
+\contentsline {chapter}{\numberline {3}System Design and Architecture}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Overall System Architecture}{9}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Backend Architectural Layers}{10}{subsection.3.1.1}%
+\contentsline {section}{\numberline {3.2}Functional Requirements}{10}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}FR-01: User Registration and Authentication}{10}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}FR-02: Seed Verification}{11}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}FR-03: Complaint Management}{11}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}FR-04: Role-Based Dashboards}{11}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}FR-05: Batch Risk Registry}{12}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}FR-06: Deep Learning Model Inference}{12}{subsection.3.2.6}%
+\contentsline {section}{\numberline {3.3}Non-Functional Requirements}{12}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Tools and Technologies}{13}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Deep Learning Stack (PyTorch and ResNet-50)}{13}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Backend Stack (ASP.NET Core 8, SQL Server, and Azure)}{14}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Model Serving (FastAPI and Docker)}{15}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Frontend Stack (Next.js, TypeScript, and TanStack Query)}{16}{subsection.3.4.4}%
+\contentsline {section}{\numberline {3.5}System Architecture Diagrams}{17}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}High-Level Architecture}{17}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Data Flow Diagram}{18}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Entity-Relationship Diagram}{18}{subsection.3.5.3}%
+\contentsline {chapter}{\numberline {4}Deep Learning Model for Paddy Seed Quality Assessment}{21}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Dataset Description}{21}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Data Sources and Collection (Kaggle)}{21}{subsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.1.1}Public Source}{21}{subsubsection.4.1.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.1.2}Custom Source}{22}{subsubsection.4.1.1.2}%
+\contentsline {subsection}{\numberline {4.1.2}Dataset Statistics and Class Distribution}{22}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Train/Validation/Test Split Strategy}{23}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Data Preprocessing and Augmentation}{23}{subsection.4.1.4}%
+\contentsline {section}{\numberline {4.2}Model Architecture}{24}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}ResNet50 Backbone (25.6M Parameters)}{24}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Custom Classification Head}{25}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Anti-Overfitting Techniques}{25}{subsection.4.2.3}%
+\contentsline {section}{\numberline {4.3}DUS Parameter Integration}{26}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Feature Extraction---17 Physical Parameters}{26}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Pixel-to-Physical Unit Conversion}{26}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Variety Matching (12 Reference Varieties)}{27}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Training Pipeline}{27}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Phase 1---Classification Head Training (Epochs 1--8)}{27}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Phase 2---Full Fine-Tuning (Epochs 9--15)}{27}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Hyperparameter Configuration and Optimiser}{28}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Model Export Formats}{28}{subsection.4.4.4}%
+\contentsline {section}{\numberline {4.5}Model Deployment}{29}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Serving Infrastructure}{29}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Containerisation and CI/CD Pipeline}{29}{subsection.4.5.2}%
+\contentsline {section}{\numberline {4.6}Model Comparison and Selection}{30}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Final Model Performance Summary}{31}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Model Serving API}{32}{chapter.5}%
+\contentsline {section}{\numberline {5.1}API Architecture Overview}{32}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}FastAPI and Uvicorn Serving Stack}{32}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}End-to-End Request Flow}{33}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Concurrency and Performance Considerations}{33}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Inference Pipeline}{34}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Input Preprocessing and Normalization}{34}{subsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.1.1}Accepted Input Formats}{34}{subsubsection.5.2.1.1}%
+\contentsline {subsubsection}{\numberline {5.2.1.2}Preprocessing Workflow}{35}{subsubsection.5.2.1.2}%
+\contentsline {subsubsection}{\numberline {5.2.1.3}Input Validation and Error Handling}{35}{subsubsection.5.2.1.3}%
+\contentsline {subsection}{\numberline {5.2.2}Prediction and Confidence Scoring}{36}{subsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.2.1}Inference Execution}{36}{subsubsection.5.2.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2.2}Top-1 Prediction}{36}{subsubsection.5.2.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.2.3}Confidence Calibration}{36}{subsubsection.5.2.2.3}%
+\contentsline {subsection}{\numberline {5.2.3}Latency Measurement}{37}{subsection.5.2.3}%
+\contentsline {subsubsection}{\numberline {5.2.3.1}Inference Timing}{37}{subsubsection.5.2.3.1}%
+\contentsline {subsubsection}{\numberline {5.2.3.2}Measurement Methodology}{37}{subsubsection.5.2.3.2}%
+\contentsline {subsubsection}{\numberline {5.2.3.3}Operational Importance of Latency Metrics}{37}{subsubsection.5.2.3.3}%
+\contentsline {section}{\numberline {5.3}API Specification}{38}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}POST /predict Endpoint}{38}{subsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.1.1}Purpose}{38}{subsubsection.5.3.1.1}%
+\contentsline {subsubsection}{\numberline {5.3.1.2}Request Format}{38}{subsubsection.5.3.1.2}%
+\contentsline {paragraph}{\numberline {5.3.1.2.1}HTTP Method}{38}{paragraph.5.3.1.2.1}%
+\contentsline {paragraph}{\numberline {5.3.1.2.2}Endpoint Path}{38}{paragraph.5.3.1.2.2}%
+\contentsline {paragraph}{\numberline {5.3.1.2.3}Content Type}{38}{paragraph.5.3.1.2.3}%
+\contentsline {paragraph}{\numberline {5.3.1.2.4}Request Parameters}{38}{paragraph.5.3.1.2.4}%
+\contentsline {subsubsection}{\numberline {5.3.1.3}Response Format}{39}{subsubsection.5.3.1.3}%
+\contentsline {subsubsection}{\numberline {5.3.1.4}Error Responses}{39}{subsubsection.5.3.1.4}%
+\contentsline {subsection}{\numberline {5.3.2}GET /health Endpoint}{39}{subsection.5.3.2}%
+\contentsline {subsubsection}{\numberline {5.3.2.1}Purpose}{39}{subsubsection.5.3.2.1}%
+\contentsline {subsubsection}{\numberline {5.3.2.2}Request Specification}{40}{subsubsection.5.3.2.2}%
+\contentsline {subsubsection}{\numberline {5.3.2.3}Response Format}{40}{subsubsection.5.3.2.3}%
+\contentsline {subsubsection}{\numberline {5.3.2.4}Liveness and Readiness Checks}{40}{subsubsection.5.3.2.4}%
+\contentsline {section}{\numberline {5.4}Containerization and Deployment}{40}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Docker Multi-Stage Build Architecture}{40}{subsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.1.1}Builder Stage}{41}{subsubsection.5.4.1.1}%
+\contentsline {subsubsection}{\numberline {5.4.1.2}Runtime Stage}{41}{subsubsection.5.4.1.2}%
+\contentsline {subsection}{\numberline {5.4.2}Deployment Considerations}{41}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Configuration and Environment Management}{42}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Environment-Based Configuration}{42}{subsection.5.5.1}%
+\contentsline {subsection}{\numberline {5.5.2}Secrets Management}{42}{subsection.5.5.2}%
+\contentsline {section}{\numberline {5.6}Security Considerations}{43}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Threat Model}{43}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Input Hardening}{43}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}Transport Security}{44}{subsection.5.6.3}%
+\contentsline {subsection}{\numberline {5.6.4}Rate Limiting and Abuse Prevention}{44}{subsection.5.6.4}%
+\contentsline {subsection}{\numberline {5.6.5}Logging and Observability}{44}{subsection.5.6.5}%
+\contentsline {section}{\numberline {5.7}Summary}{45}{section.5.7}%
+\contentsline {chapter}{\numberline {6}Frontend System Architecture and Implementation}{46}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Architecture and Design Principles}{46}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Technology Stack}{47}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Folder Structure and Repository Layout}{48}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Routing System}{48}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}App Router and Route Groups}{48}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Role-Based Access Control}{50}{subsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.2.1}Farmer Portal — Verification and Complaint Workflows}{51}{subsubsection.6.4.2.1}%
+\contentsline {subsubsection}{\numberline {6.4.2.2}Officer Portal — Complaint Processing Queue}{52}{subsubsection.6.4.2.2}%
+\contentsline {subsubsection}{\numberline {6.4.2.3}Admin Portal — Analytics and Management}{52}{subsubsection.6.4.2.3}%
+\contentsline {subsubsection}{\numberline {6.4.2.4}Public Verification — Anonymous Scanner}{52}{subsubsection.6.4.2.4}%
+\contentsline {section}{\numberline {6.5}Authentication Flow}{53}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Token Storage Strategy and Zustand Auth Store}{53}{subsection.6.5.1}%
+\contentsline {subsection}{\numberline {6.5.2}Refresh Token Recovery (Axios 401 Interceptor)}{54}{subsection.6.5.2}%
+\contentsline {section}{\numberline {6.6}API Integration}{54}{section.6.6}%
+\contentsline {subsection}{\numberline {6.6.1}Axios Client, Request Interceptor, and Proxy Route}{54}{subsection.6.6.1}%
+\contentsline {subsection}{\numberline {6.6.2}Endpoint Summary}{55}{subsection.6.6.2}%
+\contentsline {subsection}{\numberline {6.6.3}State Management (TanStack Query and Zustand)}{55}{subsection.6.6.3}%
+\contentsline {subsection}{\numberline {6.6.4}UI Component Library and Design System}{59}{subsection.6.6.4}%
+\contentsline {subsection}{\numberline {6.6.5}Responsive Design and Accessibility Notes}{60}{subsection.6.6.5}%
+\contentsline {section}{\numberline {6.7}Summary}{60}{section.6.7}%
+\contentsline {chapter}{\numberline {7}Backend System Architecture and Implementation}{62}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Architectural Overview}{62}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Architectural Layers}{62}{subsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.1}Domain Layer}{62}{subsubsection.7.1.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.2}Application Layer}{63}{subsubsection.7.1.1.2}%
+\contentsline {subsubsection}{\numberline {7.1.1.3}Infrastructure Layer}{63}{subsubsection.7.1.1.3}%
+\contentsline {subsubsection}{\numberline {7.1.1.4}Presentation Layer (API Layer)}{63}{subsubsection.7.1.1.4}%
+\contentsline {subsection}{\numberline {7.1.2}Architectural Diagram}{63}{subsection.7.1.2}%
+\contentsline {section}{\numberline {7.2}Technology Stack}{64}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Project Structure Analysis}{65}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Domain Layer Architecture}{65}{subsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.1.1}Entities Folder --- Core Business Models}{66}{subsubsection.7.3.1.1}%
+\contentsline {subsubsection}{\numberline {7.3.1.2}Enums Folder --- System Classifications}{66}{subsubsection.7.3.1.2}%
+\contentsline {subsubsection}{\numberline {7.3.1.3}Interfaces Folder --- Service Contracts}{67}{subsubsection.7.3.1.3}%
+\contentsline {subsubsection}{\numberline {7.3.1.4}Common Folder --- Shared Base Classes}{67}{subsubsection.7.3.1.4}%
+\contentsline {subsubsection}{\numberline {7.3.1.5}Exceptions Folder --- Error Handling Strategy}{68}{subsubsection.7.3.1.5}%
+\contentsline {subsection}{\numberline {7.3.2}Infrastructure Layer Architecture}{68}{subsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.2.1}Persistence Folder --- Data Management}{68}{subsubsection.7.3.2.1}%
+\contentsline {paragraph}{\numberline {7.3.2.1.1}ApplicationDbContext.cs}{68}{paragraph.7.3.2.1.1}%
+\contentsline {paragraph}{\numberline {7.3.2.1.2}UnitOfWork.cs}{69}{paragraph.7.3.2.1.2}%
+\contentsline {paragraph}{\numberline {7.3.2.1.3}Repository Implementation}{69}{paragraph.7.3.2.1.3}%
+\contentsline {subsubsection}{\numberline {7.3.2.2}Configurations Folder --- Database Mapping}{69}{subsubsection.7.3.2.2}%
+\contentsline {subsubsection}{\numberline {7.3.2.3}Migrations Folder --- Schema Version Control}{69}{subsubsection.7.3.2.3}%
+\contentsline {subsubsection}{\numberline {7.3.2.4}Services Folder --- External Integrations}{70}{subsubsection.7.3.2.4}%
+\contentsline {subsubsection}{\numberline {7.3.2.5}Extensions Folder --- Dependency Injection}{71}{subsubsection.7.3.2.5}%
+\contentsline {subsection}{\numberline {7.3.3}Application Layer Architecture}{71}{subsection.7.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.3.1}Services Subfolder}{71}{subsubsection.7.3.3.1}%
+\contentsline {paragraph}{\numberline {7.3.3.1.1}Service Interfaces}{71}{paragraph.7.3.3.1.1}%
+\contentsline {paragraph}{\numberline {7.3.3.1.2}Service Implementations}{72}{paragraph.7.3.3.1.2}%
+\contentsline {subsubsection}{\numberline {7.3.3.2}DTOs Subfolder --- Data Transfer Objects}{72}{subsubsection.7.3.3.2}%
+\contentsline {paragraph}{\numberline {7.3.3.2.1}Request DTOs}{72}{paragraph.7.3.3.2.1}%
+\contentsline {paragraph}{\numberline {7.3.3.2.2}Response DTOs}{73}{paragraph.7.3.3.2.2}%
+\contentsline {subsubsection}{\numberline {7.3.3.3}Validators Subfolder}{74}{subsubsection.7.3.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.3.4}Mappings Subfolder}{74}{subsubsection.7.3.3.4}%
+\contentsline {subsubsection}{\numberline {7.3.3.5}Exceptions Subfolder}{74}{subsubsection.7.3.3.5}%
+\contentsline {subsection}{\numberline {7.3.4}Presentation Layer (API) Architecture}{75}{subsection.7.3.4}%
+\contentsline {subsubsection}{\numberline {7.3.4.1}Controllers Subfolder}{75}{subsubsection.7.3.4.1}%
+\contentsline {paragraph}{\numberline {7.3.4.1.1}BaseApiController.cs}{75}{paragraph.7.3.4.1.1}%
+\contentsline {paragraph}{\numberline {7.3.4.1.2}AuthController.cs}{75}{paragraph.7.3.4.1.2}%
+\contentsline {paragraph}{\numberline {7.3.4.1.3}VerificationController.cs}{75}{paragraph.7.3.4.1.3}%
+\contentsline {paragraph}{\numberline {7.3.4.1.4}ComplaintsController.cs}{76}{paragraph.7.3.4.1.4}%
+\contentsline {paragraph}{\numberline {7.3.4.1.5}AdminController.cs}{76}{paragraph.7.3.4.1.5}%
+\contentsline {paragraph}{\numberline {7.3.4.1.6}AnalyticsController.cs}{76}{paragraph.7.3.4.1.6}%
+\contentsline {paragraph}{\numberline {7.3.4.1.7}AnalyticsControllerV2.cs}{76}{paragraph.7.3.4.1.7}%
+\contentsline {paragraph}{\numberline {7.3.4.1.8}ReferenceDataController.cs}{77}{paragraph.7.3.4.1.8}%
+\contentsline {subsubsection}{\numberline {7.3.4.2}Middleware Subfolder}{77}{subsubsection.7.3.4.2}%
+\contentsline {paragraph}{\numberline {7.3.4.2.1}ExceptionHandlingMiddleware.cs}{77}{paragraph.7.3.4.2.1}%
+\contentsline {paragraph}{\numberline {7.3.4.2.2}RequestLoggingMiddleware.cs}{77}{paragraph.7.3.4.2.2}%
+\contentsline {paragraph}{\numberline {7.3.4.2.3}AuthenticationMiddleware.cs}{78}{paragraph.7.3.4.2.3}%
+\contentsline {subsubsection}{\numberline {7.3.4.3}Configuration Files}{78}{subsubsection.7.3.4.3}%
+\contentsline {paragraph}{\numberline {7.3.4.3.1}appsettings.json}{78}{paragraph.7.3.4.3.1}%
+\contentsline {paragraph}{\numberline {7.3.4.3.2}appsettings.Development.json}{78}{paragraph.7.3.4.3.2}%
+\contentsline {paragraph}{\numberline {7.3.4.3.3}appsettings.Production.json}{79}{paragraph.7.3.4.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.4.4}Program.cs --- Application Entry Point}{79}{subsubsection.7.3.4.4}%
+\contentsline {section}{\numberline {7.4}Data Flow and Integration Points}{80}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Verification Workflow}{80}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Security Architecture}{80}{subsection.7.4.2}%
+\contentsline {chapter}{\numberline {8}System Integration}{82}{chapter.8}%
+\contentsline {section}{\numberline {8.1}End-to-End Request Flow (Browser to ML Model)}{82}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}Overview of the Request Lifecycle}{83}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Browser-Level Request Generation}{83}{subsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.1.3}Backend Request Reception}{84}{subsection.8.1.3}%
+\contentsline {subsection}{\numberline {8.1.4}AI Inference Execution Pipeline}{85}{subsection.8.1.4}%
+\contentsline {subsection}{\numberline {8.1.5}Request Flow Diagram}{86}{subsection.8.1.5}%
+\contentsline {section}{\numberline {8.2}Frontend - Backend Communication (Proxy Architecture)}{86}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Centralized Communication Architecture}{87}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Axios Client Integration}{87}{subsection.8.2.2}%
+\contentsline {subsection}{\numberline {8.2.3}Proxy Route Workflow}{88}{subsection.8.2.3}%
+\contentsline {subsection}{\numberline {8.2.4}Authentication and Session Recovery}{88}{subsection.8.2.4}%
+\contentsline {subsection}{\numberline {8.2.5}Proxy Architecture Diagram}{89}{subsection.8.2.5}%
+\contentsline {section}{\numberline {8.3}Backend - Model Serving API Integration}{89}{section.8.3}%
+\contentsline {subsection}{\numberline {8.3.1}AI Service Integration Architecture}{89}{subsection.8.3.1}%
+\contentsline {subsection}{\numberline {8.3.2}Image Validation Pipeline}{89}{subsection.8.3.2}%
+\contentsline {subsection}{\numberline {8.3.3}OCR and Metadata Extraction}{90}{subsection.8.3.3}%
+\contentsline {subsection}{\numberline {8.3.4}Seed Classification Workflow}{90}{subsection.8.3.4}%
+\contentsline {subsection}{\numberline {8.3.5}Model Serving Workflow Diagram}{92}{subsection.8.3.5}%
+\contentsline {section}{\numberline {8.4}Azure Service Integration Workflow}{92}{section.8.4}%
+\contentsline {subsection}{\numberline {8.4.1}Azure Services Used in the Platform}{93}{subsection.8.4.1}%
+\contentsline {subsection}{\numberline {8.4.2}Azure Blob Storage Workflow}{93}{subsection.8.4.2}%
+\contentsline {subsection}{\numberline {8.4.3}Azure AI Service Coordination}{94}{subsection.8.4.3}%
+\contentsline {subsection}{\numberline {8.4.4}Cloud-Based AI Processing Pipeline}{94}{subsection.8.4.4}%
+\contentsline {subsection}{\numberline {8.4.5}Azure Integration Diagram}{95}{subsection.8.4.5}%
+\contentsline {section}{\numberline {8.5}Deployment Architecture (Docker, Azure Container Apps)}{95}{section.8.5}%
+\contentsline {subsection}{\numberline {8.5.1}Containerization Strategy}{95}{subsection.8.5.1}%
+\contentsline {subsection}{\numberline {8.5.2}Docker-Based Build Workflow}{96}{subsection.8.5.2}%
+\contentsline {subsection}{\numberline {8.5.3}Azure Container Registry Integration}{96}{subsection.8.5.3}%
+\contentsline {subsection}{\numberline {8.5.4}Azure Container Apps Deployment}{97}{subsection.8.5.4}%
+\contentsline {subsection}{\numberline {8.5.5}Deployment Workflow Diagram}{98}{subsection.8.5.5}%
+\contentsline {chapter}{\numberline {9}Results and Evaluation}{99}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Model Performance}{99}{section.9.1}%
+\contentsline {subsection}{\numberline {9.1.1}Accuracy, Precision, Recall, and F1 Score}{99}{subsection.9.1.1}%
+\contentsline {section}{\numberline {9.2}Per-Class Performance}{100}{section.9.2}%
+\contentsline {section}{\numberline {9.3}Confusion Matrix Analysis}{100}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Regularization Effectiveness}{101}{section.9.4}%
+\contentsline {section}{\numberline {9.5}Model Comparison and Analysis}{102}{section.9.5}%
+\contentsline {section}{\numberline {9.6}System Performance}{103}{section.9.6}%
+\contentsline {subsection}{\numberline {9.6.1}API Inference Latency (\nobreakspace {}165 ms CPU / \nobreakspace {}20 ms GPU)}{103}{subsection.9.6.1}%
+\contentsline {subsection}{\numberline {9.6.2}Backend Response Times and Throughput}{104}{subsection.9.6.2}%
+\contentsline {section}{\numberline {9.7}Functional Test Cases}{104}{section.9.7}%
+\contentsline {subsection}{\numberline {9.7.1}Seed Verification Test Cases}{105}{subsection.9.7.1}%
+\contentsline {subsection}{\numberline {9.7.2}Complaint Management Test Cases}{105}{subsection.9.7.2}%
+\contentsline {subsection}{\numberline {9.7.3}Role-Based Access and Admin Test Cases}{106}{subsection.9.7.3}%
+\contentsline {subsection}{\numberline {9.7.4}Output Samples and Screenshots}{107}{subsection.9.7.4}%
+\contentsline {subsection}{\numberline {9.7.5}Challenges Encountered}{107}{subsection.9.7.5}%
+\contentsline {subsection}{\numberline {9.7.6}Known Limitations of the Current System}{108}{subsection.9.7.6}%
+\contentsline {chapter}{\numberline {10}Conclusion And Future Work}{109}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Summary of Work}{109}{section.10.1}%
+\contentsline {section}{\numberline {10.2}Key Contributions and Findings}{110}{section.10.2}%
+\contentsline {subsection}{\numberline {10.2.1}AI-Based Automated Paddy Seed Classification}{110}{subsection.10.2.1}%
+\contentsline {subsection}{\numberline {10.2.2}Integration of Multiple AI Services}{111}{subsection.10.2.2}%
+\contentsline {subsection}{\numberline {10.2.3}DUS Parameter Evaluation}{111}{subsection.10.2.3}%
+\contentsline {subsection}{\numberline {10.2.4}Real-Time Farmer Assistance}{111}{subsection.10.2.4}%
+\contentsline {subsection}{\numberline {10.2.5}Secure and Scalable System Architecture}{111}{subsection.10.2.5}%
+\contentsline {subsection}{\numberline {10.2.6}Complaint Redressal and Governance Workflow}{112}{subsection.10.2.6}%
+\contentsline {subsection}{\numberline {10.2.7}Reduction of Manual Dependency}{112}{subsection.10.2.7}%
+\contentsline {subsection}{\numberline {10.2.8}Cloud-Native AI Deployment}{112}{subsection.10.2.8}%
+\contentsline {section}{\numberline {10.3}Future Enhancements}{112}{section.10.3}%
+\contentsline {subsection}{\numberline {10.3.1}Offline-First Progressive Web Application (PWA)}{112}{subsection.10.3.1}%
+\contentsline {subsection}{\numberline {10.3.2}Enhanced Security Mechanisms}{113}{subsection.10.3.2}%
+\contentsline {subsection}{\numberline {10.3.3}Blockchain-Based Verification Ledger}{113}{subsection.10.3.3}%
+\contentsline {subsection}{\numberline {10.3.4}IoT and Smart Agriculture Integration}{113}{subsection.10.3.4}%
+\contentsline {subsection}{\numberline {10.3.5}Expansion to Multiple Crop Varieties}{113}{subsection.10.3.5}%
+\contentsline {subsection}{\numberline {10.3.6}Mobile Application Development}{113}{subsection.10.3.6}%
+\contentsline {subsection}{\numberline {10.3.7}Multilingual Farmer Assistance}{114}{subsection.10.3.7}%
+\contentsline {subsection}{\numberline {10.3.8}Advanced Analytics Dashboard}{114}{subsection.10.3.8}%
+\contentsline {subsection}{\numberline {10.3.9}Federated Learning for Privacy-Preserving AI}{114}{subsection.10.3.9}%
+\contentsline {subsection}{\numberline {10.3.10}Explainable AI (XAI)}{114}{subsection.10.3.10}%
+\contentsline {section}{\numberline {10.4}Conclusion}{114}{section.10.4}%
+\contentsline {chapter}{REFERENCES}{116}{section*.51}%

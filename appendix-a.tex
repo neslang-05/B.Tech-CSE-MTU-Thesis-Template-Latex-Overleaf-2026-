@@ -1,0 +1,1178 @@
+\section*{Folder Structure Presentation}
+\begin{tcolorbox}[colback=black!5, colframe=black!80, title=Folder Structure Presentation as a tree diagram]
+\begin{verbatim}
+AI-POSE-ESTIMATION-GYM-TRACKER/
+|-- __pycache__/
+|-- app.py
+|-- bicep_curl.py
+|-- dumbbell_row.py
+|-- lateral_raise.py
+|-- pushup.py
+|-- share_state.py
+|-- shoulder_press.py
+|-- squat.py
+|-- static/
+|   |-- script.js
+|   |-- style.css
+|   `-- wrong.mp3
+|-- templates/
+    `-- index.html
+\end{verbatim}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!10, title=]
+         {The }\verb|__pycache__/| {folder is a special directory that Python automatically creates to store compiled bytecode files.}\\
+         {\textbf{Why does Python create it?}}
+        \begin{itemize}
+            \item { {When you run a} \verb|.py| {file, Python compiles it to bytecode.}}
+            \item {{Storing this compiled bytecode avoids recompiling the file every time, making your script run faster.}}
+        \end{itemize}
+\end{tcolorbox}
+
+\section*{Full Source Code Section}
+
+\faFile \verb| app.py|
+\begin{lstlisting}[language=python]    
+from flask import Flask, render_template, Response,jsonify, request
+import cv2
+import importlib
+import share_state
+
+app = Flask(__name__)
+
+cap = cv2.VideoCapture(0)
+selected_exercise = "bicep_curl"
+
+
+def process_video():
+    global selected_exercise
+    exercise_module = importlib.import_module(selected_exercise)  # Dynamically load module
+    return exercise_module.process_video(cap)  # Run function from module
+
+@app.route('/')
+def index():
+    return render_template('index.html')  # Serve the web dashboard
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(process_video(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/select_exercise', methods=['POST'])
+def select_exercise():
+    global selected_exercise
+    selected_exercise = request.form['exercise']
+    return '', 204  # No response needed
+
+@app.route('/get_reps')
+def get_reps():
+    global selected_exercise
+    exercise_module = importlib.import_module(selected_exercise)
+    return jsonify(exercise_module.get_reps())
+
+tracking_enabled = False  # Global toggle
+
+@app.route('/start_tracking', methods=['POST'])
+def start_tracking():
+    share_state.tracking_enabled = True
+    return '', 204
+
+@app.route('/stop_tracking', methods=['POST'])
+def stop_tracking():
+    share_state.tracking_enabled = False
+    return '', 204
+
+if __name__ == "__main__":
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
+\end{lstlisting}
+
+\faFile \verb| bicep_curl.py|
+\begin{lstlisting}[language=python]    
+import cv2
+import mediapipe as mp
+import numpy as np
+import share_state
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+
+# Global variable to store rep data
+left_rep_data = {"left_counter": 0, "left_stage": None}
+right_rep_data = {"right_counter": 0, "right_stage": None}
+
+def get_reps():
+    return left_rep_data,right_rep_data
+
+def calculate_angle(a, b, c):
+    a, b, c = np.array(a), np.array(b), np.array(c)
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+    angle = np.abs(radians * 180.0 / np.pi)
+    return 360 - angle if angle > 180 else angle
+
+def process_video(cap):
+    global left_rep_data      
+    global right_rep_data   
+    left_counter, right_counter = 0, 0
+    left_stage, right_stage = None, None
+
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        while cap.isOpened():            
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            if results.pose_landmarks:
+                if share_state.tracking_enabled:
+                    landmarks = results.pose_landmarks.landmark
+
+                    left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    left_elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                    left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+
+                    right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                    right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+
+                    left_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
+                    right_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
+
+                    if left_angle > 160:
+                        left_stage = "Down"
+                    if left_angle < 30 and left_stage == "Down":
+                        left_stage = "Up"
+                        left_counter += 1
+
+                    left_rep_data["left_counter"] = left_counter
+                    left_rep_data["left_stage"] = left_stage
+
+
+                    if right_angle > 160:
+                        right_stage = "Down"
+                    if right_angle < 30 and right_stage == "Down":
+                        right_stage = "Up"
+                        right_counter += 1
+
+                    right_rep_data["right_counter"] = right_counter
+                    right_rep_data["right_stage"] = right_stage
+
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks,mp_pose.POSE_CONNECTIONS,
+                                        mp_drawing.DrawingSpec(color=(247,117,66), thickness=7 , circle_radius=3),
+                                        mp_drawing.DrawingSpec(color=(247,66,230), thickness=7 , circle_radius=3)
+                                        )                
+    
+            _, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+\end{lstlisting}
+
+\faFile \verb| dumbbell_row.py|
+\begin{lstlisting}[language=python]
+import cv2
+import mediapipe as mp
+import numpy as np
+import share_state
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+
+# Global variable to store rep data
+left_rep_data = {"left_counter": 0, "left_stage": None}
+right_rep_data = {"right_counter": 0, "right_stage": None}
+
+def get_reps():
+    return left_rep_data,right_rep_data
+
+def calculate_angle(a, b, c):
+    a, b, c = np.array(a), np.array(b), np.array(c)
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+    angle = np.abs(radians * 180.0 / np.pi)
+    return 360 - angle if angle > 180 else angle
+
+def process_video(cap):
+    global left_rep_data    
+    global right_rep_data    
+    left_counter, right_counter = 0, 0
+    left_stage, right_stage = None, None
+
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        while cap.isOpened():            
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            if results.pose_landmarks:
+                if share_state.tracking_enabled:
+                    landmarks = results.pose_landmarks.landmark
+
+                    left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    left_elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                    left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                    left_hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+                    left_knee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+
+                    right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                    right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+                    right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+                    right_knee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]                    
+
+                    left_elbow_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
+                    right_elbow_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
+
+                    left_torso_angle = calculate_angle(left_shoulder, left_hip, left_knee)
+                    right_torso_angle = calculate_angle(right_shoulder, right_hip, right_knee)
+
+                    average_torso_angle = (left_torso_angle + right_torso_angle) / 2
+
+
+                    if left_elbow_angle > 160 and 120 < average_torso_angle < 150:
+                        left_stage = "Down"
+                    if left_elbow_angle < 90 and left_stage == "Down":
+                        left_stage = "Up"
+                        left_counter += 1
+
+                    left_rep_data["left_counter"] = left_counter
+                    left_rep_data["left_stage"] = left_stage
+
+                    if right_elbow_angle > 160 and 120 < average_torso_angle < 150:
+                        right_stage = "Down"
+                    if right_elbow_angle < 90 and right_stage == "Down":
+                        right_stage = "Up"
+                        right_counter += 1
+
+                    right_rep_data["right_counter"] = right_counter
+                    right_rep_data["right_stage"] = right_stage
+
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks,mp_pose.POSE_CONNECTIONS,
+                                        mp_drawing.DrawingSpec(color=(247,117,66), thickness=7 , circle_radius=3),
+                                        mp_drawing.DrawingSpec(color=(247,66,230), thickness=7 , circle_radius=3)
+                                        )                
+
+            _, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+\end{lstlisting}
+
+\faFile \verb| lateral_raise.py|
+\begin{lstlisting}[language=python]
+import cv2
+import mediapipe as mp
+import numpy as np
+import share_state
+from playsound import playsound
+import threading
+import time
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+    
+sound_playing = False
+last_sound_time = 0  
+
+# Global variable to store rep data
+left_rep_data = {"left_counter": 0, "left_stage": None}
+right_rep_data = {"right_counter": 0, "right_stage": None}
+
+def get_reps():
+    return left_rep_data,right_rep_data
+
+def play_wrong_sound():
+    global sound_playing, last_sound_time
+
+    if sound_playing:
+        return
+
+    now = time.time()
+    if now - last_sound_time < 2:  # Cooldown of 2 seconds
+        return
+
+    sound_playing = True
+    last_sound_time = now
+
+    try:
+        playsound("static/wrong.mp3")
+    finally:
+        sound_playing = False
+
+def calculate_angle(a,b,c):
+    a = np.array(a) 
+    b = np.array(b) 
+    c = np.array(c) 
+
+    radian = np.arctan2(c[1]-b[1],c[0]-b[0]) - np.arctan2(a[1]-b[1],a[0]-b[0])
+    angle = np.abs(radian * 180.0/np.pi)
+
+    if angle > 180.0:
+        angle = 360-angle
+    return angle
+
+def process_video(cap):
+    global left_rep_data    
+    global right_rep_data      
+    left_counter = 0
+    right_counter = 0
+    left_stage = None
+    right_stage = None
+
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        while cap.isOpened():
+            ret,frame = cap.read()
+            if not ret:
+                break            
+
+            image = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+            image.flags.writeable = False
+
+            results = pose.process(image)
+
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            if results.pose_landmarks:
+                if share_state.tracking_enabled:            
+                    landmarks = results.pose_landmarks.landmark
+                       
+                    left_elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y ]
+                    left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y ]
+                    left_hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y ]
+
+                    left_angle = calculate_angle(left_elbow,left_shoulder,left_hip)
+
+                    if left_angle >=100 :
+                        left_stage = "up"
+                    if left_angle <30 and left_stage=="up":
+                        left_stage ="down"
+                        left_counter += 1
+                
+                    left_rep_data["left_counter"] = left_counter
+                    left_rep_data["left_stage"] = left_stage            
+
+                    right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y ]
+                    right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y ]
+                    right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y ]
+
+                    right_angle = calculate_angle(right_elbow,right_shoulder,right_hip)
+
+                    if  right_angle>=100 :
+                        right_stage ="up"
+                    if right_angle <30 and right_stage=="up":
+                        right_stage = "down"
+                        right_counter += 1
+                    right_rep_data["right_counter"] = right_counter
+                    right_rep_data["right_stage"] = right_stage    
+
+                    if left_angle > 140 or right_angle > 140:
+                        threading.Thread(target=play_wrong_sound,daemon=True).start()
+                        text = "Shoulders too high"
+                        font = cv2.FONT_HERSHEY_COMPLEX
+                        font_scale = 2
+                        thickness = 4
+                        (text_width, _), _ = cv2.getTextSize(text, font, font_scale, thickness)
+                        _, image_width, _ = image.shape
+                        x = (image_width - text_width) // 2
+                        y = 140  
+                        cv2.putText(image, text, (x, y), font, font_scale, (0, 0, 255), thickness, cv2.LINE_AA)                                
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks,mp_pose.POSE_CONNECTIONS,
+                                            mp_drawing.DrawingSpec(color=(247,117,66), thickness=7 , circle_radius=3),
+                                            mp_drawing.DrawingSpec(color=(247,66,230), thickness=7 , circle_radius=3)
+                                            )
+            
+            ret, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+\end{lstlisting}
+
+\faFile \verb| pushup.py|
+\begin{lstlisting}[language=python]
+import cv2
+import mediapipe as mp
+import numpy as np
+import share_state
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+
+# Global variable to store rep data
+left_rep_data = {"left_counter": 0, "left_stage": None}
+
+def get_reps():
+    return left_rep_data
+
+def calculate_angle(a, b, c):
+    a, b, c = np.array(a), np.array(b), np.array(c)
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+    angle = np.abs(radians * 180.0 / np.pi)
+    return 360 - angle if angle > 180 else angle
+
+def process_video(cap):
+    global left_rep_data    
+    left_counter = 0
+    left_stage = None
+
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            if results.pose_landmarks:
+                if share_state.tracking_enabled:                
+                    landmarks = results.pose_landmarks.landmark
+
+                    shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                    wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                    hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+                    knee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]                    
+
+                    elbow_angle = calculate_angle(shoulder, elbow, wrist)
+                    torso_angle = calculate_angle(shoulder, hip, knee)                    
+
+                    if elbow_angle < 90 and torso_angle > 160 :
+                        left_stage = "Down"
+                    if elbow_angle > 160  and left_stage == "Down":
+                        left_stage = "Up"
+                        left_counter += 1
+
+                    left_rep_data["left_counter"] = left_counter
+                    left_rep_data["left_stage"] = left_stage
+
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks,mp_pose.POSE_CONNECTIONS,
+                                        mp_drawing.DrawingSpec(color=(247,117,66), thickness=7 , circle_radius=3),
+                                        mp_drawing.DrawingSpec(color=(247,66,230), thickness=7 , circle_radius=3)
+                                        )                
+
+            _, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+\end{lstlisting}
+
+\faFile \verb| share_state.py|
+\begin{lstlisting}[language=python]
+tracking_enabled = False
+\end{lstlisting}
+
+\faFile \verb| shoulder_press.py|
+\begin{lstlisting}[language=python]
+import cv2
+import mediapipe as mp
+import numpy as np
+import share_state
+from playsound import playsound
+import threading
+import time
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+
+sound_playing = False
+last_sound_time = 0  
+
+# Global variable to store rep data
+left_rep_data = {"left_counter": 0, "left_stage": None}
+right_rep_data = {"right_counter": 0, "right_stage": None}
+
+def get_reps():
+    return left_rep_data,right_rep_data
+
+def play_wrong_sound():
+    global sound_playing, last_sound_time
+
+    if sound_playing:
+        return
+
+    now = time.time()
+    if now - last_sound_time < 2:  # Cooldown of 2 seconds
+        return
+
+    sound_playing = True
+    last_sound_time = now
+
+    try:
+        playsound("static/wrong.mp3")
+    finally:
+        sound_playing = False
+
+def calculate_angle(a, b, c):
+    a, b, c = np.array(a), np.array(b), np.array(c)
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+    angle = np.abs(radians * 180.0 / np.pi)
+    return 360 - angle if angle > 180 else angle
+
+def process_video(cap):
+    global left_rep_data    
+    global right_rep_data        
+    left_counter, right_counter = 0, 0
+    left_stage, right_stage = None, None
+
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            if results.pose_landmarks:
+                if share_state.tracking_enabled:
+                    landmarks = results.pose_landmarks.landmark
+
+                    left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    left_elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                    left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                    left_hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+
+                    right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                    right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+                    right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+
+                    left_elbow_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
+                    left_shoulder_angle = calculate_angle(left_hip,left_shoulder, left_elbow)
+                    right_elbow_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
+                    right_shoulder_angle = calculate_angle(right_hip, right_shoulder, right_elbow)
+
+                    if left_elbow_angle< 100 and left_shoulder_angle<100:
+                        left_stage = "Down"
+                    if 150< left_elbow_angle  and 150< left_shoulder_angle and left_stage == "Down":
+                        left_stage = "Up"
+                        left_counter += 1
+                    left_rep_data["left_counter"] = left_counter
+                    left_rep_data["left_stage"] = left_stage                
+
+                    if right_elbow_angle < 100  and right_shoulder_angle<100:
+                        right_stage = "Down"
+                    if 150< right_elbow_angle  and 150< right_shoulder_angle and right_stage== "Down":
+                        right_stage = "Up"
+                        right_counter += 1
+                    right_rep_data["right_counter"] = right_counter
+                    right_rep_data["right_stage"] = right_stage   
+
+                    if right_elbow_angle < 35 or left_elbow_angle < 35:
+                        threading.Thread(target=play_wrong_sound,daemon=True).start()
+                        text = "Don't collpase your elbow"
+                        font = cv2.FONT_HERSHEY_COMPLEX
+                        font_scale = 2
+                        thickness = 4
+                        (text_width, _), _ = cv2.getTextSize(text, font, font_scale, thickness)
+                        _, image_width, _ = image.shape
+                        x = (image_width - text_width) // 2
+                        y = 140  
+                        cv2.putText(image, text, (x, y), font, font_scale, (0, 0, 255), thickness, cv2.LINE_AA)                     
+
+                 
+
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks,mp_pose.POSE_CONNECTIONS,
+                                        mp_drawing.DrawingSpec(color=(247,117,66), thickness=7 , circle_radius=3),
+                                        mp_drawing.DrawingSpec(color=(247,66,230), thickness=7 , circle_radius=3)
+                                        )   
+            _, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+\end{lstlisting}
+
+\faFile \verb| squat.py|
+\begin{lstlisting}[language=python]
+import cv2
+import mediapipe as mp
+import numpy as np
+import share_state
+from playsound import playsound
+import threading
+import time
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+
+sound_playing = False
+last_sound_time = 0  
+
+# Global variable to store rep data
+left_rep_data = {"left_counter": 0, "left_stage": None}
+right_rep_data = {"right_counter": 0, "right_stage": None}
+
+def get_reps():
+    return left_rep_data,right_rep_data
+
+def play_wrong_sound():
+    global sound_playing, last_sound_time
+
+    if sound_playing:
+        return
+
+    now = time.time()
+    if now - last_sound_time < 2:  # Cooldown of 2 seconds
+        return
+
+    sound_playing = True
+    last_sound_time = now
+
+    try:
+        playsound("static/wrong.mp3")
+    finally:
+        sound_playing = False
+
+def calculate_angle(a, b, c):
+    a, b, c = np.array(a), np.array(b), np.array(c)
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+    angle = np.abs(radians * 180.0 / np.pi)
+    return 360 - angle if angle > 180 else angle
+
+def process_video(cap):
+    global left_rep_data    
+    global right_rep_data        
+    left_counter, right_counter = 0, 0
+    left_stage, right_stage = None, None
+
+    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            if results.pose_landmarks:
+                if share_state.tracking_enabled:
+                    landmarks = results.pose_landmarks.landmark
+
+                    left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    left_elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                    left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                    left_hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+
+                    right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                                    landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                    right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+                    right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
+                                landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+
+                    left_elbow_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
+                    left_shoulder_angle = calculate_angle(left_hip,left_shoulder, left_elbow)
+                    right_elbow_angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
+                    right_shoulder_angle = calculate_angle(right_hip, right_shoulder, right_elbow)
+
+                    if left_elbow_angle< 100 and left_shoulder_angle<100:
+                        left_stage = "Down"
+                    if 150< left_elbow_angle  and 150< left_shoulder_angle and left_stage == "Down":
+                        left_stage = "Up"
+                        left_counter += 1
+                    left_rep_data["left_counter"] = left_counter
+                    left_rep_data["left_stage"] = left_stage                
+
+                    if right_elbow_angle < 100  and right_shoulder_angle<100:
+                        right_stage = "Down"
+                    if 150< right_elbow_angle  and 150< right_shoulder_angle and right_stage== "Down":
+                        right_stage = "Up"
+                        right_counter += 1
+                    right_rep_data["right_counter"] = right_counter
+                    right_rep_data["right_stage"] = right_stage   
+
+                    if right_elbow_angle < 35 or left_elbow_angle < 35:
+                        threading.Thread(target=play_wrong_sound,daemon=True).start()
+                        text = "Don't collpase your elbow"
+                        font = cv2.FONT_HERSHEY_COMPLEX
+                        font_scale = 2
+                        thickness = 4
+                        (text_width, _), _ = cv2.getTextSize(text, font, font_scale, thickness)
+                        _, image_width, _ = image.shape
+                        x = (image_width - text_width) // 2
+                        y = 140  
+                        cv2.putText(image, text, (x, y), font, font_scale, (0, 0, 255), thickness, cv2.LINE_AA)                     
+                    mp_drawing.draw_landmarks(image, results.pose_landmarks,mp_pose.POSE_CONNECTIONS,
+                                        mp_drawing.DrawingSpec(color=(247,117,66), thickness=7 , circle_radius=3),
+                                        mp_drawing.DrawingSpec(color=(247,66,230), thickness=7 , circle_radius=3)
+                                        )   
+            _, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+\end{lstlisting}
+
+\faFile \verb| script.js|
+\begin{lstlisting}[language=python]
+    const toggleBtn = document.getElementById('toggleBtn');
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('main');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+
+      if (window.innerWidth > 768) {
+        main.classList.toggle('full');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (
+        window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
+        !toggleBtn.contains(e.target)
+      ) {
+        sidebar.classList.add('hidden');
+      }
+    });
+
+document.getElementById("startBtn").addEventListener("click",()=>{
+  fetch("/start_tracking",{method:"POST"})
+  .then(()=>{
+    console.log("Tracking enabled");
+  })
+  .catch((err)=> console.error(err))
+});
+
+document.getElementById("stopBtn").addEventListener("click",()=>{
+  fetch("/stop_tracking",{method:"POST"})
+  .then(()=>{
+    console.log("Tracking disabled");
+  })
+  .catch((err)=> console.error(err))
+});
+
+document.getElementById("sidebar").addEventListener("click", function(e) {
+if (e.target.classList.contains("sidebar-item")) {
+    const selectedExercise = e.target.getAttribute("exercise");
+    
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.classList.remove('color-gradient-bg');
+    });    
+    e.target.classList.add('color-gradient-bg');
+    document.getElementById("exercise-select").textContent = e.target.textContent;
+
+
+    const singleRepContainer = document.querySelector('.single-rep-container');
+    const doubleRepContainer = document.querySelector('.double-rep-container');
+
+    if (selectedExercise === 'squat' || selectedExercise === 'pushup') {
+        singleRepContainer.style.display = 'block';
+        doubleRepContainer.style.display = 'none';
+    } else {
+        singleRepContainer.style.display = 'none';
+        doubleRepContainer.style.display = 'flex';
+    }
+
+    fetch("/select_exercise", {
+        method: "POST",
+        body: new URLSearchParams({ exercise: selectedExercise }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    }).then(() => {
+        document.getElementById("video-feed").src = "/video_feed?" + new Date().getTime();
+    });
+}
+});
+
+function updateReps() {
+    fetch('/get_reps')
+        .then(response => response.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                const leftData = data[0];
+                const rightData = data[1];
+
+                // Update double-rep view
+                document.getElementById('left-rep-count').textContent = leftData.left_counter;
+                document.getElementById('right-rep-count').textContent = rightData.right_counter;
+                document.getElementById('left-stage').textContent = leftData.left_stage || '-';
+                document.getElementById('right-stage').textContent = rightData.right_stage || '-';
+            }
+
+            else if (data && typeof data === 'object') {
+                document.getElementById('rep-count').textContent = data.left_counter;
+                document.getElementById('stage').textContent = data.left_stage || '-';
+
+            }
+        })
+        .catch(err => console.error("Fetch error in updateReps:", err));
+}
+
+setInterval(updateReps, 140); // Update every 140 milliseconds
+\end{lstlisting}
+
+\faFile \verb| style.css|
+\begin{lstlisting}[language=python]
+@import url('https://fonts.googleapis.com/css2?family=Sora&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      text-align: center;
+      background: rgb(18, 18, 18);
+      font-family: 'Sora', sans-serif;
+      color: rgb(217, 217, 217);
+    }
+
+    #toggleBtn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      padding: 8px 12px;
+      color: white;
+      background: #202020;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .circle1{
+      position: absolute;
+      top: -10%;
+      left: -15%;
+      z-index: -1;
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(to right, #73ffc2, #a3acff,#e16aff);
+      border: none;
+      opacity: 0.4;
+      border-radius: 50%; 
+      filter: blur(150px);      
+    }
+    .circle2{
+      position: absolute;
+      bottom: 10%;
+      right: 3%;
+      z-index: -1;
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(to right,#73ffc2,#3544cb);
+      border: none;
+      opacity: 0.4;
+      border-radius: 50%; 
+      filter: blur(150px);      
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #333;
+      overflow-x: auto;
+      white-space: nowrap;
+      padding: 10px;
+      padding-top: 4rem;      
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      will-change: transform;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px); 
+      border-right: 1px solid rgba(255, 255, 255, 0.2);   
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); 
+      border-radius: 0 12px 12px 0;    
+    }
+
+    #sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-item {
+      display: block;
+      padding: 10px;
+      margin-bottom: 10px;
+      color: white;
+      text-align: center;
+
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(2px); 
+      -webkit-backdrop-filter: blur(2px); 
+      border-right: 1px solid rgba(255, 255, 255, 0.2);   
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); 
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    #main {
+      position: relative;
+      min-height: 100vh;
+      padding: 20px;
+      margin-left: 250px; 
+      transition: margin-left 0.3s ease;
+    }
+
+    #main.full {
+      margin-left: 0;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        width: 70%;
+        max-width: 280px;
+      }
+
+      #main {
+        margin-left: 0;
+      }
+    }
+
+.heading{
+  font-size: 3rem;
+  font-weight: bold;
+}
+.sub-heading{
+  font-size: 1.5rem;
+}
+
+.info{
+  font-size: 1.5rem;
+}
+
+.wrapper{
+  display: flex;
+  justify-content: center; 
+  margin-top: 20px;  
+  
+}
+label{
+  font-weight: 500;
+  font-size: 20px;  
+}
+#video-container {
+    display: inline-block;
+    padding: 1.3rem;
+    background-color: #202020;
+    border-radius: 1rem;  
+    width: 65%;  
+    border: 1px solid rgb(101, 101, 101);
+}
+
+#video-feed{
+  display: block;
+  border-radius: 1rem;
+  height: auto;
+  width: 100%;
+}
+#exercise-select {
+    padding: 10px;
+    font-size: 4rem;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+}
+.actionBtn{
+  border-radius: 12px;
+  width: 87px;
+  display: block;
+  padding:12px;
+  margin: 1rem;
+  cursor: pointer;
+}
+#startBtn{
+  background: #60d394;
+  color: #121212;
+}
+#stopBtn{
+  background: #ff7d76;
+  color: white;
+}
+.double-rep-container{
+  display: flex;
+  gap: 6rem;
+  justify-content: space-around;
+  align-items: center;
+  margin-top:1rem;
+}
+.single-rep-container{
+  display: none;
+  gap: 6rem;
+  justify-content: center;
+  align-items: center;
+  margin-top:1rem;
+}
+p{
+    margin: 0;    
+}
+
+.gradient-text {
+  display: inline-block; 
+  background: linear-gradient(to right, #6d6d6d, #ffffff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.color-gradient-text {
+  display: block; 
+    background: linear-gradient(to right, #73ffc2, #a3acff,#e16aff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.color-gradient-bg {
+    background: linear-gradient(to right, #f6fefe, #a3acff);
+    color: rgb(33, 33, 33);    
+
+  }
+
+.dropdown{
+  background-color: #333333;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.9em 1.4em;
+}
+
+@media (max-width: 767px) {
+body{
+  padding: 1rem;
+} 
+.heading{
+  font-size: 3rem;
+  font-weight: bold;
+}
+.sub-heading{
+  font-size: 1rem;
+}
+label{
+  font-weight: 400;
+  font-size: 16px;  
+}
+.info{
+  font-size: 1rem;
+}
+#video-container {
+    padding: 1rem;
+}
+
+.dropdown{
+  width: 100%;
+}
+}
+\end{lstlisting}
+
+\faFile \verb| index.html|
+\begin{lstlisting}[language=python]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Pose Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <button id="toggleBtn">☰</button>
+  <div class="circle1"></div>
+  <div class="circle2"></div>
+  <div id="sidebar" class="hidden">
+    <div class="sidebar-item" exercise="bicep_curl">Bicep Curl</div>
+    <div class="sidebar-item" exercise="lateral_raise">Lateral Raise</div>
+    <div class="sidebar-item" exercise="shoulder_press">Shoulder Press</div>
+    <div class="sidebar-item" exercise="dumbbell_row">Dumbbell Row</div>
+    <div class="sidebar-item" exercise="squat">Squat</div>
+    <div class="sidebar-item" exercise="pushup">Push Up</div>
+    <div style="display: flex; position: absolute; bottom: 0;">
+        <div class="actionBtn" id="startBtn">Start</div>
+        <div class="actionBtn" id="stopBtn">Stop</div>
+    </div>
+  </div>
+
+  <div id="main" class="full">
+    <p class="color-gradient-text heading">BioMimic</p>
+    <p class="gradient-text sub-heading">AI Pose Estimation Gym Tracker</p>
+    <div style="margin-top: 1rem;">
+        <p id="exercise-select">Select Exercise:</p>
+    </div>
+    
+    <div>
+        <div class="single-rep-container">
+            <div>
+                <p class="info">Stage: <span style="font-weight: bold;" id="stage">-</span></p>
+                <p class="info">Reps: <span style="font-weight: bold;" id="rep-count">0</span></p>
+            </div>            
+        </div>
+        <div class="double-rep-container">
+            <div>
+                <p class="info">Stage: <span style="font-weight: bold;" id="left-stage">-</span></p>
+                <p class="info">Left Reps: <span style="font-weight: bold;" id="left-rep-count">0</span></p>
+            </div>
+            <div>
+                <p class="info">Stage: <span style="font-weight: bold;" id="right-stage">-</span></p>
+                <p class="info">Right Reps: <span style="font-weight: bold;" id="right-rep-count">0</span></p>
+            </div>
+        </div>
+    </div>    
+    <div class="wrapper">
+        <div id="video-container">
+            <img id="video-feed" src="{{ url_for('video_feed') }}">
+        </div>
+    </div>
+  </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
+\end{lstlisting}

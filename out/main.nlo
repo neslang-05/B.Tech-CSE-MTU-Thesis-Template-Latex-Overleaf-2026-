@@ -1,0 +1,22 @@
+\nomenclatureentry{aAI@[{AI}]\begingroup Artificial Intelligence\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aML@[{ML}]\begingroup Machine Learning\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aCNN@[{CNN}]\begingroup Convolutional Neural Network\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aCV@[{CV}]\begingroup Computer Vision\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aGUI@[{GUI}]\begingroup Graphical User Interface\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aFPS@[{FPS}]\begingroup Frames Per Second\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aRGB@[{RGB}]\begingroup Red-Green-Blue color format\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aBGR@[{BGR}]\begingroup Blue-Green-Red color format\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aOpenCV@[{OpenCV}]\begingroup Open Source Computer Vision Library\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aCOVID@[{COVID}]\begingroup CoronaVIrus Disease of 2019\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a$\theta$@[{$\theta$}]\begingroup Angle between three landmarks\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a$x, y$@[{$x, y$}]\begingroup Coordinates of a detected keypoint in the frame\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a$\pi$@[{$\pi$}]\begingroup Pi constant used in degree–radian conversion\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a$\leq$@[{$\leq$}]\begingroup Less than or equal to, used in joint angle thresholding\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a$\approx$@[{$\approx$}]\begingroup Approximately equal to, used in performance evaluation\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a2D@[{2D}]\begingroup 2-Dimensional\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a3D@[{3D}]\begingroup 3-Dimensional\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{a\%@[{\%}]\begingroup Percentage\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aGHUM \& GHUML@[{GHUM \& GHUML}]\begingroup Generative 3D Human Shape and Articulated Pose Models\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aGB@[{GB}]\begingroup Gigabyte\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aRAM@[{RAM}]\begingroup Random Access Memory\nomeqref {0}|nompageref}{xxi}
+\nomenclatureentry{aiOS@[{iOS}]\begingroup iPhone Operating System\nomeqref {0}|nompageref}{xxi}

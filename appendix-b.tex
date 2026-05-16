@@ -1,0 +1,57 @@
+{\fontsize{12}{14}\selectfont
+    This appendix outlines the setup and dependencies required to execute the code presented in Appendix A. \\
+
+    This section provides a detailed guide on installing all necessary dependencies, initiating the runtime environment, and detailing optional bootstrapping steps to guarantee the seamless execution of the application \\
+
+    \section*{Dependencies Installation }
+    To run the pose estimation and rep counting system described in Appendix A, the following Python dependencies must be installed. These libraries encompass computer vision, pose detection, numerical computations, audio and visual feedback, and the Flask web framework. \\
+
+    \begin{table}[h!]
+    \centering
+    \caption{Libraries Used and Their Purpose}
+    \begin{tabular}{ll}
+    \toprule
+    \textbf{Library} & \textbf{Purpose} \\
+    \midrule
+    \texttt{opencv-python} & Capturing and processing video frames \\
+    \texttt{mediapipe} & Detecting body landmarks and calculating joint angles \\
+    \texttt{numpy} & Performing mathematical operations (e.g., angle calculation) \\
+    \texttt{playsound} & Playing sound alerts during incorrect form \\
+    \texttt{flask} & Serving the application via a local web interface \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+
+    \section*{Installation Command }
+    Use the following command in your terminal to install all the required packages:
+    \begin{tcolorbox}[terminal shell]
+        pip install opencv-python mediapipe numpy playsound flask  
+    \end{tcolorbox}
+
+    \section*{Running the application }
+    After successfully installing all dependencies, you can run the program using the following command: 
+    \begin{tcolorbox}[terminal shell]
+        python app.py
+    \end{tcolorbox}
+    This will:
+    \begin{itemize}
+        \item Initiate the Flask web server on \texttt{http://0.0.0.0:8080.} 
+        \item Open the default webcam via OpenCV (\texttt{cv2.VideoCapture(0)}).
+        \item Dynamically import the selected exercise module (e.g., bicep\_curl.py).
+        \item Commence streaming processed video frames with real-time rep and pose tracking.
+        \item Access the Web Interface.
+    \end{itemize}
+
+    \section*{Accessing the web interface }
+    Open a browser and visit: \\
+    \texttt{http://localhost:8080 }
+
+    \begin{tcolorbox}[colback=gray!10, colframe=gray!80, title=]
+         Alternatively, if accessing from another device on the same network (e.g., mobile phone), replace localhost with the host machine’s IP address: \\
+        \texttt{http://<your\_computer\_ip>:8080 }
+\end{tcolorbox}
+
+    Upon interface loading, the "BioMimic AI Pose Estimation Gym Tracker" is prepared for use.\\
+    
+    Users can now select exercises, initiate tracking, and obtain immediate feedback on their form and repetitions. \\
+}

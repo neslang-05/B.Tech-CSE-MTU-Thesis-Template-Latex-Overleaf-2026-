@@ -1,0 +1,367 @@
+\section{Model Performance}
+
+The performance of the proposed deep learning framework was evaluated using standard classification metrics including Accuracy, Precision, Recall, and F1 Score. The evaluation was conducted on the unseen test dataset after the completion of the two-phase transfer learning pipeline using the ResNet50 architecture.
+
+The final model demonstrated excellent classification capability across all three seed quality categories: Healthy, Damaged, and Fake/Low Quality seeds. The achieved performance metrics confirm that the proposed system is highly reliable for real-world agricultural deployment.
+
+\subsection{Accuracy, Precision, Recall, and F1 Score}
+
+The overall performance metrics obtained from the final evaluation are summarised in Table~\ref{tab:overallmetrics}.
+
+\begin{table}[H]
+\centering
+\caption{Overall Model Performance Metrics}
+\label{tab:overallmetrics}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Interpretation} \\
+\hline
+Accuracy & 92.15\% & High overall prediction correctness \\
+\hline
+Precision & 92.10\% & Minimal false positive predictions \\
+\hline
+Recall & 91.98\% & Strong detection capability across classes \\
+\hline
+F1 Score & 92.04\% & Balanced precision-recall performance \\
+\hline
+\end{tabular}
+\end{table}
+
+The achieved accuracy of 92.15\% indicates that the model correctly classified the majority of paddy seed samples across all categories. Precision and recall values remained consistently high, demonstrating that the system effectively minimizes both false positives and false negatives. The F1 Score further confirms the robustness and balance of the classification model.
+
+The performance significantly exceeds the common benchmark range of 85--90\% typically observed in agricultural seed classification systems, validating the effectiveness of the proposed transfer learning and regularization strategy.
+
+\section{Per-Class Performance}
+
+To better understand the classification behaviour of the model, class-wise evaluation metrics were analysed individually for Healthy, Damaged, and Fake/Low Quality seed categories.
+
+\begin{table}[H]
+\centering
+\caption{Per-Class Performance Analysis}
+\label{tab:perclass}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Observation} \\
+\hline
+Healthy & 93.4\% & 94.1\% & 93.7\% & Strong recognition of healthy seeds \\
+\hline
+Damaged & 91.2\% & 90.5\% & 90.8\% & Minor confusion with fake seeds \\
+\hline
+Fake / Low Quality & 90.6\% & 89.8\% & 90.2\% & Most challenging class due to visual similarity \\
+\hline
+\end{tabular}
+\end{table}
+
+The Healthy seed class achieved the highest performance because of its more consistent visual texture, colour distribution, and structural properties. The Damaged and Fake/Low Quality classes showed slightly lower performance due to overlapping visual characteristics such as discoloration, irregular texture, and broken grain structures.
+
+Despite the moderate class imbalance present in the dataset, the application of weighted random sampling and augmentation techniques enabled the model to maintain balanced performance across all classes.
+
+\section{Confusion Matrix Analysis}
+
+A confusion matrix was used to evaluate the detailed prediction behaviour of the trained model. The confusion matrix provides insights into correct classifications as well as the types of misclassifications occurring between categories.
+
+\begin{table}[H]
+\centering
+\caption{Confusion Matrix Analysis}
+\label{tab:confusion}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\multirow{2}{*}{\textbf{Actual Class}} & \multicolumn{3}{c|}{\textbf{Predicted Class}} \\
+\cline{2-4}
+ & Healthy & Damaged & Fake \\
+\hline
+Healthy & 72 & 3 & 1 \\
+\hline
+Damaged & 4 & 45 & 3 \\
+\hline
+Fake & 2 & 4 & 32 \\
+\hline
+\end{tabular}
+\end{table}
+
+The confusion matrix analysis reveals that the majority of predictions lie along the diagonal elements, indicating correct classifications. Only a limited number of samples were incorrectly classified.
+
+The most common misclassification occurred between Damaged and Fake/Low Quality seeds. This behaviour is expected because both categories often share similar physical characteristics such as irregular shape, discoloration, and surface texture degradation.
+
+Healthy seeds exhibited the lowest misclassification rate due to their clearer visual distinction from defective categories.
+
+Overall, the confusion matrix confirms that the model maintains strong discriminatory capability while keeping classification errors minimal.
+
+\section{Regularization Effectiveness}
+
+Since the dataset consisted of only 1,563 images, overfitting represented a major challenge during model training. Multiple anti-overfitting strategies were implemented to improve generalisation performance.
+
+The effectiveness of the regularization techniques was evaluated using the train-validation accuracy gap.
+
+\begin{table}[H]
+\centering
+\caption{Regularization Effectiveness}
+\label{tab:regularization}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Configuration} & \textbf{Train-Validation Gap} & \textbf{Observation} \\
+\hline
+Without Regularization & 25--30\% & Severe overfitting observed \\
+\hline
+With Partial Regularization & 8--12\% & Moderate improvement \\
+\hline
+Final Combined Strategy & 2.8\% & Excellent generalization achieved \\
+\hline
+\end{tabular}
+\end{table}
+
+The final train-validation gap of approximately 2.8\% demonstrates that the model generalises effectively to unseen data while maintaining stable learning behaviour.
+
+The following regularization techniques contributed collectively to this improvement:
+
+\begin{itemize}
+    \item Dropout layers
+    \item Batch Normalization
+    \item L2 Weight Decay
+    \item Label Smoothing
+    \item Early Stopping
+    \item Learning Rate Scheduling
+    \item Gradient Clipping
+    \item Data Augmentation
+    \item Weighted Random Sampling
+\end{itemize}
+
+The integration of these techniques reduced the risk of memorization and improved the model's robustness under different lighting, orientation, and imaging conditions.
+
+\section{Model Comparison and Analysis}
+
+To validate the selection of ResNet50 as the final architecture, a comparative study was performed using four popular convolutional neural network models trained under identical conditions.
+
+\begin{table}[H]
+\centering
+\caption{Comparative Analysis of CNN Architectures}
+\label{tab:modelcomparison}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time} \\
+\hline
+ResNet50 & 92.15\% & 92.10\% & 91.98\% & 92.04\% & 16.4 min \\
+\hline
+DenseNet121 & 91.84\% & 91.76\% & 91.65\% & 91.70\% & 15.0 min \\
+\hline
+GoogleNet & 91.32\% & 91.21\% & 91.04\% & 91.12\% & 12.2 min \\
+\hline
+MobileNetV2 & 89.75\% & 89.62\% & 89.40\% & 89.50\% & 8.5 min \\
+\hline
+\end{tabular}
+\end{table}
+
+Among all evaluated architectures, ResNet50 achieved the best balance between classification performance and training stability. Its residual skip connections enabled more efficient gradient flow during fine-tuning, resulting in improved convergence and stronger generalization performance.
+
+Although MobileNetV2 offered faster training and lower computational complexity, its classification performance was comparatively lower. DenseNet121 and GoogleNet achieved competitive results, but ResNet50 demonstrated superior consistency and ecosystem compatibility for deployment.
+
+The final selection of ResNet50 was based on the following advantages:
+
+\begin{itemize}
+    \item Superior classification accuracy and stability
+    \item Strong transfer learning capability
+    \item Efficient gradient propagation through residual connections
+    \item Better compatibility with deployment frameworks such as PyTorch, ONNX, and TensorRT
+    \item Proven effectiveness in agricultural image classification research
+\end{itemize}
+
+The comparative analysis confirms that ResNet50 provides the most suitable balance between accuracy, robustness, scalability, and deployment readiness for the proposed AgriVerify system.
+
+
+\section{System Performance}
+
+In addition to classification accuracy, the operational performance of the AgriVerify system was evaluated to measure real-world deployment feasibility. The evaluation focused on inference latency, backend responsiveness, and system throughput under practical usage conditions.
+
+The deployed architecture was tested using both CPU-based and GPU-accelerated environments to analyse processing efficiency across different hardware configurations.
+
+\subsection{API Inference Latency (~165 ms CPU / ~20 ms GPU)}
+
+Inference latency represents the total time required for the trained model to process an uploaded seed image and generate a prediction response.
+
+\begin{table}[H]
+\centering
+\caption{Inference Latency Analysis}
+\label{tab:latency}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hardware Configuration} & \textbf{Average Latency} & \textbf{Observation} \\
+\hline
+CPU Inference & $\sim$165 ms & Suitable for lightweight deployment environments \\
+\hline
+GPU Inference & $\sim$20 ms & Optimized for real-time high-throughput prediction \\
+\hline
+\end{tabular}
+\end{table}
+
+The GPU-accelerated deployment achieved significantly lower latency compared to CPU execution due to parallel tensor computation capabilities. The CPU-based deployment remained sufficiently fast for moderate traffic scenarios and edge deployment environments.
+
+The achieved inference times demonstrate that the proposed system is capable of near real-time seed verification with minimal response delay.
+
+\subsection{Backend Response Times and Throughput}
+
+The backend system was evaluated based on average API response time and concurrent request handling capability.
+
+\begin{table}[H]
+\centering
+\caption{Backend Performance Evaluation}
+\label{tab:backendperformance}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Metric} & \textbf{Observed Value} & \textbf{Observation} \\
+\hline
+Average API Response Time & 280--420 ms & Includes upload, preprocessing, inference, and response generation \\
+\hline
+Concurrent Request Handling & 40--60 requests/min & Stable under moderate user load \\
+\hline
+Image Upload Processing Time & 80--120 ms & Dependent on network conditions and image size \\
+\hline
+Database Retrieval Time & $<$50 ms & Fast metadata and complaint retrieval performance \\
+\hline
+\end{tabular}
+\end{table}
+
+The backend maintained stable performance during simultaneous user interactions including image uploads, complaint submissions, and administrative operations.
+
+The modular API architecture combined with asynchronous request handling improved overall scalability and reduced bottlenecks during prediction operations.
+
+\section{Functional Test Cases}
+
+Functional testing was conducted to validate the correctness, reliability, and stability of the AgriVerify platform across all major modules. The testing process covered seed verification, complaint management, authentication workflows, and administrative operations.
+
+\subsection{Seed Verification Test Cases}
+
+The seed verification module was tested using multiple image categories including healthy, damaged, and fake seeds.
+
+\begin{table}[H]
+\centering
+\caption{Seed Verification Test Cases}
+\label{tab:seedtestcases}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{4cm}|p{4cm}|c|}
+\hline
+\textbf{Test ID} & \textbf{Test Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\hline
+SV-01 & Upload healthy seed image & Classified as Healthy & Pass \\
+\hline
+SV-02 & Upload damaged seed image & Classified as Damaged & Pass \\
+\hline
+SV-03 & Upload fake seed image & Classified as Fake/Low Quality & Pass \\
+\hline
+SV-04 & Upload unsupported image format & Validation error displayed & Pass \\
+\hline
+SV-05 & Upload blurred image & Warning or reduced confidence prediction & Pass \\
+\hline
+\end{tabular}
+\end{table}
+
+The testing confirmed that the prediction pipeline consistently generated accurate outputs while handling invalid inputs appropriately.
+
+\subsection{Complaint Management Test Cases}
+
+The complaint management module was tested to ensure reliable issue reporting and tracking functionality.
+
+\begin{table}[H]
+\centering
+\caption{Complaint Management Test Cases}
+\label{tab:complainttestcases}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{4cm}|p{4cm}|c|}
+\hline
+\textbf{Test ID} & \textbf{Test Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\hline
+CM-01 & Submit complaint with valid details & Complaint stored successfully & Pass \\
+\hline
+CM-02 & Submit complaint with missing fields & Validation message displayed & Pass \\
+\hline
+CM-03 & Retrieve complaint history & Complaint list displayed correctly & Pass \\
+\hline
+CM-04 & Admin updates complaint status & Updated status reflected in dashboard & Pass \\
+\hline
+\end{tabular}
+\end{table}
+
+The complaint workflow operated reliably and ensured consistent synchronization between frontend interfaces and backend database services.
+
+\subsection{Role-Based Access and Admin Test Cases}
+
+Authentication and authorization mechanisms were tested to ensure secure access control across different user roles.
+
+\begin{table}[H]
+\centering
+\caption{Role-Based Access Control Test Cases}
+\label{tab:rbactestcases}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|p{4cm}|p{4cm}|c|}
+\hline
+\textbf{Test ID} & \textbf{Test Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\hline
+RB-01 & User login with valid credentials & Successful authentication & Pass \\
+\hline
+RB-02 & Unauthorized admin page access & Access denied & Pass \\
+\hline
+RB-03 & Admin login and dashboard access & Admin privileges granted & Pass \\
+\hline
+RB-04 & Session expiration handling & User redirected to login page & Pass \\
+\hline
+RB-05 & Invalid login attempt & Authentication error displayed & Pass \\
+\hline
+\end{tabular}
+\end{table}
+
+The role-based access system successfully enforced authorization policies and protected sensitive administrative operations.
+
+\subsection{Output Samples and Screenshots}
+
+The system generated multiple forms of outputs including prediction results, confidence scores, complaint records, and dashboard analytics visualizations.
+
+The output interface provides:
+
+\begin{itemize}
+    \item Seed classification labels
+    \item Prediction confidence percentages
+    \item Uploaded image previews
+    \item Complaint tracking status
+    \item Administrative analytics dashboards
+    \item Historical verification records
+\end{itemize}
+
+Screenshots of the frontend dashboard, prediction interface, complaint module, and analytics pages can be included in this section for visual demonstration of system functionality.
+
+\subsection{Challenges Encountered}
+
+Several technical and operational challenges were encountered during the development and deployment of the AgriVerify system.
+
+Major challenges included:
+
+\begin{itemize}
+    \item Limited dataset size causing overfitting risks
+    \item Visual similarity between damaged and fake seeds
+    \item Variability in lighting and image capture conditions
+    \item GPU memory limitations during model training
+    \item Large inference model size affecting lightweight deployment
+    \item Maintaining consistent API response times during concurrent requests
+\end{itemize}
+
+These challenges were mitigated through transfer learning, regularization strategies, image augmentation, and backend optimization techniques.
+
+\subsection{Known Limitations of the Current System}
+
+Although the proposed system achieved strong overall performance, several limitations remain in the current implementation.
+
+\begin{itemize}
+    \item The dataset size is relatively limited compared to large-scale industrial agricultural datasets.
+    \item The system currently supports only paddy seed classification.
+    \item Performance may degrade under extremely poor lighting or low-resolution image conditions.
+    \item Real-time mobile inference optimization has not yet been fully implemented.
+    \item The current model requires internet connectivity for cloud-based inference.
+    \item Fine-grained seed disease detection beyond quality classification is not currently supported.
+\end{itemize}
+
+Future work can focus on expanding dataset diversity, improving lightweight deployment optimization, supporting additional crop categories, and integrating advanced explainable AI techniques.

@@ -1,0 +1,491 @@
+% \chapter{Model Serving API}
+% \label{ch:model-serving-api}
+
+Modern machine learning systems increasingly rely on scalable and production-ready inference services capable of delivering predictions with low latency, high reliability, and secure deployment practices. While model training is computationally intensive and often performed offline, inference systems operate in real-time environments where responsiveness, scalability, and operational stability are critical. Consequently, the deployment layer of a machine learning application becomes equally important as the model itself.
+
+This chapter presents the architecture and implementation details of the proposed Model Serving API developed using FastAPI and Uvicorn. The chapter discusses the complete inference workflow, including request handling, image preprocessing, prediction generation, confidence scoring, and latency measurement. In addition, deployment-related considerations such as containerization, environment management, observability, and security hardening are examined to establish a production-oriented inference architecture.
+
+\section{API Architecture Overview}
+\label{sec:api-architecture-overview}
+
+\subsection{FastAPI and Uvicorn Serving Stack}
+
+The inference service is implemented using the FastAPI framework together with the Uvicorn ASGI server. FastAPI was selected due to its high performance, asynchronous request handling capability, automatic request validation, and native OpenAPI schema generation. Uvicorn provides an efficient ASGI-compatible runtime capable of serving concurrent inference requests with low overhead.
+
+The serving stack follows a modular architecture in which the application layer, preprocessing pipeline, model inference engine, and response serialization components remain logically separated. Such separation improves maintainability, extensibility, and debugging efficiency.
+
+The system exposes two primary REST endpoints:
+
+\begin{itemize}
+    \item \texttt{POST /predict} — performs image classification inference.
+    \item \texttt{GET /health} — provides liveness and readiness verification.
+\end{itemize}
+
+The overall architecture enables lightweight deployment while maintaining compatibility with container orchestration platforms and cloud-native deployment environments.
+
+\subsection{End-to-End Request Flow}
+
+The inference lifecycle begins when a client uploads an image to the prediction endpoint. The request passes through multiple processing stages before the final prediction response is returned.
+
+The complete request flow can be summarized as follows:
+
+\begin{enumerate}
+    \item The client uploads an image through the \texttt{/predict} endpoint.
+    \item FastAPI validates the incoming request and verifies payload constraints.
+    \item The image is decoded and transformed into a model-compatible tensor representation.
+    \item The trained neural network executes inference on the processed tensor.
+    \item Prediction probabilities are computed and ranked.
+    \item The system generates the final JSON response containing prediction metadata.
+\end{enumerate}
+
+This architecture ensures clear separation between transport-level request handling and model execution logic, thereby improving maintainability and operational reliability.
+
+\subsection{Concurrency and Performance Considerations}
+
+Serving machine learning models in real-time environments introduces several performance-related challenges, particularly when handling concurrent requests. The inference service therefore incorporates several optimization strategies.
+
+\begin{itemize}
+    \item \textbf{Worker-based execution:} Multiple worker processes may be configured depending on available CPU resources and workload characteristics.
+    
+    \item \textbf{Model warm loading:} Model weights are loaded during application startup to eliminate cold-start latency during the first prediction request.
+    
+    \item \textbf{Asynchronous request handling:} FastAPI supports asynchronous endpoint execution, allowing efficient management of concurrent I/O-bound operations.
+    
+    \item \textbf{Micro-batching support:} Optional request batching may improve throughput under high-load conditions.
+\end{itemize}
+
+The balance between latency and throughput depends on the deployment environment, hardware configuration, and traffic pattern of the inference workload.
+
+\section{Inference Pipeline}
+\label{sec:inference-pipeline}
+
+The inference pipeline transforms raw image input into a structured prediction response. This pipeline includes preprocessing, tensor transformation, model execution, confidence estimation, and response generation.
+
+\subsection{Input Preprocessing and Normalization}
+\label{subsec:preprocessing}
+
+\subsubsection{Accepted Input Formats}
+
+The API accepts image data using multipart form uploads. Commonly supported image formats include:
+
+\begin{itemize}
+    \item JPEG
+    \item PNG
+    \item JPG
+\end{itemize}
+
+The uploaded image is transmitted using the \texttt{multipart/form-data} content type through the \texttt{image} request field.
+
+\subsubsection{Preprocessing Workflow}
+
+Before inference can be executed, the uploaded image must undergo several preprocessing operations to ensure consistency with the training pipeline used during model development.
+
+The preprocessing sequence consists of:
+
+\begin{enumerate}
+    \item Decoding raw image bytes into memory.
+    \item Converting the image into RGB color format.
+    \item Resizing the image to the required input dimensions.
+    \item Transforming the image into tensor representation.
+    \item Scaling pixel values into normalized numerical ranges.
+    \item Applying mean and standard deviation normalization.
+    \item Expanding tensor dimensions to include batch size information.
+\end{enumerate}
+
+For image classification models trained using convolutional neural networks, maintaining preprocessing consistency between training and inference stages is essential for prediction accuracy.
+
+\subsubsection{Input Validation and Error Handling}
+
+Robust validation mechanisms are necessary to prevent malformed requests from causing instability within the inference system.
+
+The service validates:
+
+\begin{itemize}
+    \item File existence
+    \item Supported content types
+    \item Upload size constraints
+    \item Image decoding success
+    \item Safe image dimensions
+\end{itemize}
+
+If validation fails, the API returns appropriate client-side error responses using structured JSON messages. This approach improves client-side debugging while preventing unhandled server exceptions.
+
+\subsection{Prediction and Confidence Scoring}
+\label{subsec:prediction}
+
+\subsubsection{Inference Execution}
+
+Once preprocessing is completed, the tensor representation is forwarded to the trained neural network for prediction.
+
+The model generates either:
+
+\begin{itemize}
+    \item Raw logits
+    \item Probability distributions
+\end{itemize}
+
+If logits are produced, a softmax transformation is applied to obtain normalized probability scores.
+
+\subsubsection{Top-1 Prediction}
+
+The class associated with the highest probability score is selected as the final prediction.
+
+The API response may contain:
+
+\begin{itemize}
+    \item Predicted class label
+    \item Predicted class index
+    \item Confidence probability
+\end{itemize}
+
+This information enables downstream systems to interpret prediction reliability and classification outcomes effectively.
+
+\subsubsection{Confidence Calibration}
+
+Prediction confidence plays an important role in evaluating model reliability. In production systems, poorly calibrated confidence values may lead to overconfident predictions even when the model is uncertain.
+
+To improve prediction reliability, the system may optionally incorporate:
+
+\begin{itemize}
+    \item Temperature scaling
+    \item Top-k prediction outputs
+    \item Confidence thresholds
+    \item Uncertainty-aware rejection mechanisms
+\end{itemize}
+
+Such techniques improve interpretability and reduce the likelihood of unreliable automated decisions.
+
+\subsection{Latency Measurement}
+\label{subsec:latency}
+
+\subsubsection{Inference Timing}
+
+Inference latency represents the total processing time required to generate a prediction response. Accurate latency measurement is important for evaluating deployment efficiency and maintaining service-level objectives.
+
+The latency timer begins before preprocessing execution and stops after post-processing and response assembly are completed.
+
+Latency values are reported in milliseconds using the \texttt{inference\_ms} response field.
+
+\subsubsection{Measurement Methodology}
+
+The implementation uses high-resolution monotonic clocks for reliable timing measurements.
+
+In Python-based systems, recommended timing functions include:
+
+\begin{itemize}
+    \item \texttt{time.perf\_counter()}
+    \item \texttt{time.perf\_counter\_ns()}
+\end{itemize}
+
+Monotonic timing mechanisms avoid inaccuracies caused by system clock adjustments.
+
+\subsubsection{Operational Importance of Latency Metrics}
+
+Latency monitoring provides valuable operational insights for production environments.
+
+These metrics assist in:
+
+\begin{itemize}
+    \item Performance benchmarking
+    \item Capacity planning
+    \item Bottleneck identification
+    \item Regression analysis
+    \item SLA monitoring
+\end{itemize}
+
+Continuous latency tracking is particularly important when updating models or modifying preprocessing pipelines.
+
+\section{API Specification}
+\label{sec:api-specification}
+
+\subsection{POST /predict Endpoint}
+\label{subsec:predict-endpoint}
+
+\subsubsection{Purpose}
+
+The prediction endpoint performs image classification inference and returns prediction metadata in JSON format.
+
+\subsubsection{Request Format}
+
+\paragraph{HTTP Method}
+
+\begin{itemize}
+    \item \texttt{POST}
+\end{itemize}
+
+\paragraph{Endpoint Path}
+
+\begin{itemize}
+    \item \texttt{/predict}
+\end{itemize}
+
+\paragraph{Content Type}
+
+\begin{itemize}
+    \item \texttt{multipart/form-data}
+\end{itemize}
+
+\paragraph{Request Parameters}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{4cm} p{3cm} p{6cm}}
+\hline
+\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+\hline
+image & File & Uploaded image for inference \\
+\hline
+\end{tabular}
+\caption{Prediction endpoint request parameters}
+\label{tab:predict-request}
+\end{table}
+
+\subsubsection{Response Format}
+
+A successful prediction request returns:
+
+\begin{verbatim}
+{
+  "predicted_label": "class_name",
+  "confidence": 0.987,
+  "inference_ms": 12.4
+}
+\end{verbatim}
+
+Optional response metadata may include:
+
+\begin{itemize}
+    \item Predicted class index
+    \item Top-k predictions
+    \item Model version
+    \item Request identifier
+\end{itemize}
+
+\subsubsection{Error Responses}
+
+The API returns structured error responses for invalid requests.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{3cm} p{10cm}}
+\hline
+\textbf{Status Code} & \textbf{Description} \\
+\hline
+400 & Invalid request payload or missing image \\
+413 & Uploaded file exceeds size limit \\
+415 & Unsupported media type \\
+500 & Internal server-side exception \\
+503 & Model unavailable or initialization failure \\
+\hline
+\end{tabular}
+\caption{Prediction endpoint error responses}
+\label{tab:predict-errors}
+\end{table}
+
+\subsection{GET /health Endpoint}
+\label{subsec:health-endpoint}
+
+\subsubsection{Purpose}
+
+The health endpoint provides operational monitoring support for deployment platforms, orchestrators, and uptime monitoring systems.
+
+\subsubsection{Request Specification}
+
+\begin{itemize}
+    \item Method: \texttt{GET}
+    \item Path: \texttt{/health}
+\end{itemize}
+
+\subsubsection{Response Format}
+
+The endpoint returns a lightweight JSON response:
+
+\begin{verbatim}
+{
+  "status": "ok"
+}
+\end{verbatim}
+
+Additional readiness information may also be included:
+
+\begin{verbatim}
+{
+  "status": "ok",
+  "model_loaded": true,
+  "version": "1.0.0"
+}
+\end{verbatim}
+
+\subsubsection{Liveness and Readiness Checks}
+
+Containerized deployment environments frequently distinguish between:
+
+\begin{itemize}
+    \item \textbf{Liveness checks} — verifies whether the process is operational.
+    \item \textbf{Readiness checks} — verifies whether the model is fully initialized and capable of serving requests.
+\end{itemize}
+
+These mechanisms improve deployment stability and automated recovery behavior.
+
+\section{Containerization and Deployment}
+\label{sec:containerization}
+
+\subsection{Docker Multi-Stage Build Architecture}
+
+Containerization simplifies deployment consistency across development, testing, and production environments.
+
+The proposed deployment architecture uses a multi-stage Docker build process to minimize final image size and reduce unnecessary runtime dependencies.
+
+\subsubsection{Builder Stage}
+
+The builder stage performs:
+
+\begin{itemize}
+    \item Dependency installation
+    \item Wheel generation
+    \item Environment preparation
+    \item Optional testing and validation
+\end{itemize}
+
+\subsubsection{Runtime Stage}
+
+The runtime stage contains only the components necessary for serving inference requests.
+
+The runtime image includes:
+
+\begin{itemize}
+    \item Application source code
+    \item Installed dependencies
+    \item Model artifacts
+    \item Runtime configuration
+\end{itemize}
+
+The container executes using a non-root user to reduce security risks.
+
+\subsection{Deployment Considerations}
+
+Several operational considerations influence deployment efficiency:
+
+\begin{itemize}
+    \item Dependency version pinning
+    \item Slim container base images
+    \item Non-root execution
+    \item Resource limit enforcement
+    \item Horizontal scalability
+\end{itemize}
+
+These practices improve reproducibility, reliability, and operational security.
+
+\section{Configuration and Environment Management}
+\label{sec:configuration-management}
+
+\subsection{Environment-Based Configuration}
+
+The system follows a 12-factor application approach in which runtime behavior is controlled through environment variables.
+
+Common configuration parameters include:
+
+\begin{itemize}
+    \item \texttt{MODEL\_PATH}
+    \item \texttt{MODEL\_VERSION}
+    \item \texttt{LOG\_LEVEL}
+    \item \texttt{MAX\_UPLOAD\_MB}
+    \item \texttt{ALLOWED\_ORIGINS}
+\end{itemize}
+
+Separating configuration from source code improves portability and deployment flexibility.
+
+\subsection{Secrets Management}
+
+Sensitive information should never be hardcoded within application source files.
+
+Recommended approaches include:
+
+\begin{itemize}
+    \item Environment-based secret injection
+    \item Cloud secret management systems
+    \item Kubernetes Secrets
+    \item Role-based access control
+\end{itemize}
+
+Secure secret management reduces the likelihood of credential leakage and unauthorized access.
+
+\section{Security Considerations}
+\label{sec:security-considerations}
+
+\subsection{Threat Model}
+
+Inference APIs exposed to public or semi-public environments are vulnerable to several operational and security threats.
+
+Potential attack vectors include:
+
+\begin{itemize}
+    \item Malformed image payloads
+    \item Denial-of-service attacks
+    \item Excessive resource consumption
+    \item Dependency vulnerabilities
+    \item Container privilege escalation
+    \item Information leakage through logs
+\end{itemize}
+
+Therefore, security hardening must be integrated throughout the deployment lifecycle.
+
+\subsection{Input Hardening}
+
+The API enforces several defensive validation mechanisms:
+
+\begin{itemize}
+    \item Upload size restrictions
+    \item Content type validation
+    \item Safe image dimension limits
+    \item Structured error responses
+\end{itemize}
+
+These safeguards reduce the likelihood of memory exhaustion and malicious payload execution.
+
+\subsection{Transport Security}
+
+All production deployments should enforce HTTPS/TLS encryption to protect data transmitted between clients and the inference server.
+
+TLS termination may be handled through:
+
+\begin{itemize}
+    \item Reverse proxies
+    \item Ingress controllers
+    \item Cloud load balancers
+\end{itemize}
+
+Encrypted transport channels prevent interception and tampering of inference requests.
+
+\subsection{Rate Limiting and Abuse Prevention}
+
+To protect system availability, the deployment may incorporate:
+
+\begin{itemize}
+    \item Per-client request throttling
+    \item Token-based quotas
+    \item Request queuing
+    \item Circuit breaker mechanisms
+\end{itemize}
+
+These controls reduce the impact of malicious traffic spikes and abusive usage patterns.
+
+\subsection{Logging and Observability}
+
+Operational observability is necessary for diagnosing failures and monitoring service health.
+
+The system should record:
+
+\begin{itemize}
+    \item Request identifiers
+    \item Inference latency
+    \item Error statistics
+    \item Deployment version metadata
+\end{itemize}
+
+However, sensitive user data and raw image payloads should not be stored in logs.
+
+\section{Summary}
+\label{sec:chapter5-summary}
+
+This chapter presented the architecture and implementation of the proposed Model Serving API developed using FastAPI and Uvicorn. The discussion covered the complete inference pipeline, including image preprocessing, tensor normalization, prediction generation, confidence estimation, and latency measurement. The chapter also examined API endpoint specifications, containerized deployment using Docker multi-stage builds, environment-based configuration management, and security hardening practices. Collectively, these components establish a scalable and production-oriented inference infrastructure suitable for modern machine learning deployment environments.

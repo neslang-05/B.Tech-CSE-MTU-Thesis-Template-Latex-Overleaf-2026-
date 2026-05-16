@@ -1,0 +1,425 @@
+% ============================================================
+%  Chapter 6 — Frontend Application
+%  AgriVerify: AI-Powered Seed Quality Verification System
+%  Thesis Submission — Manipur Technical University
+% ============================================================
+
+% \chapter{Frontend Application}
+% \label{chap:frontend}
+
+\section{Architecture and Design Principles}
+\label{sec:frontend-architecture}
+
+The AgriVerify frontend is implemented as a Next.js 15 application following a layered component-service architecture~\cite{fowler2002patterns}. Rather than concentrating business logic inside route pages, the design distributes responsibilities across four distinct layers: presentation, query, service, and transport. Each layer has a single, well-defined concern, which keeps individual files small and makes the dependency chain easy to follow.
+
+At the topmost layer, route page components remain thin. They declare what data they need and how it should be displayed, but they delegate all asynchronous behavior to custom hooks. The hook layer wraps TanStack Query~\cite{tanstack2024query} mutations and queries, exposing loading, error, and data states to the page. Beneath the hooks, domain service modules group backend-facing functions by subject area, such as authentication, verification, complaints, and administration. Finally, a shared Axios~\cite{axios2024} client handles token injection and refresh-token recovery, forwarding every request to a Next.js proxy route that relays it to the ASP.NET REST backend.
+
+This layering produces several practical benefits. Testing any individual layer does not require instantiating the full component tree. New features can extend an existing service module without modifying page components. Authentication changes propagate through a single Axios interceptor rather than being scattered across individual fetch calls. The architecture is therefore both extensible and straightforward to audit.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{figures/frontend_architecture.png}
+\caption{Layered frontend architecture and data flow for the AgriVerify application}
+\label{fig:frontend-arch}
+\end{figure}
+
+\section{Technology Stack}
+\label{sec:frontend-stack}
+
+Table~\ref{tab:frontend-stack} lists the primary libraries and frameworks used in the frontend. The choices reflect a preference for well-maintained, type-safe tooling that integrates cleanly with the Next.js App Router~\cite{nextjs2024}.
+
+\begin{table}[htbp]
+\centering
+\caption{Technology stack used by the AgriVerify frontend}
+\label{tab:frontend-stack}
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{Component} & \textbf{Version} & \textbf{Role in the application} \\
+\midrule
+Next.js       & 15.2.4  & Application framework, App Router, and server-side proxy route \\
+React         & 19.2.5  & Component rendering and local UI state \\
+TypeScript    & 5.7.3   & Static typing across UI, services, hooks, and shared models \\
+Tailwind CSS  & 3.4.17  & Utility-first styling and design-token application \\
+Axios         & 1.7.9   & HTTP client with request and response interceptors \\
+TanStack Query & 5.59.0 & Server-state caching, invalidation, and query lifecycle management \\
+Zustand       & 5.0.1   & Lightweight global store for authentication state \\
+Framer Motion & 12.38.0 & Page transitions and animated state changes \\
+Lucide React  & 1.14.0  & Consistent icon library \\
+react-webcam  & 7.2.0   & Camera capture interface for the public verification scanner \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+
+
+Typography is handled through Next.js native font loading. The root layout loads \texttt{DM Sans} for body text and \texttt{Sora} for display headings via \texttt{next/font/google}, which injects both families as CSS variables. The Tailwind configuration then maps these variables into semantic font families, giving the application a consistent typographic hierarchy without any runtime font-fetch overhead in the browser.
+
+Notably absent from the dependency list are a dedicated form validation library and a charting package. Forms across the application are handled with controlled inputs and manual validation checks, while analytics screens present data through metric cards, progress bars, and tabular summaries rather than graphical charts. This keeps the bundle lean and reduces the number of abstraction layers that must be traced when debugging a form submission or a dashboard figure.
+
+\section{Folder Structure and Repository Layout}
+\label{sec:folder-structure}
+
+The source tree is rooted at \texttt{src/} and partitioned into seven top-level directories. Table~\ref{tab:repo-layout} describes the responsibility of each area.
+
+\begin{table}[htbp]
+\centering
+\caption{Directory responsibilities in the AgriVerify frontend repository}
+\label{tab:repo-layout}
+\begin{tabularx}{\linewidth}{@{} l X @{}}
+\toprule
+\textbf{Directory} & \textbf{Responsibility} \\
+\midrule
+\texttt{src/app/}        & Next.js routes, layouts, route groups, and the API proxy handler \\
+\texttt{src/components/} & Shared UI primitives and feature components such as camera capture, verification results, and branding elements \\
+\texttt{src/hooks/}      & Custom hooks built on TanStack Query for authentication, complaints, verification, analytics, administration, and reference data \\
+\texttt{src/services/}   & Backend-facing API functions grouped by domain \\
+\texttt{src/lib/}        & Utility functions including error normalization and role-to-route mapping \\
+\texttt{src/store/}      & Zustand store for authentication state \\
+\texttt{src/types/}      & Shared TypeScript interfaces and response models \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Within \texttt{src/app/}, the Next.js App Router organizes routes into four groups: \texttt{(auth)}, \texttt{(farmer)}, \texttt{(officer)}, and \texttt{(admin)}. Route group parentheses do not appear in the public URL, so a file at \texttt{src/app/(farmer)/farmer/dashboard/page.tsx} resolves cleanly to \texttt{/farmer/dashboard}. A catch-all proxy handler at \texttt{src/app/api/proxy/[...path]/route.ts} relays every browser request to the ASP.NET backend, keeping the backend base URL out of the browser environment entirely.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.75\linewidth]{figures/folder_structure.png}
+\caption{Logical folder organization of the AgriVerify frontend source tree}
+\label{fig:folder-structure}
+\end{figure}
+
+\section{Routing System}
+\label{sec:routing}
+
+\subsection{App Router and Route Groups}
+\label{subsec:app-router}
+
+AgriVerify uses the Next.js App Router exclusively. Each route is defined by a \texttt{page.tsx} file, and layouts at each level of the hierarchy inject shared navigation, providers, and access guards. Route groups separate the four major access domains — public, authentication, farmer, and administration — without introducing extra path segments.
+
+The visible URL space is as follows:
+
+\begin{itemize}
+  \item \texttt{/} — public landing page;
+  \item \texttt{/verify} — anonymous seed-verification scanner;
+  \item \texttt{/login} and \texttt{/register} — authentication entry points;
+  \item \texttt{/farmer/dashboard}, \texttt{/farmer/verify}, \texttt{/farmer/history}, \texttt{/farmer/complaints} — farmer portal pages;
+  \item \texttt{/officer/dashboard}, \texttt{/officer/complaints} — officer complaint queue;
+  \item \texttt{/admin/dashboard}, \texttt{/admin/officers}, \texttt{/admin/farmers}, \texttt{/admin/analytics}, \texttt{/admin/audit-logs} — administrative management views.
+\end{itemize}
+
+The root layout applies global metadata, imports the Tailwind stylesheet, and wraps the entire application in the \texttt{Providers} component, which instantiates the TanStack Query client, mounts the global toast notification system, and exposes React Query Devtools in development mode.
+
+\subsection{Role-Based Access Control}
+\label{subsec:rbac}
+
+Route protection is enforced through a shared \texttt{RoleGuard} component rather than a Next.js middleware file. Every role-specific layout wraps its children in \texttt{RoleGuard}, centralizing the access check so that it is not duplicated across individual pages. On mount, the guard reads the effective token and role from the Zustand store, falling back to \texttt{localStorage} when the in-memory store has not yet been hydrated. If no valid token is found, the user is redirected to \texttt{/login}. If a token is present but the role does not match the allowed role for the current layout, the guard resolves the user's correct dashboard path via \texttt{getDashboardPathByRole} and redirects accordingly.
+
+\begin{lstlisting}[
+  language=TypeScript,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{gray!60},
+  stringstyle=\color{red!70!black},
+  backgroundcolor=\color{gray!5},
+  frame=single, rulecolor=\color{gray!30},
+  breaklines=true, columns=fullflexible,
+  caption={RoleGuard: client-side route enforcement for role-partitioned layouts},
+  label={lst:roleguard}
+]
+export default function RoleGuard({ allowedRole, children }: RoleGuardProps) {
+  const router   = useRouter()
+  const pathname = usePathname()
+  const token    = useAuthStore((s) => s.token)
+  const role     = useAuthStore((s) => s.role)
+
+  const localToken = typeof window !== 'undefined'
+    ? window.localStorage.getItem('accessToken') : null
+  const localRole  = typeof window !== 'undefined'
+    ? JSON.parse(window.localStorage.getItem('user') ?? 'null')?.role ?? null
+    : null
+
+  const effectiveToken = token ?? localToken
+  const effectiveRole  = role  ?? localRole
+
+  useEffect(() => {
+    if (!effectiveToken) { router.replace('/login'); return }
+    if (effectiveRole !== allowedRole) {
+      const fallback = getDashboardPathByRole(effectiveRole)
+      if (pathname !== fallback) router.replace(fallback)
+    }
+  }, [allowedRole, effectiveRole, effectiveToken, pathname, router])
+
+  if (!isAllowed) return <div>Checking access...</div>
+  return <>{children}</>
+}
+\end{lstlisting}
+
+The role-to-dashboard mapping is maintained in \texttt{src/lib/authRouting.ts}: \texttt{Admin} resolves to \texttt{/admin/dashboard}, \texttt{Officer} to \texttt{/officer/dashboard}, and all remaining authenticated users fall back to \texttt{/farmer/dashboard}. Centralizing this mapping prevents route drift when new role-specific pages are introduced.
+
+\subsubsection{Farmer Portal — Verification and Complaint Workflows}
+\label{subsubsec:farmer-portal}
+
+The farmer portal is the primary interface for registered farmers. After authentication, farmers are directed to a dashboard that presents headline metrics: total verifications performed, the proportion of genuine versus suspect results, and active complaint counts. From the dashboard, a farmer can initiate a new seed verification by uploading front and back photographs of a seed packet along with the crop type and district metadata. Completed verifications are archived in a paginated history view, where each entry can be expanded to reveal the full analysis report including confidence scores, image previews, and batch-risk indicators.
+
+The complaint module allows farmers to raise a formal grievance when a verification result conflicts with field experience. A complaint form collects a descriptive summary, severity rating, and the associated verification record. Submitted complaints are tracked in a status-aware list that reflects officer assignments and resolution updates in near real time through React Query polling.
+
+\subsubsection{Officer Portal — Complaint Processing Queue}
+\label{subsubsec:officer-portal}
+
+Officers access a focused work queue that surfaces all complaints assigned to the current officer along with unassigned complaints in their jurisdiction. The queue table supports filtering by status and district, allowing officers to prioritize pending items efficiently. Selecting a complaint row opens a detail panel that displays the originating verification images, the farmer's narrative, and the full audit history for that complaint record. Officers update the complaint status through a controlled dropdown, and each transition triggers an optimistic UI update followed by a cache invalidation to keep the list consistent.
+
+\subsubsection{Admin Portal — Analytics and Management}
+\label{subsubsec:admin-portal}
+
+The administrative dashboard aggregates platform-wide activity. Metric cards at the top of the screen display total verifications, active complaints, registered farmers, and officer counts. Below the metrics, tabular views support officer management — including creation, profile updates, and deactivation — and farmer account oversight, where an administrator can activate or suspend accounts and inspect onboarding details. An analytics section presents verification and complaint metrics across user-selected date ranges. Audit logs provide a chronological record of all state-changing operations for compliance and accountability purposes.
+
+\subsubsection{Public Verification — Anonymous Scanner}
+\label{subsubsec:public-verify}
+
+The public verification route at \texttt{/verify} provides an unauthenticated experience suitable for farmers who have not yet registered or who wish to perform a quick scan in the field. The \texttt{CameraCapture} component activates the device camera through \texttt{react-webcam} and guides the user through capturing both faces of a seed packet. The captured images are submitted to the \texttt{/verification/verify-anonymous} endpoint without any authentication header. The resulting \texttt{VerificationResult} panel renders the classification label, confidence level, visual match summary, and a recommendation to file a complaint or contact the agriculture department if the result is suspect. A separate placeholder route at \texttt{/farmer/verify/anonymous} redirects to \texttt{/verify} to avoid duplicating the scanner implementation.
+
+\section{Authentication Flow}
+\label{sec:auth-flow}
+
+\subsection{Token Storage Strategy and Zustand Auth Store}
+\label{subsec:token-storage}
+
+AgriVerify uses a token-based authentication model. Upon a successful login or registration, the ASP.NET backend returns an access token, a refresh token, expiry metadata, and a serialized user profile. The frontend stores all four values in \texttt{localStorage} and simultaneously writes them into the Zustand auth store, making the session immediately available to the Axios request interceptor and all authenticated components.
+
+The Zustand store exposes four state fields — \texttt{user}, \texttt{token}, \texttt{role}, and \texttt{isAuthenticated} — and two actions: \texttt{setAuth} and \texttt{clearAuth}. During initial client-side hydration, the store reads \texttt{localStorage} to restore the prior session without requiring a fresh login on page reload.
+
+\begin{lstlisting}[
+  language=TypeScript,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{gray!60},
+  stringstyle=\color{red!70!black},
+  backgroundcolor=\color{gray!5},
+  frame=single, rulecolor=\color{gray!30},
+  breaklines=true, columns=fullflexible,
+  caption={Zustand authentication store with browser-storage persistence},
+  label={lst:authstore}
+]
+export const useAuthStore = create<AuthStore>((set) => ({
+  ...getInitialAuthState(),
+  setAuth: (token, refreshToken, user) => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('accessToken',  token)
+      window.localStorage.setItem('refreshToken', refreshToken)
+      window.localStorage.setItem('user',         JSON.stringify(user))
+    }
+    set({ user, token, role: user.role ?? null, isAuthenticated: true })
+  },
+  clearAuth: () => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('accessToken')
+      window.localStorage.removeItem('refreshToken')
+      window.localStorage.removeItem('user')
+    }
+    set({ user: null, token: null, role: null, isAuthenticated: false })
+  },
+}))
+\end{lstlisting}
+
+Storing tokens in \texttt{localStorage} is straightforward to implement and survives page reloads, but it exposes the session to JavaScript-accessible storage. A cross-site scripting compromise would therefore be able to read the token directly. For a production hardening pass, replacing \texttt{localStorage} with \texttt{httpOnly} cookies and a CSRF-aware session design would eliminate this attack surface~\cite{owasp2021session}.
+
+\subsection{Refresh Token Recovery (Axios 401 Interceptor)}
+\label{subsec:refresh-token}
+
+When the access token expires, the backend returns a \texttt{401 Unauthorized} response. The Axios response interceptor detects this condition and, provided the request has not already been retried, posts the stored refresh token to \texttt{/api/proxy/auth/refresh}. If the backend accepts the refresh token, the interceptor writes the new access and refresh tokens back to \texttt{localStorage} and to the Zustand store, then reissues the original request transparently. If the refresh call itself fails — for example because the refresh token has also expired — the interceptor calls \texttt{clearAuth}, clears all stored tokens, and redirects the browser to \texttt{/login}. This design means that individual components never need to implement token-expiry logic; the interceptor handles it universally for every request in the application.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\linewidth]{figures/auth_flow.png}
+\caption{Authentication lifecycle including token persistence and refresh recovery}
+\label{fig:auth-flow}
+\end{figure}
+
+\section{API Integration}
+\label{sec:api-integration}
+
+\subsection{Axios Client, Request Interceptor, and Proxy Route}
+\label{subsec:axios-proxy}
+
+All HTTP communication is routed through a single Axios instance whose \texttt{baseURL} is set to \texttt{/api/proxy}. A request interceptor reads the access token from \texttt{localStorage} and attaches it as a \texttt{Bearer} authorization header on every outgoing request. Because the interceptor operates at the transport layer rather than within individual service functions, token injection is guaranteed regardless of which service module initiates the call.
+
+\begin{lstlisting}[
+  language=TypeScript,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{gray!60},
+  stringstyle=\color{red!70!black},
+  backgroundcolor=\color{gray!5},
+  frame=single, rulecolor=\color{gray!30},
+  breaklines=true, columns=fullflexible,
+  caption={Centralized Axios client with bearer-token injection},
+  label={lst:axios}
+]
+export const apiClient = axios.create({
+  baseURL: '/api/proxy',
+  headers: { 'Content-Type': 'application/json' },
+})
+
+apiClient.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const token = window.localStorage.getItem('accessToken')
+    if (token) config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+\end{lstlisting}
+
+The Next.js proxy route at \texttt{src/app/api/proxy/[...path]/route.ts} receives the proxied request, reconstructs the target URL by prefixing the path with \texttt{/api/v1/}, and forwards the call to the ASP.NET backend whose address is stored in the server-only environment variable \texttt{BACKEND\_API\_URL}. Authorization and content-type headers are forwarded verbatim. Multipart form-data payloads — used for seed-image uploads — are piped through as raw request bodies without re-parsing, which preserves the boundary delimiters required by the backend's file-upload handler. JSON payloads for POST and PUT requests are deserialized and re-serialized so that the proxy can log or inspect them if needed. Response status codes and headers from the ASP.NET backend are returned to the browser unchanged, ensuring that HTTP semantics such as cache-control and content-type are preserved end to end.
+
+\subsection{Endpoint Summary}
+\label{subsec:endpoints}
+
+The service layer exposes grouped API functions that map to the paths listed in Tables~\ref{tab:ep-auth}–\ref{tab:ep-analytics}. All paths are relative to \texttt{/api/proxy} in the browser; the proxy prepends \texttt{/api/v1/} before forwarding to the backend.
+
+\begin{table}[htbp]
+\centering
+\caption{Authentication API endpoints}
+\label{tab:ep-auth}
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{Function} & \textbf{Method} & \textbf{Path and notes} \\
+\midrule
+\texttt{login}         & POST & \texttt{/auth/login} — farmer email and password; public. \\
+\texttt{officerLogin}  & POST & \texttt{/auth/officer-login} — officer ID and OTP; public. \\
+\texttt{register}      & POST & \texttt{/auth/register} — new farmer account; public. \\
+\texttt{refreshToken}  & POST & \texttt{/auth/refresh} — token renewal; used by 401 interceptor. \\
+\texttt{logout}        & POST & \texttt{/auth/logout} — bearer token required. \\
+\texttt{getMe}         & GET  & \texttt{/auth/me} — current user profile; bearer token required. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Seed verification API endpoints}
+\label{tab:ep-verify}
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{Function} & \textbf{Method} & \textbf{Path and notes} \\
+\midrule
+\texttt{uploadVerification}      & POST & \texttt{/verification/upload} — multipart; front and back images, crop, district; authenticated. \\
+\texttt{verifyAnonymous}         & POST & \texttt{/verification/verify-anonymous} — multipart; front and back images; public. \\
+\texttt{getVerificationHistory}  & GET  & \texttt{/verification/history} — paginated; authenticated. \\
+\texttt{getVerification}         & GET  & \texttt{/verification/\{id\}} — single record; authenticated. \\
+\texttt{getVerificationStatistics} & GET & \texttt{/verification/statistics} — dashboard metrics; authenticated. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Complaint management API endpoints}
+\label{tab:ep-complaints}
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{Function} & \textbf{Method} & \textbf{Path and notes} \\
+\midrule
+\texttt{createComplaint}        & POST & \texttt{/Complaints} — creates a complaint record; authenticated. \\
+\texttt{getMyComplaints}        & GET  & \texttt{/Complaints/my-complaints} — paginated farmer view; authenticated. \\
+\texttt{getAllComplaints}       & GET  & \texttt{/Complaints} — officer/admin filtered list; role-protected. \\
+\texttt{getComplaint}           & GET  & \texttt{/Complaints/\{id\}} — single record; authenticated. \\
+\texttt{updateComplaintStatus}  & PUT  & \texttt{/Complaints/\{id\}/status} — officer status transition; authenticated. \\
+\texttt{assignComplaint}        & POST & \texttt{/complaints/\{id\}/assign} — admin assignment; authenticated. \\
+\texttt{getBatchRisks}          & GET  & \texttt{/Complaints/batch-risks} — risk summary list; authenticated. \\
+\texttt{getComplaintStats}      & GET  & \texttt{/complaints/stats} — aggregate statistics; authenticated. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Administration and analytics API endpoints}
+\label{tab:ep-analytics}
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{Function} & \textbf{Method} & \textbf{Path and notes} \\
+\midrule
+\texttt{getOfficers}            & GET    & \texttt{/admin/officers} — paginated; authenticated. \\
+\texttt{createOfficer}          & POST   & \texttt{/admin/officers} — authenticated. \\
+\texttt{updateOfficer}          & PUT    & \texttt{/admin/officers/\{id\}} — authenticated. \\
+\texttt{deleteOfficer}          & DELETE & \texttt{/admin/officers/\{id\}} — authenticated. \\
+\texttt{deactivateOfficer}      & POST   & \texttt{/admin/officers/\{id\}/deactivate} — authenticated. \\
+\texttt{getFarmers}             & GET    & \texttt{/admin/farmers} — paginated; authenticated. \\
+\texttt{updateFarmerStatus}     & PUT    & \texttt{/admin/farmers/\{id\}/status} — authenticated. \\
+\texttt{getAdminDashboard}      & GET    & \texttt{/admin/dashboard} — authenticated. \\
+\texttt{getAuditLogs}           & GET    & \texttt{/admin/audit-logs} — paginated; authenticated. \\
+\texttt{getSystemAnalytics}     & GET    & \texttt{/analytics/system} — date-range filtered; authenticated. \\
+\texttt{getVerificationMetrics} & GET    & \texttt{/analytics/verifications} — date-range filtered; authenticated. \\
+\texttt{getComplaintMetrics}    & GET    & \texttt{/analytics/complaints} — date-range filtered; authenticated. \\
+\texttt{getStates}              & GET    & \texttt{/reference/states} — public reference data. \\
+\texttt{getDistricts}           & GET    & \texttt{/reference/districts} — public reference data. \\
+\texttt{getCrops}               & GET    & \texttt{/reference/crops} — public reference data. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{State Management (TanStack Query and Zustand)}
+\label{subsec:state-mgmt}
+
+The application separates server state from client state~\cite{tanstack2024query}. TanStack Query owns all data that originates from the backend: it fetches, caches, invalidates, and refetches records in response to mutations and stale-time expiry. Zustand owns all data that describes the current user's session. This division means that neither library is asked to perform a role it was not designed for.
+
+Several behavioral defaults are configured at the query client level. Window-focus refetching is disabled globally to avoid spurious reloads when farmers switch between browser tabs during field use. Reference data queries — states, districts, and crops — use an infinite stale time, since this data rarely changes and repeated fetches would add unnecessary latency on low-bandwidth connections common in rural Manipur. Dashboard queries use a moderate stale window, balancing metric freshness against the cost of each request.
+
+Mutations follow a consistent pattern: the hook performs an optimistic update on the local cache to give immediate visual feedback, submits the change to the backend, and then invalidates the corresponding list query on success. Failure cases roll back the optimistic patch and surface an error toast. This approach keeps the UI responsive even on slow connections while guaranteeing eventual consistency with the server.
+
+Error normalization is handled centrally by the \texttt{extractErrorMessage} utility in \texttt{src/lib}. The function inspects the rejected Axios value, extracts the \texttt{detail} or \texttt{title} field from problem-detail-shaped responses, and falls back to a generic failure message when the error is not structured. Because all hooks call this utility before passing errors to the toast system, error messages across the application are consistent and predictable.
+
+\subsection{UI Component Library and Design System}
+\label{subsec:ui-components}
+
+The repository includes a compact local component library under \texttt{src/components/ui}. Table~\ref{tab:ui-primitives} lists the shared primitives, each of which wraps a native HTML element or a small portal-based container.
+
+\begin{table}[htbp]
+\centering
+\caption{Shared UI primitives in the AgriVerify component library}
+\label{tab:ui-primitives}
+\begin{tabularx}{\linewidth}{@{} l l X @{}}
+\toprule
+\textbf{Component} & \textbf{Purpose} & \textbf{Notable detail} \\
+\midrule
+\texttt{Button}    & Action control       & Variant and size maps encoded as Tailwind class strings \\
+\texttt{Input}     & Text input           & Standardized focus and disabled states \\
+\texttt{Textarea}  & Multi-line input     & Styled consistently with \texttt{Input} \\
+\texttt{Select}    & Option selection     & Context-driven wrapper around native \texttt{select} \\
+\texttt{Checkbox}  & Boolean control      & Emits values through \texttt{onCheckedChange} \\
+\texttt{Slider}    & Range input          & Used for complaint severity rating \\
+\texttt{Card}      & Content container    & Border, shadow, and spacing defaults \\
+\texttt{Badge}     & Status marker        & Applied to verification and complaint state labels \\
+\texttt{Table}     & Tabular layout       & Standard wrappers with hover-row styling \\
+\texttt{Dialog}    & Modal overlay        & Portal-based with local open state \\
+\texttt{Sheet}     & Side-panel overlay   & Portal-based responsive drawer \\
+\texttt{Tabs}      & Segmented UI state   & Context-driven active-tab selection \\
+\texttt{Progress}  & Linear progress bar  & CSS transform-based fill animation \\
+\texttt{Skeleton}  & Loading placeholder  & Pulse animation for dashboard fetch states \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Feature-level components sit alongside the primitives. \texttt{AgriVerifyLogo} and \texttt{LeafDecoration} provide consistent branding across public and authentication screens. \texttt{CameraCapture} encapsulates the webcam lifecycle, including permission requests and frame capture. \texttt{VerificationResult} renders the structured analysis panel with status badge, confidence breakdown, and image preview. \texttt{RoleGuard} enforces route access as described in Section~\ref{subsec:rbac}.
+
+Dashboard pages follow a uniform composition pattern: metric cards for headline counters, tables for record lists, badges for status labels, dialogs for row-level detail and edit flows, and skeletons during data fetches. This consistency makes the interface visually predictable across all three role portals and reduces the cognitive overhead for users who switch between roles.
+
+Forms are built from controlled inputs and explicit submission handlers using \texttt{useState}. The login and registration pages use a centered card layout with icon-decorated fields, password-visibility toggling, and a remember-me checkbox. Validation is performed through a combination of HTML \texttt{required} constraints, type-specific inputs such as \texttt{type="email"}, explicit equality checks for password confirmation, and toast-based error reporting when constraints are violated.
+
+\subsection{Responsive Design and Accessibility Notes}
+\label{subsec:responsive-a11y}
+
+The application is styled exclusively with Tailwind CSS utilities~\cite{tailwind2024}. The Tailwind configuration extends the default palette with a green-toned agricultural color scheme defined in the global stylesheet. Custom shadows and border radii are mapped to semantic names, and the \texttt{DM Sans} and \texttt{Sora} font families are wired into the \texttt{fontFamily} configuration for consistent typographic hierarchy.
+
+Layouts respond to screen size through Tailwind breakpoint prefixes. On small screens, dashboard grids collapse to a single column and tables become horizontally scrollable. On medium and large screens, metric grids expand to two or three columns, and detail panels open as side sheets rather than full-page overlays. This approach is sufficient for field use on mobile devices, which is an important consideration given that many farmers in Manipur access the platform on smartphones.
+
+Accessibility is addressed through native HTML semantics. Form fields have associated \texttt{label} elements. Interactive elements use \texttt{button} rather than \texttt{div} with click handlers. Data grids use proper \texttt{table}, \texttt{thead}, \texttt{tbody}, \texttt{th}, and \texttt{td} elements so that screen readers can announce column headers. Portal-based overlays leverage the browser's default focus management. No custom focus-trap logic is implemented beyond what the browser provides, which is adequate for the current scope but would need extension if the application were to target users who rely heavily on keyboard navigation.
+
+\section{Summary}
+\label{sec:frontend-summary}
+
+The AgriVerify frontend implements a well-structured, role-aware Next.js application suitable for production deployment in low-bandwidth agricultural environments. Its layered architecture cleanly separates presentation, asynchronous behavior, backend communication, and authentication state. The App Router route groups produce clean, predictable URLs while centralizing access control through a single guard component. TanStack Query and Zustand provide a maintainable data layer without requiring a heavyweight global state library. The local component library and Tailwind-based design system give the UI a consistent, accessible, and responsive character across all four user roles — farmer, officer, administrator, and anonymous visitor.
+
+Future development should prioritize migrating token storage to \texttt{httpOnly} cookies, introducing a schema-based form validation library for larger forms, and adding a dedicated charting library to enrich the analytics screens currently represented as tabular summaries.

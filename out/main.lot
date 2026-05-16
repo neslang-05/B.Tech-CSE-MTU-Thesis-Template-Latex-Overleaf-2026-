@@ -1,0 +1,39 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Backend Technology Stack\relax }}{15}{table.caption.10}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Dataset Source Summary\relax }}{21}{table.caption.14}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Class-wise Distribution of the Combined Dataset\relax }}{21}{table.caption.15}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Dataset Split Statistics\relax }}{22}{table.caption.16}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Hyperparameter Configuration and Training Settings\relax }}{27}{table.caption.17}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Model Export Formats\relax }}{27}{table.caption.18}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Architecture Comparison on Test Set\relax }}{29}{table.caption.19}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Final Test Set Performance---ResNet50\relax }}{30}{table.caption.20}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces Training Behaviour Summary\relax }}{30}{table.caption.21}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Prediction endpoint request parameters\relax }}{37}{table.caption.22}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Prediction endpoint error responses\relax }}{38}{table.caption.23}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Technology stack used by the AgriVerify frontend\relax }}{47}{table.caption.25}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Directory responsibilities in the AgriVerify frontend repository\relax }}{48}{table.caption.26}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Authentication API endpoints\relax }}{55}{table.caption.29}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Seed verification API endpoints\relax }}{55}{table.caption.30}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Complaint management API endpoints\relax }}{56}{table.caption.31}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Administration and analytics API endpoints\relax }}{57}{table.caption.32}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Shared UI primitives in the AgriVerify component library\relax }}{58}{table.caption.33}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {7.1}{\ignorespaces Backend Technology Stack Components\relax }}{64}{table.caption.35}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {9.1}{\ignorespaces Overall Model Performance Metrics\relax }}{98}{table.caption.41}%
+\contentsline {table}{\numberline {9.2}{\ignorespaces Per-Class Performance Analysis\relax }}{99}{table.caption.42}%
+\contentsline {table}{\numberline {9.3}{\ignorespaces Confusion Matrix Analysis\relax }}{100}{table.caption.43}%
+\contentsline {table}{\numberline {9.4}{\ignorespaces Regularization Effectiveness\relax }}{100}{table.caption.44}%
+\contentsline {table}{\numberline {9.5}{\ignorespaces Comparative Analysis of CNN Architectures\relax }}{101}{table.caption.45}%
+\contentsline {table}{\numberline {9.6}{\ignorespaces Inference Latency Analysis\relax }}{103}{table.caption.46}%
+\contentsline {table}{\numberline {9.7}{\ignorespaces Backend Performance Evaluation\relax }}{103}{table.caption.47}%
+\contentsline {table}{\numberline {9.8}{\ignorespaces Seed Verification Test Cases\relax }}{104}{table.caption.48}%
+\contentsline {table}{\numberline {9.9}{\ignorespaces Complaint Management Test Cases\relax }}{105}{table.caption.49}%
+\contentsline {table}{\numberline {9.10}{\ignorespaces Role-Based Access Control Test Cases\relax }}{105}{table.caption.50}%
+\addvspace {10\p@ }

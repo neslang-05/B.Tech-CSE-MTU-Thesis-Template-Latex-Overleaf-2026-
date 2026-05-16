@@ -1,0 +1,91 @@
+% ============================================================
+%  Literature Review — AgriVerify / Fake Seed Detection System
+%  Humanized & academically refined version
+% ============================================================
+
+\section{Seed Quality Assessment: Traditional Methods}
+
+{\fontsize{12}{14}\selectfont
+
+Conventional seed quality assessment relies on two broad approaches: manual visual inspection and laboratory-based biochemical testing. In field practice, inspectors evaluate seeds by examining size, shape, colour, and surface texture. These judgements are inherently subjective, vary between observers, and are difficult to standardise across districts or seasons. Laboratory tests such as the Tetrazolium (TZ) test and standard germination assays provide more defensible viability estimates, but both are destructive, the seed cannot be planted after testing and typically require four to seven days to complete under controlled conditions. This turnaround makes them impractical for screening large consignments at intake points, or for use by farmers who need a decision before the planting window closes.
+\\
+\noindent
+Near-infrared (NIR) spectroscopy and X-ray transmission imaging have been investigated as non-destructive alternatives. NIR detects internal moisture gradients and biochemical composition without damaging the sample; X-ray imaging can reveal embryo defects invisible on the seed surface. Both methods perform well in laboratory conditions, but the equipment costs typically \textbf{USD~15{,}000–80{,}000} per unit and the need for trained operators confine their use to national seed-testing stations. Smallholder farmers and district-level inspectors in regions such as northeast India have no practical access to either technology, which is precisely where the need for affordable, rapid screening is most acute.
+\\
+}
+
+% ----------------------------------------------------------
+\section{Deep Learning for Agricultural Image Classification}
+% ----------------------------------------------------------
+
+{\fontsize{12}{14}\selectfont
+
+Convolutional Neural Networks (CNNs) have been applied to a range of agricultural classification problems over the past decade, including leaf disease identification~\cite{mohanty2016plant}, weed recognition~\cite{dyrmann2016}, and post-harvest quality grading~\cite{zhang2020}. Their main advantage over classical machine-learning pipelines is that spatial features are learned directly from raw pixel data during training, removing the need to manually engineer feature extractors for each new crop or defect type.
+\\
+\noindent
+Applying CNNs to seed classification follows naturally from this body of work. Paddy seeds, for example, exhibit subtle differences in surface texture and colour between certified and counterfeit lots differences that are difficult to quantify with handcrafted descriptors but emerge reliably from sufficiently large training sets. The computational cost of running a trained CNN at inference time is also modest enough to support server-side web deployment, which matters when the target users have intermittent electricity but reasonable mobile-data coverage.\\
+}
+
+% ----------------------------------------------------------
+\section{Transfer Learning and ResNet Architectures}
+% ----------------------------------------------------------
+
+{\fontsize{12}{14}\selectfont
+
+Training a CNN from random initialization requires on the order of tens of thousands of labeled examples per class to achieve stable convergence. Annotated seed image datasets of that scale do not yet exist for most crop varieties, and certainly not for the specific task of detecting counterfeits. Transfer learning is the standard response: a model pre-trained on ImageNet (1.28 million labeled images across 1{,}000 categories) is fine-tuned on the smaller domain-specific dataset. The early convolutional layers, which encode low-level features such as edges and textures, are retained; only the later task-specific layers are updated. In practice, this approach consistently reaches accuracy
+close to what a from-scratch model would achieve on a dataset roughly ten times larger.
+\\
+\noindent
+ResNet architectures are well-suited to this fine-tuning scenario. The residual skip connections introduced by He et al.~\cite{he2016deep} allow gradients to propagate through very deep networks without vanishing, making it feasible to fine-tune models with 50 or more layers on datasets that would cause shallower architectures to overfit. ResNet-50 has become a common baseline in agricultural image classification because it balances parameter count ($\approx$25 million) against accuracy on standard benchmarks, and pre-trained weights are publicly available. For this project, it provides a well-validated starting point that reduces both training time and the risk of overfitting on the available paddy seed dataset.\par
+}
+
+% ----------------------------------------------------------
+\section{Farmer Feedback Systems}
+% ----------------------------------------------------------
+
+{\fontsize{12}{14}\selectfont
+
+A detection model trained on a fixed dataset will degrade over time if counterfeiting practices evolve and no new training data are collected. Field-level feedback from farmers is one practical mechanism for capturing these shifts. When a farmer submits a seed batch for image-based verification and later reports germination failure or abnormal yield from that batch, the report constitutes a labeled example a model prediction paired with a ground-truth outcome that can be incorporated into periodic retraining cycles.\par
+
+\noindent
+Feedback also serves a more immediate function. Aggregating reports across users can flag a suspect lot or supplier before the model itself is updated: three independent failure reports from the same district within a fortnight is a meaningful signal, regardless of what the image classifier predicts. This kind of rule-based alert complements the model rather than replacing it. The practical difficulty is sustaining farmer participation; most deployments in low-resource contexts find that single-tap rating interfaces produce far higher response rates than free-text fields or structured forms~\cite{munoz2018ict}.\par
+}
+
+% ----------------------------------------------------------
+\section{Web-Based Agricultural Platforms}
+% ----------------------------------------------------------
+
+{\fontsize{12}{14}\selectfont
+
+Deploying a trained model as a web service separates the computational workload from the end user's device. A farmer uploads a seed image through a browser; the server runs inference and returns a result. This architecture has two concrete advantages over distributing a standalone mobile application: the model can be updated centrally without requiring client-side installations, and every prediction is logged in a structured format that supports monitoring and retraining.\par
+
+\noindent
+For farmers in Manipur and similar regions, browser-based access via a mid-range Android handset is more realistic than assuming a dedicated app installation. Keeping the frontend lightweight and avoiding heavy JavaScript bundles and large media assets reduces page-load times on 4G connections with variable signal quality. Containerised (Dockerized) inference endpoints can handle the computationally intensive tasks without requiring a permanently running server, which reduces operating costs during off-season periods when query volume is low. Together, these design choices bring ML-assisted quality screening within reach of users who would otherwise have no access to any testing infrastructure.\par
+}
+
+% ----------------------------------------------------------
+\section{Review of Related Work}
+% ----------------------------------------------------------
+
+{\fontsize{12}{14}\selectfont
+
+Early automated seed classification used Support Vector Machines (SVMs) and Random Forests operating on handcrafted features derived from shape measurements, colour histograms, and texture descriptors. Ni et al.~\cite{ni2009} classified rice seed varieties using morphological parameters extracted from binary silhouettes, achieving 94\% accuracy across five varieties under controlled lighting. These methods perform adequately when intra-class variation is low and imaging conditions are uniform, but generalise poorly to photographs taken in field settings.\par
+
+\noindent
+Deep learning approaches have largely replaced handcrafted methods in more recent work. Liu et al.~\cite{liu2020} applied VGG16 transfer learning to maize seed defect detection and reported 97.3\% accuracy on a 12-class dataset. Xu et al.~\cite{xu2021} used ResNet-50 for soybean quality grading and found that fine-tuning from ImageNet weights outperformed training from scratch by approximately 8 percentage points when training data were limited to fewer than 2{,}000 images per class. However, both studies address naturally occurring defects — cracking, mould, insect damage rather than intentional substitution. A counterfeit seed is designed to resemble the genuine article; distinguishing the two is a harder classification problem than separating a damaged kernel from an intact one, because the visual gap is smaller and the adversarial nature of counterfeiting means it may shift over time. No published study directly evaluates CNN performance on verified counterfeit-versus-genuine seed pairs, and none integrates a structured feedback collection mechanism into the evaluation pipeline.\par
+}
+
+% ----------------------------------------------------------
+\section{Summary and Research Gaps}
+% ----------------------------------------------------------
+
+{\fontsize{12}{14}\selectfont
+
+The reviewed literature establishes that transfer-learned CNNs are effective for agricultural image classification, including seed quality assessment. Three specific gaps are directly relevant to this work. First, no published study has targeted intentional counterfeiting as distinct from natural quality defects; the two problems differ in that counterfeits may pass casual visual inspection and require the model to detect very subtle cues. Second, existing models are evaluated on laboratory-quality images collected under controlled conditions; performance on photographs taken by farmers using mobile devices in variable lighting has not been reported. Third, no end-to-end system has been published that connects model inference to a structured feedback collection mechanism and uses that feedback to retrain the model iteratively.\par
+
+\noindent
+This project addresses all three gaps. The classifier is trained and evaluated specifically on a fake-versus-genuine paddy seed dataset; the web platform is tested with mobile-captured images; and the farmer feedback module is built directly into the application, with logged responses stored in a format suitable for future retraining rounds.\par
+
+}
+
+
