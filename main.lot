@@ -15,29 +15,29 @@
 \contentsline {table}{\numberline {4.7}{\ignorespaces Final Test Set Performance---ResNet50\relax }}{32}{table.caption.21}%
 \contentsline {table}{\numberline {4.8}{\ignorespaces Training Behaviour Summary\relax }}{32}{table.caption.22}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Contractual Specification for the \texttt {POST /predict} Classification Endpoint\relax }}{38}{table.caption.24}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces Contractual Specification for the \texttt {GET /health} Operational Monitoring Endpoint\relax }}{39}{table.caption.25}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Contractual Specification for the \texttt {GET /health} Operational Monitoring Endpoint\relax }}{37}{table.caption.25}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Contractual Specification for the \texttt {POST /predict} Classification Endpoint\relax }}{41}{table.caption.24}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Core Technology Stack of the AgriVerify Frontend Application\relax }}{46}{table.caption.28}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Directory Structure and Component Responsibilities within \texttt {src/}\relax }}{47}{table.caption.29}%
-\contentsline {table}{\numberline {6.3}{\ignorespaces Frontend Application Route Namespace and Access Hierarchy\relax }}{49}{table.caption.31}%
-\contentsline {table}{\numberline {6.4}{\ignorespaces Authentication Service API Endpoint Integration Contracts\relax }}{56}{table.caption.33}%
-\contentsline {table}{\numberline {6.5}{\ignorespaces Seed Verification Service API Endpoint Integration Contracts\relax }}{57}{table.caption.34}%
-\contentsline {table}{\numberline {6.6}{\ignorespaces Complaint Management Service API Endpoint Integration Contracts\relax }}{58}{table.caption.35}%
-\contentsline {table}{\numberline {6.7}{\ignorespaces Administration and Analytics Service API Endpoint Integration Contracts\relax }}{59}{table.caption.36}%
-\contentsline {table}{\numberline {6.8}{\ignorespaces Shared Core UI Primitive Components in \texttt {src/components/ui/}\relax }}{61}{table.caption.37}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Core Technology Stack of the AgriVerify Frontend Application\relax }}{45}{table.caption.28}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Directory Structure and Component Responsibilities within \texttt {src/}\relax }}{46}{table.caption.29}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Frontend Application Route Namespace and Access Hierarchy\relax }}{48}{table.caption.31}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Authentication Service API Endpoint Integration Contracts\relax }}{55}{table.caption.33}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Seed Verification Service API Endpoint Integration Contracts\relax }}{56}{table.caption.34}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Complaint Management Service API Endpoint Integration Contracts\relax }}{57}{table.caption.35}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Administration and Analytics Service API Endpoint Integration Contracts\relax }}{58}{table.caption.36}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Shared Core UI Primitive Components in \texttt {src/components/ui/}\relax }}{60}{table.caption.37}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {7.1}{\ignorespaces Backend Technology Stack Components\relax }}{66}{table.caption.39}%
+\contentsline {table}{\numberline {7.1}{\ignorespaces Backend Technology Stack Components\relax }}{65}{table.caption.39}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {9.1}{\ignorespaces Overall Model Performance Metrics\relax }}{99}{table.caption.45}%
-\contentsline {table}{\numberline {9.2}{\ignorespaces Per-Class Performance Analysis\relax }}{100}{table.caption.46}%
-\contentsline {table}{\numberline {9.3}{\ignorespaces Confusion Matrix Analysis\relax }}{101}{table.caption.47}%
-\contentsline {table}{\numberline {9.4}{\ignorespaces Regularization Effectiveness\relax }}{101}{table.caption.48}%
-\contentsline {table}{\numberline {9.5}{\ignorespaces Comparative Analysis of CNN Architectures\relax }}{102}{table.caption.49}%
-\contentsline {table}{\numberline {9.6}{\ignorespaces Inference Latency Analysis\relax }}{104}{table.caption.50}%
-\contentsline {table}{\numberline {9.7}{\ignorespaces Backend Performance Evaluation\relax }}{104}{table.caption.51}%
-\contentsline {table}{\numberline {9.8}{\ignorespaces Seed Verification Test Cases\relax }}{105}{table.caption.52}%
-\contentsline {table}{\numberline {9.9}{\ignorespaces Complaint Management Test Cases\relax }}{106}{table.caption.53}%
-\contentsline {table}{\numberline {9.10}{\ignorespaces Role-Based Access Control Test Cases\relax }}{106}{table.caption.54}%
+\contentsline {table}{\numberline {9.1}{\ignorespaces Overall Model Performance Metrics\relax }}{98}{table.caption.45}%
+\contentsline {table}{\numberline {9.2}{\ignorespaces Per-Class Performance Analysis\relax }}{99}{table.caption.46}%
+\contentsline {table}{\numberline {9.3}{\ignorespaces Confusion Matrix Analysis\relax }}{100}{table.caption.47}%
+\contentsline {table}{\numberline {9.4}{\ignorespaces Regularization Effectiveness\relax }}{100}{table.caption.48}%
+\contentsline {table}{\numberline {9.5}{\ignorespaces Comparative Analysis of CNN Architectures\relax }}{101}{table.caption.49}%
+\contentsline {table}{\numberline {9.6}{\ignorespaces Inference Latency Analysis\relax }}{103}{table.caption.50}%
+\contentsline {table}{\numberline {9.7}{\ignorespaces Backend Performance Evaluation\relax }}{103}{table.caption.51}%
+\contentsline {table}{\numberline {9.8}{\ignorespaces Seed Verification Test Cases\relax }}{104}{table.caption.52}%
+\contentsline {table}{\numberline {9.9}{\ignorespaces Complaint Management Test Cases\relax }}{105}{table.caption.53}%
+\contentsline {table}{\numberline {9.10}{\ignorespaces Role-Based Access Control Test Cases\relax }}{105}{table.caption.54}%
 \addvspace {10\p@ }

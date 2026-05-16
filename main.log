@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.5.17)  17 MAY 2026 01:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.5.17)  17 MAY 2026 01:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2168,25 +2168,24 @@ Underfull \hbox (badness 10000) in paragraph at lines 169--169
 tic
  []
 
-[37]
-Overfull \vbox (148.05869pt too high) has occurred while \output is active []
+
+LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-[38]
 Underfull \hbox (badness 2027) in paragraph at lines 199--199
 []|\T1/pcr/b/n/12 503 Service Unavailable\T1/ptm/m/n/12 (+20) : Pro-cess run-ni
 ng but
  []
 
-[39] [40]
+[37] [38]
 Overfull \hbox (29.6685pt too wide) in paragraph at lines 268--269
 []\T1/pcr/m/n/12 MODEL_-WEIGHTS_-PATH\T1/ptm/m/n/12 (-20) : File path lo-cat-in
 g the pre-trained \T1/pcr/m/n/12 resnet50_-paddy.pth
  []
 
-[41]) [42]
+[39]) [40] [41]
 Chapter 6.
-(./chapter6.tex [43
+(./chapter6.tex [42
 
 ]
 Overfull \hbox (59.37654pt too wide) in paragraph at lines 24--25
@@ -2202,7 +2201,7 @@ laintService.ts\T1/ptm/m/n/12 (-20) , \T1/pcr/m/n/12 adminService.ts\T1/ptm/m/n
 /12 (-20) )
  []
 
-<figures/frontend_architecture.png, id=1721, 715.473pt x 570.933pt>
+<figures/frontend_architecture.png, id=1717, 715.473pt x 570.933pt>
 File: figures/frontend_architecture.png Graphic file (type png)
 <use figures/frontend_architecture.png>
 Package pdftex.def Info: figures/frontend_architecture.png  used on input line 
@@ -2213,7 +2212,7 @@ Underfull \hbox (badness 1990) in paragraph at lines 75--75
 []|\T1/ptm/m/n/12 (+20) Orchestrates fluid page tran-si-tions and micro-
  []
 
-[44] [45 <./figures/frontend_architecture.png>]
+[43] [44 <./figures/frontend_architecture.png>]
 Overfull \hbox (78.88206pt too wide) in paragraph at lines 78--79
 []\T1/ptm/m/n/12 (-20) Application ty-pog-ra-phy is man-aged via Next.js na-tiv
 e Google Font op-ti-miza-tion (\T1/pcr/m/n/12 next/font/google\T1/ptm/m/n/12 (-
@@ -2227,7 +2226,7 @@ s (\T1/pcr/m/n/12 tsconfig.json\T1/ptm/m/n/12 (-20) , \T1/pcr/m/n/12 tailwind.c
 onfig.ts\T1/ptm/m/n/12 (-20) ,
  []
 
-[46]
+[45]
 Underfull \hbox (badness 10000) in paragraph at lines 110--110
 \T1/ptm/m/n/12 (+20) and com-plex fea-ture com-po-nents (\T1/pcr/m/n/12 CameraC
 apture\T1/ptm/m/n/12 (+20) ,
@@ -2244,20 +2243,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 110--110
 T1/pcr/m/n/12 useComplaints.ts\T1/ptm/m/n/12 (+20) ,
  []
 
-<figures/folder_structure.png, id=1765, 715.473pt x 498.663pt>
+<figures/folder_structure.png, id=1761, 715.473pt x 498.663pt>
 File: figures/folder_structure.png Graphic file (type png)
 <use figures/folder_structure.png>
 Package pdftex.def Info: figures/folder_structure.png  used on input line 118.
 (pdftex.def)             Requested size: 418.25552pt x 291.50743pt.
-[47]
+[46]
 Underfull \hbox (badness 2302) in paragraph at lines 160--160
 []|\T1/ptm/b/n/12 (+20) Access Scope and Func-tional
  []
 
-[48 <./figures/folder_structure.png>] [49]
+[47 <./figures/folder_structure.png>] [48]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 178.
- [50]
+ [49]
 Overfull \hbox (9.4623pt too wide) in paragraph at lines 213--214
 \T1/ptm/m/n/12 (-20) ing: \T1/pcr/m/n/12 Admin \T1/ptm/m/n/12 (-20) re-solves t
 o \T1/pcr/m/n/12 /admin/dashboard\T1/ptm/m/n/12 (-20) , \T1/pcr/m/n/12 Officer 
@@ -2265,19 +2264,19 @@ o \T1/pcr/m/n/12 /admin/dashboard\T1/ptm/m/n/12 (-20) , \T1/pcr/m/n/12 Officer
 
  []
 
-[51]
+[50]
 Overfull \hbox (90.62903pt too wide) in paragraph at lines 233--234
 \T1/ptm/m/n/12 (-20) eras. The cap-tured im-age buffers are trans-mit-ted di-re
 ctly to the \T1/pcr/m/n/12 /verification/verify-anonymous
  []
 
-[52]
-<figures/auth_flow.png, id=1837, 787.743pt x 498.663pt>
+[51]
+<figures/auth_flow.png, id=1833, 787.743pt x 498.663pt>
 File: figures/auth_flow.png Graphic file (type png)
 <use figures/auth_flow.png>
 Package pdftex.def Info: figures/auth_flow.png  used on input line 288.
 (pdftex.def)             Requested size: 418.25552pt x 264.76949pt.
- [53] [54 <./figures/auth_flow.png>] [55]
+ [52] [53 <./figures/auth_flow.png>] [54]
 Overfull \hbox (41.41568pt too wide) in paragraph at lines 380--380
 []|\T1/pcr/b/n/12 /verification/verify-anonymous 
  []
@@ -2287,12 +2286,12 @@ Underfull \hbox (badness 7099) in paragraph at lines 380--380
 \T1/ptm/m/n/12 (+20) Public unau-then-ti-cated mul-ti-part
  []
 
-[56]
+[55]
 Underfull \hbox (badness 2221) in paragraph at lines 406--406
 \T1/ptm/m/n/12 (+20) Updates in-ves-ti-ga-tion state (\T1/pcr/m/n/12 Under
  []
 
-[57]
+[56]
 Underfull \hbox (badness 1062) in paragraph at lines 434--434
 \T1/ptm/m/n/12 (+20) Provisions a new of-fi-cer ac-count
  []
@@ -2317,26 +2316,26 @@ Underfull \hbox (badness 10000) in paragraph at lines 434--434
 \T1/ptm/m/n/12 (+20) Modifies farmer ac-count sta-tus
  []
 
-[58]
+[57]
 Overfull \vbox (44.64095pt too high) has occurred while \output is active []
 
 
-[59] [60] [61]) [62]
+[58] [59] [60]) [61]
 Chapter 7.
-(./chapter7.tex [63
+(./chapter7.tex [62
 
-] [64]
+] [63]
 Underfull \hbox (badness 10000) in paragraph at lines 87--87
 []|\T1/ptm/m/n/10.95 (+20) Object-Relational Map-
  []
 
-[65] [66] [67] [68] [69] [70] [71]
+[64] [65] [66] [67] [68] [69] [70]
 Overfull \hbox (5.79405pt too wide) in paragraph at lines 312--313
 []\T1/ptm/m/n/12 (-20) Specifies ad-min-is-tra-tive op-er-a-tions in-clud-ing o
 f-fi-cer man-age-ment, farmer
  []
 
-[72] [73]
+[71] [72]
 Overfull \hbox (5.20253pt too wide) in paragraph at lines 392--393
 []\T1/ptm/m/n/12 (-20) Aggregates sys-tem overview statis-tics in-clud-ing user
  counts
@@ -2348,51 +2347,51 @@ Overfull \hbox (0.13252pt too wide) in paragraph at lines 394--395
 a-tus break-
  []
 
-[74] [75] [76] [77]
+[73] [74] [75] [76]
 Overfull \hbox (11.42639pt too wide) in paragraph at lines 552--553
 [] [] |\T1/ptm/b/n/12 (-20) 7.3.4.2.2  Re-quest-Log-ging-Mid-dle-ware.cs[] \T1/
 ptm/m/n/12 (-20) Im-ple-ments com-pre-hen-sive request-response
  []
 
-[78] [79] [80]) [81]
+[77] [78] [79]) [80]
 Chapter 8.
-(./chapter8.tex [82
+(./chapter8.tex [81
 
-] [83] [84] [85] [86] [87]
+] [82] [83] [84] [85] [86]
 Overfull \hbox (73.56683pt too wide) in paragraph at lines 295--296
  [][] 
  []
 
-[88] [89] [90] [91] [92] [93]
+[87] [88] [89] [90] [91] [92]
 Overfull \hbox (28.8515pt too wide) in paragraph at lines 552--553
  [][] 
  []
 
-[94] [95] [96]) [97] [98]
+[93] [94] [95]) [96] [97]
 Chapter 9.
-(./chapter9.tex [99
+(./chapter9.tex [98
 
 ]
 Overfull \hbox (84.40736pt too wide) in paragraph at lines 44--55
  [][] 
  []
 
-[100]
+[99]
 Overfull \hbox (22.32399pt too wide) in paragraph at lines 104--115
  [][] 
  []
 
-[101] [102]
+[100] [101]
 Overfull \hbox (78.9044pt too wide) in paragraph at lines 191--200
  [][] 
  []
 
-[103]
+[102]
 Overfull \hbox (186.47122pt too wide) in paragraph at lines 215--228
  [][] 
  []
 
-[104]
+[103]
 Underfull \hbox (badness 10000) in paragraph at lines 257--257
 []|\T1/ptm/m/n/12 (+20) Validation er-ror dis-
  []
@@ -2407,7 +2406,7 @@ Underfull \hbox (badness 4981) in paragraph at lines 285--285
 []|\T1/ptm/m/n/12 (+20) Admin up-dates com-
  []
 
-[105]
+[104]
 Underfull \hbox (badness 3826) in paragraph at lines 305--305
 []|\T1/ptm/m/n/12 (+20) Successful au-then-ti-ca-
  []
@@ -2422,17 +2421,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 309--309
 []|\T1/ptm/m/n/12 (+20) Admin priv-i-leges
  []
 
-[106] [107]) [108]
+[105] [106]) [107]
 Chapter 10.
-(./conclusion.tex [109
+(./conclusion.tex [108
 
-] [110] [111] [112] [113]
+] [109] [110] [111] [112]
 Overfull \hbox (3.21786pt too wide) in paragraph at lines 106--107
 []\T1/ptm/m/n/12 (-20) Adding Ex-plain-able AI mech-a-nisms such as Grad-CAM vi
 -su-al-iza-tions or fea-ture heatmaps
  []
 
-[114]) [115] [116
+[113]) [114] [115
 
 ]
 Overfull \hbox (128.78604pt too wide) in paragraph at lines 384--384
@@ -2447,14 +2446,17 @@ uery) v5 doc-u-men-ta-tion\T1/ptm/m/n/12 (-20) , [][]$\T1/pcr/m/n/12 https : /
 / tanstack .
  []
 
-[117]
+[116]
 Overfull \hbox (45.30022pt too wide) in paragraph at lines 384--384
 []\T1/ptm/m/n/12 (-20) OWASP Foun-da-tion, \T1/ptm/m/it/12 (-20) Ses-sion man-a
 ge-ment cheat sheet\T1/ptm/m/n/12 (-20) , [][]$\T1/pcr/m/n/12 https : / / cheat
 sheetseries .
  []
 
-[118] (./main.aux)
+[117] (./main.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 8ECA54630E91EAF9681D9E3EB493F796;50359.
 Package logreq Info: Writing requests to 'main.run.xml'.
@@ -2462,8 +2464,8 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 46788 strings out of 476034
- 895385 string characters out of 5792864
+ 46787 strings out of 476034
+ 895377 string characters out of 5792864
  2129388 words of memory out of 6000000
  65227 multiletter control sequences out of 15000+600000
  640356 words of font info for 493 fonts, out of 8000000 for 9000
@@ -2479,10 +2481,10 @@ mbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></
 usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (144 pages, 2966864 bytes).
+Output written on main.pdf (143 pages, 2966450 bytes).
 PDF statistics:
- 2455 PDF objects out of 2487 (max. 8388607)
- 2242 compressed objects within 23 object streams
- 640 named destinations out of 1000 (max. 500000)
+ 2451 PDF objects out of 2487 (max. 8388607)
+ 2239 compressed objects within 23 object streams
+ 639 named destinations out of 1000 (max. 500000)
  138057 words of extra memory for PDF output out of 154059 (max. 10000000)
 

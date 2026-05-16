@@ -68,162 +68,162 @@
 \contentsline {subsection}{\numberline {5.2.1}Image Preprocessing and Tensor Normalization}{35}{subsection.5.2.1}%
 \contentsline {subsection}{\numberline {5.2.2}Prediction, Confidence Scoring, and Latency Measurement}{36}{subsection.5.2.2}%
 \contentsline {section}{\numberline {5.3}API Specification and Endpoint Contracts}{37}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Containerisation and Deployment Architecture}{39}{section.5.4}%
-\contentsline {subsection}{\numberline {5.4.1}Docker Multi-Stage Build Architecture}{39}{subsection.5.4.1}%
-\contentsline {subsection}{\numberline {5.4.2}Serverless Deployment on GCP Cloud Run}{40}{subsection.5.4.2}%
-\contentsline {section}{\numberline {5.5}Configuration, Observability, and Security Hardening}{41}{section.5.5}%
-\contentsline {subsection}{\numberline {5.5.1}Environment Management and Secret Injection}{41}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Threat Model and Defensive Hardening}{41}{subsection.5.5.2}%
-\contentsline {section}{\numberline {5.6}Summary}{42}{section.5.6}%
-\contentsline {chapter}{\numberline {6}Frontend System Architecture and Implementation}{43}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Architecture and Design Principles}{43}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Technology Stack}{44}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Folder Structure and Repository Layout}{47}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Routing System and Access Control}{48}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}App Router Namespace and Access Hierarchy}{48}{subsection.6.4.1}%
-\contentsline {subsection}{\numberline {6.4.2}Role-Based Access Control Implementation}{50}{subsection.6.4.2}%
-\contentsline {subsection}{\numberline {6.4.3}User Role Workflows and Portal Functionality}{51}{subsection.6.4.3}%
-\contentsline {subsubsection}{\numberline {6.4.3.1}Farmer Portal --- Verification and Complaint Workflows}{51}{subsubsection.6.4.3.1}%
-\contentsline {subsubsection}{\numberline {6.4.3.2}Officer Portal --- Regional Investigation Queue}{51}{subsubsection.6.4.3.2}%
-\contentsline {subsubsection}{\numberline {6.4.3.3}Admin Portal --- System Governance and Analytics}{52}{subsubsection.6.4.3.3}%
-\contentsline {subsubsection}{\numberline {6.4.3.4}Public Verification --- Anonymous Field Scanner}{52}{subsubsection.6.4.3.4}%
-\contentsline {section}{\numberline {6.5}Authentication Flow and Session Management}{52}{section.6.5}%
-\contentsline {subsection}{\numberline {6.5.1}Token Storage Strategy and Zustand Auth Store}{52}{subsection.6.5.1}%
-\contentsline {subsection}{\numberline {6.5.2}Automated Refresh Token Recovery (Axios 401 Interceptor)}{53}{subsection.6.5.2}%
-\contentsline {section}{\numberline {6.6}API Integration and Client Layer}{54}{section.6.6}%
-\contentsline {subsection}{\numberline {6.6.1}Centralized Axios HTTP Client and Server Proxy Route}{54}{subsection.6.6.1}%
-\contentsline {subsection}{\numberline {6.6.2}API Endpoint Integration Summary}{55}{subsection.6.6.2}%
-\contentsline {section}{\numberline {6.7}State Management and UI Design System}{60}{section.6.7}%
-\contentsline {subsection}{\numberline {6.7.1}Asynchronous Server State Management}{60}{subsection.6.7.1}%
-\contentsline {subsection}{\numberline {6.7.2}UI Component Library and Design Tokens}{60}{subsection.6.7.2}%
-\contentsline {subsection}{\numberline {6.7.3}Responsive Layouts and Accessibility}{62}{subsection.6.7.3}%
-\contentsline {section}{\numberline {6.8}Summary}{62}{section.6.8}%
-\contentsline {chapter}{\numberline {7}Backend System Architecture and Implementation}{63}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Architectural Overview}{63}{section.7.1}%
-\contentsline {subsection}{\numberline {7.1.1}Architectural Layers}{63}{subsection.7.1.1}%
-\contentsline {subsubsection}{\numberline {7.1.1.1}Domain Layer}{63}{subsubsection.7.1.1.1}%
-\contentsline {subsubsection}{\numberline {7.1.1.2}Application Layer}{64}{subsubsection.7.1.1.2}%
-\contentsline {subsubsection}{\numberline {7.1.1.3}Infrastructure Layer}{64}{subsubsection.7.1.1.3}%
-\contentsline {subsubsection}{\numberline {7.1.1.4}Presentation Layer (API Layer)}{64}{subsubsection.7.1.1.4}%
-\contentsline {subsection}{\numberline {7.1.2}Architectural Diagram}{64}{subsection.7.1.2}%
-\contentsline {section}{\numberline {7.2}Technology Stack}{65}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Project Structure Analysis}{66}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Domain Layer Architecture}{66}{subsection.7.3.1}%
-\contentsline {subsubsection}{\numberline {7.3.1.1}Entities Folder --- Core Business Models}{67}{subsubsection.7.3.1.1}%
-\contentsline {subsubsection}{\numberline {7.3.1.2}Enums Folder --- System Classifications}{67}{subsubsection.7.3.1.2}%
-\contentsline {subsubsection}{\numberline {7.3.1.3}Interfaces Folder --- Service Contracts}{68}{subsubsection.7.3.1.3}%
-\contentsline {subsubsection}{\numberline {7.3.1.4}Common Folder --- Shared Base Classes}{68}{subsubsection.7.3.1.4}%
-\contentsline {subsubsection}{\numberline {7.3.1.5}Exceptions Folder --- Error Handling Strategy}{69}{subsubsection.7.3.1.5}%
-\contentsline {subsection}{\numberline {7.3.2}Infrastructure Layer Architecture}{69}{subsection.7.3.2}%
-\contentsline {subsubsection}{\numberline {7.3.2.1}Persistence Folder --- Data Management}{69}{subsubsection.7.3.2.1}%
-\contentsline {paragraph}{\numberline {7.3.2.1.1}ApplicationDbContext.cs}{69}{paragraph.7.3.2.1.1}%
-\contentsline {paragraph}{\numberline {7.3.2.1.2}UnitOfWork.cs}{69}{paragraph.7.3.2.1.2}%
-\contentsline {paragraph}{\numberline {7.3.2.1.3}Repository Implementation}{70}{paragraph.7.3.2.1.3}%
-\contentsline {subsubsection}{\numberline {7.3.2.2}Configurations Folder --- Database Mapping}{70}{subsubsection.7.3.2.2}%
-\contentsline {subsubsection}{\numberline {7.3.2.3}Migrations Folder --- Schema Version Control}{70}{subsubsection.7.3.2.3}%
-\contentsline {subsubsection}{\numberline {7.3.2.4}Services Folder --- External Integrations}{71}{subsubsection.7.3.2.4}%
-\contentsline {subsubsection}{\numberline {7.3.2.5}Extensions Folder --- Dependency Injection}{71}{subsubsection.7.3.2.5}%
-\contentsline {subsection}{\numberline {7.3.3}Application Layer Architecture}{72}{subsection.7.3.3}%
-\contentsline {subsubsection}{\numberline {7.3.3.1}Services Subfolder}{72}{subsubsection.7.3.3.1}%
-\contentsline {paragraph}{\numberline {7.3.3.1.1}Service Interfaces}{72}{paragraph.7.3.3.1.1}%
-\contentsline {paragraph}{\numberline {7.3.3.1.2}Service Implementations}{72}{paragraph.7.3.3.1.2}%
-\contentsline {subsubsection}{\numberline {7.3.3.2}DTOs Subfolder --- Data Transfer Objects}{73}{subsubsection.7.3.3.2}%
-\contentsline {paragraph}{\numberline {7.3.3.2.1}Request DTOs}{73}{paragraph.7.3.3.2.1}%
-\contentsline {paragraph}{\numberline {7.3.3.2.2}Response DTOs}{74}{paragraph.7.3.3.2.2}%
-\contentsline {subsubsection}{\numberline {7.3.3.3}Validators Subfolder}{74}{subsubsection.7.3.3.3}%
-\contentsline {subsubsection}{\numberline {7.3.3.4}Mappings Subfolder}{75}{subsubsection.7.3.3.4}%
-\contentsline {subsubsection}{\numberline {7.3.3.5}Exceptions Subfolder}{75}{subsubsection.7.3.3.5}%
-\contentsline {subsection}{\numberline {7.3.4}Presentation Layer (API) Architecture}{75}{subsection.7.3.4}%
-\contentsline {subsubsection}{\numberline {7.3.4.1}Controllers Subfolder}{75}{subsubsection.7.3.4.1}%
-\contentsline {paragraph}{\numberline {7.3.4.1.1}BaseApiController.cs}{75}{paragraph.7.3.4.1.1}%
-\contentsline {paragraph}{\numberline {7.3.4.1.2}AuthController.cs}{76}{paragraph.7.3.4.1.2}%
-\contentsline {paragraph}{\numberline {7.3.4.1.3}VerificationController.cs}{76}{paragraph.7.3.4.1.3}%
-\contentsline {paragraph}{\numberline {7.3.4.1.4}ComplaintsController.cs}{76}{paragraph.7.3.4.1.4}%
-\contentsline {paragraph}{\numberline {7.3.4.1.5}AdminController.cs}{76}{paragraph.7.3.4.1.5}%
-\contentsline {paragraph}{\numberline {7.3.4.1.6}AnalyticsController.cs}{77}{paragraph.7.3.4.1.6}%
-\contentsline {paragraph}{\numberline {7.3.4.1.7}AnalyticsControllerV2.cs}{77}{paragraph.7.3.4.1.7}%
-\contentsline {paragraph}{\numberline {7.3.4.1.8}ReferenceDataController.cs}{77}{paragraph.7.3.4.1.8}%
-\contentsline {subsubsection}{\numberline {7.3.4.2}Middleware Subfolder}{78}{subsubsection.7.3.4.2}%
-\contentsline {paragraph}{\numberline {7.3.4.2.1}ExceptionHandlingMiddleware.cs}{78}{paragraph.7.3.4.2.1}%
-\contentsline {paragraph}{\numberline {7.3.4.2.2}RequestLoggingMiddleware.cs}{78}{paragraph.7.3.4.2.2}%
-\contentsline {paragraph}{\numberline {7.3.4.2.3}AuthenticationMiddleware.cs}{78}{paragraph.7.3.4.2.3}%
-\contentsline {subsubsection}{\numberline {7.3.4.3}Configuration Files}{79}{subsubsection.7.3.4.3}%
-\contentsline {paragraph}{\numberline {7.3.4.3.1}appsettings.json}{79}{paragraph.7.3.4.3.1}%
-\contentsline {paragraph}{\numberline {7.3.4.3.2}appsettings.Development.json}{79}{paragraph.7.3.4.3.2}%
-\contentsline {paragraph}{\numberline {7.3.4.3.3}appsettings.Production.json}{79}{paragraph.7.3.4.3.3}%
-\contentsline {subsubsection}{\numberline {7.3.4.4}Program.cs --- Application Entry Point}{80}{subsubsection.7.3.4.4}%
-\contentsline {section}{\numberline {7.4}Data Flow and Integration Points}{80}{section.7.4}%
-\contentsline {subsection}{\numberline {7.4.1}Verification Workflow}{80}{subsection.7.4.1}%
-\contentsline {subsection}{\numberline {7.4.2}Security Architecture}{81}{subsection.7.4.2}%
-\contentsline {chapter}{\numberline {8}System Integration}{82}{chapter.8}%
-\contentsline {section}{\numberline {8.1}End-to-End Request Flow (Browser to ML Model)}{82}{section.8.1}%
-\contentsline {subsection}{\numberline {8.1.1}Overview of the Request Lifecycle}{83}{subsection.8.1.1}%
-\contentsline {subsection}{\numberline {8.1.2}Browser-Level Request Generation}{83}{subsection.8.1.2}%
-\contentsline {subsection}{\numberline {8.1.3}Backend Request Reception}{84}{subsection.8.1.3}%
-\contentsline {subsection}{\numberline {8.1.4}AI Inference Execution Pipeline}{85}{subsection.8.1.4}%
-\contentsline {subsection}{\numberline {8.1.5}Request Flow Diagram}{86}{subsection.8.1.5}%
-\contentsline {section}{\numberline {8.2}Frontend - Backend Communication (Proxy Architecture)}{86}{section.8.2}%
-\contentsline {subsection}{\numberline {8.2.1}Centralized Communication Architecture}{87}{subsection.8.2.1}%
-\contentsline {subsection}{\numberline {8.2.2}Axios Client Integration}{87}{subsection.8.2.2}%
-\contentsline {subsection}{\numberline {8.2.3}Proxy Route Workflow}{88}{subsection.8.2.3}%
-\contentsline {subsection}{\numberline {8.2.4}Authentication and Session Recovery}{88}{subsection.8.2.4}%
-\contentsline {subsection}{\numberline {8.2.5}Proxy Architecture Diagram}{89}{subsection.8.2.5}%
-\contentsline {section}{\numberline {8.3}Backend - Model Serving API Integration}{89}{section.8.3}%
-\contentsline {subsection}{\numberline {8.3.1}AI Service Integration Architecture}{89}{subsection.8.3.1}%
-\contentsline {subsection}{\numberline {8.3.2}Image Validation Pipeline}{89}{subsection.8.3.2}%
-\contentsline {subsection}{\numberline {8.3.3}OCR and Metadata Extraction}{90}{subsection.8.3.3}%
-\contentsline {subsection}{\numberline {8.3.4}Seed Classification Workflow}{90}{subsection.8.3.4}%
-\contentsline {subsection}{\numberline {8.3.5}Model Serving Workflow Diagram}{92}{subsection.8.3.5}%
-\contentsline {section}{\numberline {8.4}Azure Service Integration Workflow}{92}{section.8.4}%
-\contentsline {subsection}{\numberline {8.4.1}Azure Services Used in the Platform}{93}{subsection.8.4.1}%
-\contentsline {subsection}{\numberline {8.4.2}Azure Blob Storage Workflow}{93}{subsection.8.4.2}%
-\contentsline {subsection}{\numberline {8.4.3}Azure AI Service Coordination}{94}{subsection.8.4.3}%
-\contentsline {subsection}{\numberline {8.4.4}Cloud-Based AI Processing Pipeline}{94}{subsection.8.4.4}%
-\contentsline {subsection}{\numberline {8.4.5}Azure Integration Diagram}{95}{subsection.8.4.5}%
-\contentsline {section}{\numberline {8.5}Deployment Architecture (Docker, Azure Container Apps)}{95}{section.8.5}%
-\contentsline {subsection}{\numberline {8.5.1}Containerization Strategy}{95}{subsection.8.5.1}%
-\contentsline {subsection}{\numberline {8.5.2}Docker-Based Build Workflow}{96}{subsection.8.5.2}%
-\contentsline {subsection}{\numberline {8.5.3}Azure Container Registry Integration}{96}{subsection.8.5.3}%
-\contentsline {subsection}{\numberline {8.5.4}Azure Container Apps Deployment}{97}{subsection.8.5.4}%
-\contentsline {subsection}{\numberline {8.5.5}Deployment Workflow Diagram}{98}{subsection.8.5.5}%
-\contentsline {chapter}{\numberline {9}Results and Evaluation}{99}{chapter.9}%
-\contentsline {section}{\numberline {9.1}Model Performance}{99}{section.9.1}%
-\contentsline {subsection}{\numberline {9.1.1}Accuracy, Precision, Recall, and F1 Score}{99}{subsection.9.1.1}%
-\contentsline {section}{\numberline {9.2}Per-Class Performance}{100}{section.9.2}%
-\contentsline {section}{\numberline {9.3}Confusion Matrix Analysis}{100}{section.9.3}%
-\contentsline {section}{\numberline {9.4}Regularization Effectiveness}{101}{section.9.4}%
-\contentsline {section}{\numberline {9.5}Model Comparison and Analysis}{102}{section.9.5}%
-\contentsline {section}{\numberline {9.6}System Performance}{103}{section.9.6}%
-\contentsline {subsection}{\numberline {9.6.1}API Inference Latency (\nobreakspace {}165 ms CPU / \nobreakspace {}20 ms GPU)}{103}{subsection.9.6.1}%
-\contentsline {subsection}{\numberline {9.6.2}Backend Response Times and Throughput}{104}{subsection.9.6.2}%
-\contentsline {section}{\numberline {9.7}Functional Test Cases}{104}{section.9.7}%
-\contentsline {subsection}{\numberline {9.7.1}Seed Verification Test Cases}{105}{subsection.9.7.1}%
-\contentsline {subsection}{\numberline {9.7.2}Complaint Management Test Cases}{105}{subsection.9.7.2}%
-\contentsline {subsection}{\numberline {9.7.3}Role-Based Access and Admin Test Cases}{106}{subsection.9.7.3}%
-\contentsline {subsection}{\numberline {9.7.4}Output Samples and Screenshots}{107}{subsection.9.7.4}%
-\contentsline {subsection}{\numberline {9.7.5}Challenges Encountered}{107}{subsection.9.7.5}%
-\contentsline {subsection}{\numberline {9.7.6}Known Limitations of the Current System}{108}{subsection.9.7.6}%
-\contentsline {chapter}{\numberline {10}Conclusion And Future Work}{109}{chapter.10}%
-\contentsline {section}{\numberline {10.1}Summary of Work}{109}{section.10.1}%
-\contentsline {section}{\numberline {10.2}Key Contributions and Findings}{110}{section.10.2}%
-\contentsline {subsection}{\numberline {10.2.1}AI-Based Automated Paddy Seed Classification}{110}{subsection.10.2.1}%
-\contentsline {subsection}{\numberline {10.2.2}Integration of Multiple AI Services}{111}{subsection.10.2.2}%
-\contentsline {subsection}{\numberline {10.2.3}DUS Parameter Evaluation}{111}{subsection.10.2.3}%
-\contentsline {subsection}{\numberline {10.2.4}Real-Time Farmer Assistance}{111}{subsection.10.2.4}%
-\contentsline {subsection}{\numberline {10.2.5}Secure and Scalable System Architecture}{111}{subsection.10.2.5}%
-\contentsline {subsection}{\numberline {10.2.6}Complaint Redressal and Governance Workflow}{112}{subsection.10.2.6}%
-\contentsline {subsection}{\numberline {10.2.7}Reduction of Manual Dependency}{112}{subsection.10.2.7}%
-\contentsline {subsection}{\numberline {10.2.8}Cloud-Native AI Deployment}{112}{subsection.10.2.8}%
-\contentsline {section}{\numberline {10.3}Future Enhancements}{112}{section.10.3}%
-\contentsline {subsection}{\numberline {10.3.1}Offline-First Progressive Web Application (PWA)}{112}{subsection.10.3.1}%
-\contentsline {subsection}{\numberline {10.3.2}Enhanced Security Mechanisms}{113}{subsection.10.3.2}%
-\contentsline {subsection}{\numberline {10.3.3}Blockchain-Based Verification Ledger}{113}{subsection.10.3.3}%
-\contentsline {subsection}{\numberline {10.3.4}IoT and Smart Agriculture Integration}{113}{subsection.10.3.4}%
-\contentsline {subsection}{\numberline {10.3.5}Expansion to Multiple Crop Varieties}{113}{subsection.10.3.5}%
-\contentsline {subsection}{\numberline {10.3.6}Mobile Application Development}{113}{subsection.10.3.6}%
-\contentsline {subsection}{\numberline {10.3.7}Multilingual Farmer Assistance}{113}{subsection.10.3.7}%
-\contentsline {subsection}{\numberline {10.3.8}Advanced Analytics Dashboard}{114}{subsection.10.3.8}%
-\contentsline {subsection}{\numberline {10.3.9}Federated Learning for Privacy-Preserving AI}{114}{subsection.10.3.9}%
-\contentsline {subsection}{\numberline {10.3.10}Explainable AI (XAI)}{114}{subsection.10.3.10}%
-\contentsline {section}{\numberline {10.4}Conclusion}{114}{section.10.4}%
-\contentsline {chapter}{References}{116}{section*.55}%
+\contentsline {section}{\numberline {5.4}Containerisation and Deployment Architecture}{38}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Docker Multi-Stage Build Architecture}{38}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Serverless Deployment on GCP Cloud Run}{38}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Configuration, Observability, and Security Hardening}{39}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Environment Management and Secret Injection}{39}{subsection.5.5.1}%
+\contentsline {subsection}{\numberline {5.5.2}Threat Model and Defensive Hardening}{39}{subsection.5.5.2}%
+\contentsline {section}{\numberline {5.6}Summary}{40}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Frontend System Architecture and Implementation}{42}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Architecture and Design Principles}{42}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Technology Stack}{43}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Folder Structure and Repository Layout}{46}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Routing System and Access Control}{47}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}App Router Namespace and Access Hierarchy}{47}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Role-Based Access Control Implementation}{49}{subsection.6.4.2}%
+\contentsline {subsection}{\numberline {6.4.3}User Role Workflows and Portal Functionality}{50}{subsection.6.4.3}%
+\contentsline {subsubsection}{\numberline {6.4.3.1}Farmer Portal --- Verification and Complaint Workflows}{50}{subsubsection.6.4.3.1}%
+\contentsline {subsubsection}{\numberline {6.4.3.2}Officer Portal --- Regional Investigation Queue}{50}{subsubsection.6.4.3.2}%
+\contentsline {subsubsection}{\numberline {6.4.3.3}Admin Portal --- System Governance and Analytics}{51}{subsubsection.6.4.3.3}%
+\contentsline {subsubsection}{\numberline {6.4.3.4}Public Verification --- Anonymous Field Scanner}{51}{subsubsection.6.4.3.4}%
+\contentsline {section}{\numberline {6.5}Authentication Flow and Session Management}{51}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Token Storage Strategy and Zustand Auth Store}{51}{subsection.6.5.1}%
+\contentsline {subsection}{\numberline {6.5.2}Automated Refresh Token Recovery (Axios 401 Interceptor)}{52}{subsection.6.5.2}%
+\contentsline {section}{\numberline {6.6}API Integration and Client Layer}{53}{section.6.6}%
+\contentsline {subsection}{\numberline {6.6.1}Centralized Axios HTTP Client and Server Proxy Route}{53}{subsection.6.6.1}%
+\contentsline {subsection}{\numberline {6.6.2}API Endpoint Integration Summary}{54}{subsection.6.6.2}%
+\contentsline {section}{\numberline {6.7}State Management and UI Design System}{59}{section.6.7}%
+\contentsline {subsection}{\numberline {6.7.1}Asynchronous Server State Management}{59}{subsection.6.7.1}%
+\contentsline {subsection}{\numberline {6.7.2}UI Component Library and Design Tokens}{59}{subsection.6.7.2}%
+\contentsline {subsection}{\numberline {6.7.3}Responsive Layouts and Accessibility}{61}{subsection.6.7.3}%
+\contentsline {section}{\numberline {6.8}Summary}{61}{section.6.8}%
+\contentsline {chapter}{\numberline {7}Backend System Architecture and Implementation}{62}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Architectural Overview}{62}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Architectural Layers}{62}{subsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.1}Domain Layer}{62}{subsubsection.7.1.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.2}Application Layer}{63}{subsubsection.7.1.1.2}%
+\contentsline {subsubsection}{\numberline {7.1.1.3}Infrastructure Layer}{63}{subsubsection.7.1.1.3}%
+\contentsline {subsubsection}{\numberline {7.1.1.4}Presentation Layer (API Layer)}{63}{subsubsection.7.1.1.4}%
+\contentsline {subsection}{\numberline {7.1.2}Architectural Diagram}{63}{subsection.7.1.2}%
+\contentsline {section}{\numberline {7.2}Technology Stack}{64}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Project Structure Analysis}{65}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Domain Layer Architecture}{65}{subsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.1.1}Entities Folder --- Core Business Models}{66}{subsubsection.7.3.1.1}%
+\contentsline {subsubsection}{\numberline {7.3.1.2}Enums Folder --- System Classifications}{66}{subsubsection.7.3.1.2}%
+\contentsline {subsubsection}{\numberline {7.3.1.3}Interfaces Folder --- Service Contracts}{67}{subsubsection.7.3.1.3}%
+\contentsline {subsubsection}{\numberline {7.3.1.4}Common Folder --- Shared Base Classes}{67}{subsubsection.7.3.1.4}%
+\contentsline {subsubsection}{\numberline {7.3.1.5}Exceptions Folder --- Error Handling Strategy}{68}{subsubsection.7.3.1.5}%
+\contentsline {subsection}{\numberline {7.3.2}Infrastructure Layer Architecture}{68}{subsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.2.1}Persistence Folder --- Data Management}{68}{subsubsection.7.3.2.1}%
+\contentsline {paragraph}{\numberline {7.3.2.1.1}ApplicationDbContext.cs}{68}{paragraph.7.3.2.1.1}%
+\contentsline {paragraph}{\numberline {7.3.2.1.2}UnitOfWork.cs}{68}{paragraph.7.3.2.1.2}%
+\contentsline {paragraph}{\numberline {7.3.2.1.3}Repository Implementation}{69}{paragraph.7.3.2.1.3}%
+\contentsline {subsubsection}{\numberline {7.3.2.2}Configurations Folder --- Database Mapping}{69}{subsubsection.7.3.2.2}%
+\contentsline {subsubsection}{\numberline {7.3.2.3}Migrations Folder --- Schema Version Control}{69}{subsubsection.7.3.2.3}%
+\contentsline {subsubsection}{\numberline {7.3.2.4}Services Folder --- External Integrations}{70}{subsubsection.7.3.2.4}%
+\contentsline {subsubsection}{\numberline {7.3.2.5}Extensions Folder --- Dependency Injection}{70}{subsubsection.7.3.2.5}%
+\contentsline {subsection}{\numberline {7.3.3}Application Layer Architecture}{71}{subsection.7.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.3.1}Services Subfolder}{71}{subsubsection.7.3.3.1}%
+\contentsline {paragraph}{\numberline {7.3.3.1.1}Service Interfaces}{71}{paragraph.7.3.3.1.1}%
+\contentsline {paragraph}{\numberline {7.3.3.1.2}Service Implementations}{71}{paragraph.7.3.3.1.2}%
+\contentsline {subsubsection}{\numberline {7.3.3.2}DTOs Subfolder --- Data Transfer Objects}{72}{subsubsection.7.3.3.2}%
+\contentsline {paragraph}{\numberline {7.3.3.2.1}Request DTOs}{72}{paragraph.7.3.3.2.1}%
+\contentsline {paragraph}{\numberline {7.3.3.2.2}Response DTOs}{73}{paragraph.7.3.3.2.2}%
+\contentsline {subsubsection}{\numberline {7.3.3.3}Validators Subfolder}{73}{subsubsection.7.3.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.3.4}Mappings Subfolder}{74}{subsubsection.7.3.3.4}%
+\contentsline {subsubsection}{\numberline {7.3.3.5}Exceptions Subfolder}{74}{subsubsection.7.3.3.5}%
+\contentsline {subsection}{\numberline {7.3.4}Presentation Layer (API) Architecture}{74}{subsection.7.3.4}%
+\contentsline {subsubsection}{\numberline {7.3.4.1}Controllers Subfolder}{74}{subsubsection.7.3.4.1}%
+\contentsline {paragraph}{\numberline {7.3.4.1.1}BaseApiController.cs}{74}{paragraph.7.3.4.1.1}%
+\contentsline {paragraph}{\numberline {7.3.4.1.2}AuthController.cs}{75}{paragraph.7.3.4.1.2}%
+\contentsline {paragraph}{\numberline {7.3.4.1.3}VerificationController.cs}{75}{paragraph.7.3.4.1.3}%
+\contentsline {paragraph}{\numberline {7.3.4.1.4}ComplaintsController.cs}{75}{paragraph.7.3.4.1.4}%
+\contentsline {paragraph}{\numberline {7.3.4.1.5}AdminController.cs}{75}{paragraph.7.3.4.1.5}%
+\contentsline {paragraph}{\numberline {7.3.4.1.6}AnalyticsController.cs}{76}{paragraph.7.3.4.1.6}%
+\contentsline {paragraph}{\numberline {7.3.4.1.7}AnalyticsControllerV2.cs}{76}{paragraph.7.3.4.1.7}%
+\contentsline {paragraph}{\numberline {7.3.4.1.8}ReferenceDataController.cs}{76}{paragraph.7.3.4.1.8}%
+\contentsline {subsubsection}{\numberline {7.3.4.2}Middleware Subfolder}{77}{subsubsection.7.3.4.2}%
+\contentsline {paragraph}{\numberline {7.3.4.2.1}ExceptionHandlingMiddleware.cs}{77}{paragraph.7.3.4.2.1}%
+\contentsline {paragraph}{\numberline {7.3.4.2.2}RequestLoggingMiddleware.cs}{77}{paragraph.7.3.4.2.2}%
+\contentsline {paragraph}{\numberline {7.3.4.2.3}AuthenticationMiddleware.cs}{77}{paragraph.7.3.4.2.3}%
+\contentsline {subsubsection}{\numberline {7.3.4.3}Configuration Files}{78}{subsubsection.7.3.4.3}%
+\contentsline {paragraph}{\numberline {7.3.4.3.1}appsettings.json}{78}{paragraph.7.3.4.3.1}%
+\contentsline {paragraph}{\numberline {7.3.4.3.2}appsettings.Development.json}{78}{paragraph.7.3.4.3.2}%
+\contentsline {paragraph}{\numberline {7.3.4.3.3}appsettings.Production.json}{78}{paragraph.7.3.4.3.3}%
+\contentsline {subsubsection}{\numberline {7.3.4.4}Program.cs --- Application Entry Point}{79}{subsubsection.7.3.4.4}%
+\contentsline {section}{\numberline {7.4}Data Flow and Integration Points}{79}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Verification Workflow}{79}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Security Architecture}{80}{subsection.7.4.2}%
+\contentsline {chapter}{\numberline {8}System Integration}{81}{chapter.8}%
+\contentsline {section}{\numberline {8.1}End-to-End Request Flow (Browser to ML Model)}{81}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}Overview of the Request Lifecycle}{82}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Browser-Level Request Generation}{82}{subsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.1.3}Backend Request Reception}{83}{subsection.8.1.3}%
+\contentsline {subsection}{\numberline {8.1.4}AI Inference Execution Pipeline}{84}{subsection.8.1.4}%
+\contentsline {subsection}{\numberline {8.1.5}Request Flow Diagram}{85}{subsection.8.1.5}%
+\contentsline {section}{\numberline {8.2}Frontend - Backend Communication (Proxy Architecture)}{85}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Centralized Communication Architecture}{86}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Axios Client Integration}{86}{subsection.8.2.2}%
+\contentsline {subsection}{\numberline {8.2.3}Proxy Route Workflow}{87}{subsection.8.2.3}%
+\contentsline {subsection}{\numberline {8.2.4}Authentication and Session Recovery}{87}{subsection.8.2.4}%
+\contentsline {subsection}{\numberline {8.2.5}Proxy Architecture Diagram}{88}{subsection.8.2.5}%
+\contentsline {section}{\numberline {8.3}Backend - Model Serving API Integration}{88}{section.8.3}%
+\contentsline {subsection}{\numberline {8.3.1}AI Service Integration Architecture}{88}{subsection.8.3.1}%
+\contentsline {subsection}{\numberline {8.3.2}Image Validation Pipeline}{88}{subsection.8.3.2}%
+\contentsline {subsection}{\numberline {8.3.3}OCR and Metadata Extraction}{89}{subsection.8.3.3}%
+\contentsline {subsection}{\numberline {8.3.4}Seed Classification Workflow}{89}{subsection.8.3.4}%
+\contentsline {subsection}{\numberline {8.3.5}Model Serving Workflow Diagram}{91}{subsection.8.3.5}%
+\contentsline {section}{\numberline {8.4}Azure Service Integration Workflow}{91}{section.8.4}%
+\contentsline {subsection}{\numberline {8.4.1}Azure Services Used in the Platform}{92}{subsection.8.4.1}%
+\contentsline {subsection}{\numberline {8.4.2}Azure Blob Storage Workflow}{92}{subsection.8.4.2}%
+\contentsline {subsection}{\numberline {8.4.3}Azure AI Service Coordination}{93}{subsection.8.4.3}%
+\contentsline {subsection}{\numberline {8.4.4}Cloud-Based AI Processing Pipeline}{93}{subsection.8.4.4}%
+\contentsline {subsection}{\numberline {8.4.5}Azure Integration Diagram}{94}{subsection.8.4.5}%
+\contentsline {section}{\numberline {8.5}Deployment Architecture (Docker, Azure Container Apps)}{94}{section.8.5}%
+\contentsline {subsection}{\numberline {8.5.1}Containerization Strategy}{94}{subsection.8.5.1}%
+\contentsline {subsection}{\numberline {8.5.2}Docker-Based Build Workflow}{95}{subsection.8.5.2}%
+\contentsline {subsection}{\numberline {8.5.3}Azure Container Registry Integration}{95}{subsection.8.5.3}%
+\contentsline {subsection}{\numberline {8.5.4}Azure Container Apps Deployment}{96}{subsection.8.5.4}%
+\contentsline {subsection}{\numberline {8.5.5}Deployment Workflow Diagram}{97}{subsection.8.5.5}%
+\contentsline {chapter}{\numberline {9}Results and Evaluation}{98}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Model Performance}{98}{section.9.1}%
+\contentsline {subsection}{\numberline {9.1.1}Accuracy, Precision, Recall, and F1 Score}{98}{subsection.9.1.1}%
+\contentsline {section}{\numberline {9.2}Per-Class Performance}{99}{section.9.2}%
+\contentsline {section}{\numberline {9.3}Confusion Matrix Analysis}{99}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Regularization Effectiveness}{100}{section.9.4}%
+\contentsline {section}{\numberline {9.5}Model Comparison and Analysis}{101}{section.9.5}%
+\contentsline {section}{\numberline {9.6}System Performance}{102}{section.9.6}%
+\contentsline {subsection}{\numberline {9.6.1}API Inference Latency (\nobreakspace {}165 ms CPU / \nobreakspace {}20 ms GPU)}{102}{subsection.9.6.1}%
+\contentsline {subsection}{\numberline {9.6.2}Backend Response Times and Throughput}{103}{subsection.9.6.2}%
+\contentsline {section}{\numberline {9.7}Functional Test Cases}{103}{section.9.7}%
+\contentsline {subsection}{\numberline {9.7.1}Seed Verification Test Cases}{104}{subsection.9.7.1}%
+\contentsline {subsection}{\numberline {9.7.2}Complaint Management Test Cases}{104}{subsection.9.7.2}%
+\contentsline {subsection}{\numberline {9.7.3}Role-Based Access and Admin Test Cases}{105}{subsection.9.7.3}%
+\contentsline {subsection}{\numberline {9.7.4}Output Samples and Screenshots}{106}{subsection.9.7.4}%
+\contentsline {subsection}{\numberline {9.7.5}Challenges Encountered}{106}{subsection.9.7.5}%
+\contentsline {subsection}{\numberline {9.7.6}Known Limitations of the Current System}{107}{subsection.9.7.6}%
+\contentsline {chapter}{\numberline {10}Conclusion And Future Work}{108}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Summary of Work}{108}{section.10.1}%
+\contentsline {section}{\numberline {10.2}Key Contributions and Findings}{109}{section.10.2}%
+\contentsline {subsection}{\numberline {10.2.1}AI-Based Automated Paddy Seed Classification}{109}{subsection.10.2.1}%
+\contentsline {subsection}{\numberline {10.2.2}Integration of Multiple AI Services}{110}{subsection.10.2.2}%
+\contentsline {subsection}{\numberline {10.2.3}DUS Parameter Evaluation}{110}{subsection.10.2.3}%
+\contentsline {subsection}{\numberline {10.2.4}Real-Time Farmer Assistance}{110}{subsection.10.2.4}%
+\contentsline {subsection}{\numberline {10.2.5}Secure and Scalable System Architecture}{110}{subsection.10.2.5}%
+\contentsline {subsection}{\numberline {10.2.6}Complaint Redressal and Governance Workflow}{111}{subsection.10.2.6}%
+\contentsline {subsection}{\numberline {10.2.7}Reduction of Manual Dependency}{111}{subsection.10.2.7}%
+\contentsline {subsection}{\numberline {10.2.8}Cloud-Native AI Deployment}{111}{subsection.10.2.8}%
+\contentsline {section}{\numberline {10.3}Future Enhancements}{111}{section.10.3}%
+\contentsline {subsection}{\numberline {10.3.1}Offline-First Progressive Web Application (PWA)}{111}{subsection.10.3.1}%
+\contentsline {subsection}{\numberline {10.3.2}Enhanced Security Mechanisms}{112}{subsection.10.3.2}%
+\contentsline {subsection}{\numberline {10.3.3}Blockchain-Based Verification Ledger}{112}{subsection.10.3.3}%
+\contentsline {subsection}{\numberline {10.3.4}IoT and Smart Agriculture Integration}{112}{subsection.10.3.4}%
+\contentsline {subsection}{\numberline {10.3.5}Expansion to Multiple Crop Varieties}{112}{subsection.10.3.5}%
+\contentsline {subsection}{\numberline {10.3.6}Mobile Application Development}{112}{subsection.10.3.6}%
+\contentsline {subsection}{\numberline {10.3.7}Multilingual Farmer Assistance}{112}{subsection.10.3.7}%
+\contentsline {subsection}{\numberline {10.3.8}Advanced Analytics Dashboard}{113}{subsection.10.3.8}%
+\contentsline {subsection}{\numberline {10.3.9}Federated Learning for Privacy-Preserving AI}{113}{subsection.10.3.9}%
+\contentsline {subsection}{\numberline {10.3.10}Explainable AI (XAI)}{113}{subsection.10.3.10}%
+\contentsline {section}{\numberline {10.4}Conclusion}{113}{section.10.4}%
+\contentsline {chapter}{References}{115}{section*.55}%
