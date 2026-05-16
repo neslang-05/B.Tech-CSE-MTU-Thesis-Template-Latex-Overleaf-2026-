@@ -1,87 +1,579 @@
-\section{System Architecture }
-{\fontsize{12}{14}\selectfont
-    The system architecture of the BioMimic system has been carefully crafted to support real-time pose estimation of humans, categorization of exercises and posture correction in an AI-facilitated fitness setup. The system is a combination of computer vision models and human biomechanics allowing users to exercise in the gym with precision and get instant corrective feedback. The design structure of BioMimic follows a module-based, layered architecture in which every component collaborates to bring about the common goal of maximizing user performance and reducing posture-related injuries. \\
+% ============================================================
+%  CHAPTER 3: SYSTEM DESIGN AND ARCHITECTURE
+%  AgriVerify — AI-Powered Fake Seed Detection System
+%  Manipur Technical University, Final Year Project Report
+% ============================================================
 
-    \begin{figure}[H]
-      \centering
-      \includegraphics[width=1\textwidth]{assets/flowchart.jpg}
-      \captionsetup{justification=centering}
-      \caption[BioMimic system architecture (flow diagram)]{BioMimic system architecture (flow diagram)}\\
-      \label{fig:mediapipe_landmarks}
-    \end{figure}
+% \chapter{System Design and Architecture}
 
-    On the highest level, the system consists of five main layers: the Input Layer (Video Stream Acquisition), the Pose Detection Layer (MediaPipe Pose framework), the Analysis Layer (pose classification, joint angle calculation), the Feedback Layer (repetition counting) and the User Interface Layer. The video stream from a webcam or external camera serves as the main input. It is fed to MediaPipe which does pose estimation and returns a list of 33 key points with high spatial precision. These key points are then processed through trigonometric calculations to assess joint angles, body orientation and motion flow. \\
+% ──────────────────────────────────────────────────────────────
+\section{Overall System Architecture}
+% ──────────────────────────────────────────────────────────────
 
-    A fundamental part of the system design is its feedback loop in real-time. Once the pose has been captured and examined, it is compared to the set standards of a specific exercise (e.g., squats or bicep curls). The system gives feedback in the form of audio and visual cues or printed outputs to assist the user. This is adaptive and dynamic feedback that changes with each frame of movement making the interaction smooth and adaptive. \\
+The AgriVerify platform is engineered as a distributed, multi-tier web system
+that integrates deep learning inference, cloud-based AI orchestration, and a
+role-aware web application into a single coherent service. The system follows
+the \textbf{Clean Architecture} (Onion Architecture variant), ensuring that the
+core business logic remains completely independent of infrastructure concerns
+such as databases, cloud vendors, or UI frameworks. Dependencies flow strictly
+inward: the outer layers (Infrastructure, API) depend on abstractions exposed by
+the inner layers (Application, Domain), never the reverse.
 
-    The architecture is also made to be lightweight and platform-agnostic. The choice of using MediaPipe guarantees light inference on even low-end devices, making deployment on consumer-grade laptops and even mobile devices possible. The system's modular design also makes it easy to upgrade and incorporate additional exercises, sensors, or even depth cameras in subsequent versions. Significantly, the architecture also permits the potential to store user performance data longitudinally, which creates possibilities for incorporating fitness tracking, personalized schedules and injury forecasting. \\
+\medskip
+At the highest level the system is composed of three major subsystems:
 
-    Therefore, the BioMimic architecture not only operates in real-time but is also scalable, portable and configurable. It constitutes the technical basis of the system's capability to solve the main issues set out in previous chapters - i.e., posture inaccuracy, absence of personalization in home exercise and lack of affordable AI-driven fitness products. \\
-}
+\begin{enumerate}
+  \item \textbf{Deep Learning Microservice} — A PyTorch/ResNet-50 model trained
+        on a 1{,}563-image paddy seed corpus and served as a containerised
+        FastAPI endpoint on Google Cloud Platform (GCP).
+
+  \item \textbf{Backend API} — An ASP.NET Core 8 Web API that acts as the
+        primary orchestration layer. It authenticates users, mediates access to
+        the ML microservice and Azure AI services (Custom Vision, AI Vision OCR,
+        OpenAI), persists results to Microsoft SQL Server via Entity Framework
+        Core, and exposes a versioned REST API consumed by the frontend.
+
+  \item \textbf{Frontend Web Application} — A Next.js 14 App Router application
+        with role-based dashboards for Farmers, Officers, and Administrators.
+        All browser-to-backend traffic is forwarded through a server-side proxy
+        route to avoid exposing credentials and to centralise authentication
+        token injection.
+\end{enumerate}
+
+\medskip
+The four architectural layers of the backend follow the Onion model:
+
+
+
+\begin{enumerate}
+  \item[Domain Layer] Contains core entities (\texttt{User},
+        \texttt{VerificationHistory}, \\
+        \texttt{ProductComplaint}), value objects,
+        enumerations (\texttt{UserRole}, \texttt{VerificationStatus},
+        \texttt{ComplaintStatus}), and domain exceptions. This layer carries no
+        dependency on any framework or external service.
+
+  \item[Application Layer] Orchestrates business workflows through application
+        services (\texttt{VerificationService}, \texttt{UserService},
+        \texttt{ComplaintService}), defines Data Transfer Objects (DTOs),
+        AutoMapper profiles, and FluentValidation rules. It depends only on the
+        Domain layer.
+
+  \item[Infrastructure Layer] Provides concrete implementations for interfaces
+        declared in the Application layer: EF Core repositories, the
+        \texttt{ApplicationDbContext}, Azure service wrappers
+        (\texttt{CustomVisionService}, \texttt{ComputerVisionService},
+        \texttt{OpenAIService}, \texttt{BlobStorageService}), and migration
+        management. This layer bridges the application to external systems
+        without exposing implementation details upward.
+
+  \item[API Layer] Hosts ASP.NET Core controllers
+        (\texttt{AuthController}, \texttt{VerificationController},
+        \texttt{ComplaintController}, \texttt{AdminController}), the JWT
+        middleware pipeline, Swagger/OpenAPI documentation, and the global
+        exception handling middleware.
+\end{enumerate}
+
+
+% ──────────────────────────────────────────────────────────────
 \section{Functional Requirements}
-{\fontsize{12}{14}\selectfont 
-    The functional specifications of the BioMimic system determine what the system should do to attain its desired purposes. The requirements have been designed around user needs and encompass a broad range of activities the system should be able to perform. Functional requirements are key to the usability and effectiveness of the system within actual gym or home exercise settings. \\
+% ──────────────────────────────────────────────────────────────
 
-    First, the system has to be capable of continuously receiving video input from a camera source. This is the visual stream upon which all computations and decisions are made. The system has to be capable of detecting human presence in the frame and triggering pose detection. This detection includes the identification and tracking of major body joints like the shoulders, elbows, knees and ankles. \\
+The following functional requirements were derived from stakeholder analysis
+and form the basis of the system implementation.
 
-    Secondly, the system needs to compute joint angles from coordinate geometry and determine if a pose is one of the "correct" positions for an exercise. For example, in squats, the angle between the calf and thigh needs to be within a specific range to be correct. \\
+\subsection*{FR-01: User Registration and Authentication}
+\begin{itemize}
+  \item Farmers must be able to register using their name, email address, state,
+        and district, and authenticate via email and password.
+  \item Agricultural officers must authenticate using an officer ID and a
+        time-based one-time password (OTP) as a second factor.
+  \item Administrators are provisioned through database seeding with
+        credentials managed by the platform.
+  \item The system must issue JWT access tokens and refresh tokens upon
+        successful login, and invalidate sessions on logout.
+\end{itemize}
 
-    Furthermore, the system needs to tally the number of properly done repetitions. This involves being able to tell the difference between a full repetition, partial movement and bad form. The counter should only rise when the posture is good through the whole range of motion. This is important both for motivation and performance measurement. \\
+\subsection*{FR-02: Seed Verification}
+\begin{itemize}
+  \item Authenticated farmers must be able to upload front and back images of
+        seed packaging for AI-powered authenticity analysis.
+  \item The system must perform parallel inference using Azure Custom Vision
+        for classification, Azure AI Vision for OCR text extraction, and Azure
+        OpenAI for contextual report synthesis.
+  \item A confidence score, verification status (Genuine / Counterfeit /
+        Suspicious), extracted text, and a natural-language summary must be
+        returned and persisted.
+  \item An anonymous public verification endpoint must be available without
+        requiring authentication.
+\end{itemize}
 
-    In addition, the system must provide exercise-specific configuration. The user or developer must be able to dictate proper form for varying workouts by modifying angle tolerances or sequence flows. The system also needs to capture and store session data like the number of reps performed and posture drifts. \\
+\subsection*{FR-03: Complaint Management}
+\begin{itemize}
+  \item Authenticated farmers must be able to file complaints against seed
+        batches, specifying issue type, district, severity, and
+        optional image evidence.
+  \item Officers must be able to view assigned complaints, update their status
+        (Open / Investigation / Resolved / Closed), and record investigation
+        actions with timestamps.
+  \item Administrators must be able to view all complaints, filter by district
+        and status, and assign unassigned complaints to officers.
+\end{itemize}
 
-    These functional requirements make sure that BioMimic is able to provide a responsive and rich experience to users, converting passive workout sessions into intelligent, interactive fitness experiences. \\
-}
+\subsection*{FR-04: Role-Based Dashboards}
+\begin{itemize}
+  \item Farmers must have access to a personal dashboard showing verification
+        history, complaint status, and summary metrics.
+  \item Officers must be able to view a complaint queue, perform batch risk
+        assessments, and access officer-level analytics.
+  \item Administrators must have access to platform-wide analytics, user
+        management, and reference data configuration.
+\end{itemize}
 
-\section{Non-functional Requirements }
-{\fontsize{12}{14}\selectfont 
-While functional requirements dictate what the system should do, non-functional requirements define how the system performs under various conditions. These aspects are crucial to ensure usability, reliability, maintainability and performance of the BioMimic system. Non-functional requirements are often what differentiate a good system from an excellent one, especially in real-time AI applications. \\
+\subsection*{FR-05: Batch Risk Registry}
+\begin{itemize}
+  \item The system must maintain a \texttt{BatchRiskRegistry} that aggregates
+        complaint statistics per batch number, tracks affected districts,
+        computes average severity scores, and assigns risk levels.
+\end{itemize}
 
-Performance is one of the key non-functional requirements. The system has to run in real-time, i.e., process video input, execute the pose estimation model, analyze key points and send back feedback within milliseconds. The overall latency from input to output has to be low enough not to introduce delays that would interfere with the flow of the exercise routine of the user. \\
+\subsection*{FR-06: Deep Learning Model Inference}
+\begin{itemize}
+  \item The ResNet-50 microservice must accept seed images, apply the
+        224\,×\,224 preprocessing pipeline, run forward inference, and return
+        class probabilities alongside 17 extracted DUS physical parameters
+        (length, width, colour, texture, shape metrics).
+  \item The microservice must perform variety matching against a reference
+        database of 12 registered paddy varieties and return the top-3 matches
+        with similarity percentages.
+\end{itemize}
 
-Another critical requirement is precision. Because the system gives feedback based on posture, KeyPoint detection and angle calculation accuracy is crucial. Pose estimation errors would lead to false positives or negatives, which might confirm detrimental habits or dissuade the user by providing inappropriate correction. The adoption of MediaPipe increases precision, but calibration and frame resolution are also necessary. \\
+% ──────────────────────────────────────────────────────────────
+\section{Non-Functional Requirements}
+% ──────────────────────────────────────────────────────────────
 
-Scalability is another key non-functional requirement. The system needs to be flexible enough to accommodate more exercises and potentially users in the future. It should be implemented in a way that adding new exercise templates, angle thresholds or classification models does not mean re-writing major parts. \\
+\begin{description}
+  \item[NFR-01 — Performance]
+        The end-to-end verification pipeline (image upload → AI orchestration →
+        database write → response) must complete within a latency budget suitable
+        for interactive web use. Parallel execution of the OCR and Custom Vision
+        calls via \texttt{Task.WhenAll} is mandated to reduce blocking latency.
+        The FastAPI microservice must serve single-image inference in sub-second
+        wall-clock time on GCP Cloud Run hardware.
 
-Usability and user experience (UX) also come into play. The system must have a user-friendly interface and minimal setup. The user should not be required to calibrate the camera himself or make intricate settings. It must be plug-and-play in order to make it simple enough for non-technical users to utilize. \\
+  \item[NFR-02 — Scalability]
+        The backend must be stateless and deployable as a Dockerised container,
+        allowing horizontal scaling without code changes. The frontend Next.js
+        application must support server-side rendering and edge caching.
 
-Finally, portability and platform-independence are crucial. The system should preferably execute on various operating systems (Windows, Linux) and be deployable on edge devices such as Raspberry Pi or Jetson Nano for mobile fitness applications. \\
+  \item[NFR-03 — Security]
+        All HTTP traffic must be served over TLS (HTTPS). JWT access tokens must
+        carry minimal claims and expire within a configurable TTL. Passwords must
+        be stored as cryptographic hashes using PBKDF2 or bcrypt. Sensitive
+        credentials (Azure keys, database connection strings, API keys) must be
+        stored in environment variables and never hard-coded. Role-based endpoint
+        protection must be enforced through ASP.NET Core \texttt{[Authorize]}
+        policies.
 
-Briefly, these non-functional requirements confirm not only the correctness of BioMimic, but also its optimality so that it can be an effective solution in actual fitness and health usage. \\
-}
-\section{Tools and Technologies Used (MediaPipe, Python, OpenCV)}
-{\fontsize{12}{14}\selectfont  
-    The success of BioMimic greatly depends on the strong and effective tools and technologies used to implement it. Every technology was chosen to provide a special function - through from pose detection to system control and feedback rendering. The primary tools used are MediaPipe, Python and OpenCV. \\
+  \item[NFR-04 — Reliability and Data Integrity]
+        All grouped repository operations must execute within a Unit of Work
+        transaction with atomic commit-or-rollback semantics. Soft-delete
+        functionality must be implemented for complaint and verification records
+        to support future legal auditing. Health check endpoints (\texttt{/health},
+        \texttt{/api/health}) must expose the connectivity status of critical
+        dependencies.
 
-    MediaPipe forms the foundation of the pose estimation module. Created by Google, MediaPipe is a cross-platform system that offers customizable and pre-trained computer vision and machine learning solutions. MediaPipe's Pose module identifies 33 3D landmarks on the human anatomy at incredibly high speed and accuracy, making it very suitable for real-time applications. It processes frames in a pipeline structure, which allows parallel computation and low latency and this is critical for our fitness feedback loop. \\
+  \item[NFR-05 — Maintainability]
+        The codebase must adhere to Clean Architecture layering with clear
+        separation of concerns. Infrastructure services must be registered through
+        an \texttt{InfrastructureServiceCollectionExtensions} extension class
+        rather than inline in \texttt{Program.cs}. All public API endpoints must
+        be documented via Swagger/OpenAPI 3.0.
 
-    Python is the foundation for the whole system. Python provides a large number of libraries, is simple to comprehend and allows for rapid development. Python's rich ecosystem includes numerical libraries such as NumPy for computational geometry. Python's simplicity also makes it easy for future developers to extend or change the system with little overhead. \\
+  \item[NFR-06 — Usability and Accessibility]
+        The frontend must deliver a responsive layout usable on both desktop
+        browsers and mobile devices, supporting farmers who access the platform
+        via smartphones. The UI must provide immediate loading feedback through
+        skeleton placeholders and toast notifications for asynchronous operations.
 
-    OpenCV (Open Source Computer Vision) Library is utilized for frame manipulation, video capture and visual annotation. OpenCV allows the system to read camera feeds, draw angles and landmarks of the skeleton and visually annotate the user. It gives access to pixel-level operations and supports many cameras hardware, so it is needed to be able to integrate the output of pose estimation into a meaningful and user-friendly visual presentation. \\
+  \item[NFR-07 — Portability]
+        The deep learning microservice must be exported in multiple formats
+        (\texttt{.pth}, TorchScript \texttt{.pt}, ONNX \texttt{.onnx}) to support
+        deployment across different runtime environments. The entire application
+        stack must be containerisable via Docker.
+\end{description}
 
-    Other assistive technologies that can be used to improve the system are GUI libraries such as Tkinter or PyQt for developing user-friendly interfaces. If the system is later developed to include deep learning-powered posture classification, TensorFlow Lite can be thought of for light on-device inference. The interaction between these tools helps in making the system efficient, responsive and scalable while ensuring high performance with quality outputs in real-time applications. \\
+% ──────────────────────────────────────────────────────────────
+\section{Tools and Technologies}
+% ──────────────────────────────────────────────────────────────
 
-    Together, these technologies make BioMimic a practical and ready-to-use solution that can be implemented and deployed effectively, but it can be a complex concept. Their large-scale adoption and community support also enable future improvements to be made more easily and economically.\\
-}
-\section{Pose Estimation Technique (MediaPipe Framework, Landmark Tracking)}
-{\fontsize{12}{14}\selectfont 
-    The pose estimation algorithm is the heart and soul of the BioMimic platform since it determines the quality of response and general intelligence of the platform. For the project, we utilize the MediaPipe Pose library, which offers sophisticated, real-time and light-weight human pose detection capabilities by detecting 33 important landmarks on the human body. \\
+\subsection{Deep Learning Stack (PyTorch, ResNet-50)}
 
-    MediaPipe's pose estimation pipeline consists of two main machine learning models. The Pose Landmarker uses a series of models to predict pose landmarks. The first model detects the presence of human bodies within an image frame, and the second model locates landmarks on the bodies.\\
+The classification model is implemented entirely in \textbf{Python 3.10} using
+the following libraries:
 
-    The following models are packaged together into a downloadable model bundle: 
-    \begin{itemize}
-        \item \textbf{Pose detection model}: detects the presence of bodies with a few key pose landmarks.
-        \item \textbf{Pose landmarker model}: adds a complete mapping of the pose. The model outputs an estimate of 33 3-dimensional pose landmarks.
-    \end{itemize}
-    
-    This bundle uses a convolutional neural network similar to \href{https://arxiv.org/pdf/1801.04381}{MobileNetV2} and is optimized for on-device, real-time fitness applications. This variant of the \href{https://arxiv.org/pdf/2006.10204}{BlazePose} model uses \href{https://openaccess.thecvf.com/content_CVPR_2020/papers/Xu_GHUM__GHUML_Generative_3D_Human_Shape_and_Articulated_Pose_CVPR_2020_paper.pdf}{GHUM \& GHUML}, a 3D human shape modeling pipeline, to estimate the full 3D body pose of an individual in images or videos. \\
+\begin{itemize}
+  \item \textbf{PyTorch} (\texttt{torch}, \texttt{torchvision}) — The primary
+        deep learning framework used for model definition, training, and
+        inference. PyTorch's dynamic computation graph simplifies debugging and
+        enables flexible architecture modifications during the transfer-learning
+        fine-tuning phases.
 
-    After receiving the landmarks, BioMimic calculates joint angles between successive points using vector math and trigonometric relationships. For instance, by calculating the angle made at the knee with respect to the hip, knee and ankle landmarks, the system is able to tell the user if he/she is squatting properly. Outsiders beyond a predefined threshold will not be detected.  \\
+  \item \textbf{ResNet-50} — A 50-layer deep residual network pre-trained on
+        ImageNet (1.2M images, 1{,}000 classes) sourced from
+        \texttt{torchvision.models}. The backbone contributes approximately
+        23.5M parameters; a custom three-layer classification head
+        (2{,}048 → 512 → 128 → 3 units) adds a further 1.1M trainable parameters.
 
-    One of the standout advantages of MediaPipe is that it not only offers high-speed and high-accuracy results, but also better handles occlusions and partial visibility situations compared to most previous generation models. This means the system can be used in home setups where lighting and backgrounds are not necessarily ideal. The MediaPipe framework also supports GPU acceleration, enabling higher frame rates and more fluid interactions. \\
+  \item \textbf{OpenCV} (\texttt{cv2}) — Used in the DUS parameter extraction
+        pipeline for contour detection, pixel-to-millimetre calibration, and
+        morphological analysis of seed images to compute the 17 physical
+        parameters (colour mean/std, circularity, solidity, grain length/width,
+        etc.).
 
-    Following these landmarks over time allows BioMimic to move beyond static pose analysis. It also allows for temporal tracking, which is essential in recognizing the sequence of motion in dynamic exercises such as push-ups or lunges. The movement of the landmarks over time can also be utilized to train basic classification models that can differentiate between correct and incorrect movement, thereby allowing for personalized coaching experiences. \\
+  \item \textbf{NumPy / Pandas} — Numerical array manipulation and dataset
+        statistics management.
 
-    In summary, the MediaPipe-powered pose estimation module is both technically advanced and pragmatically effective. It is a crucial enabler of real-time, intelligent feedback within the BioMimic system and directly solves the root issue of posture correction and exercise monitoring in AI-driven fitness apps.  \\
-}
+  \item \textbf{scikit-learn} — Provides stratified train/validation/test split
+        utilities and evaluation metric helpers.
+
+  \item \textbf{Matplotlib / Seaborn} — Training curve visualisation and
+        confusion matrix rendering.
+\end{itemize}
+
+\noindent
+Training was conducted on a GPU-enabled environment with the \textbf{AdamW}
+optimiser (weight decay $\lambda = 10^{-4}$), cross-entropy loss with label
+smoothing ($\varepsilon = 0.1$), and a two-phase transfer learning schedule:
+Phase 1 (Epochs 1--8, backbone frozen, LR $= 10^{-3}$) followed by Phase 2
+(Epochs 9--15, full fine-tuning, LR $= 10^{-4}$).  The final ResNet-50 model
+achieved a test accuracy of 99.57\% on the combined 1{,}563-image dataset with
+a train-validation gap below 5\%.
+
+% ──────────────────────────────────────
+\subsection{Backend Stack (ASP.NET Core 8, SQL Server, Azure)}
+
+The backend REST API is built on the \textbf{Microsoft .NET 8} ecosystem.
+Table~\ref{tab:backend_stack} summarises the key components.
+
+\begin{table}[h!]
+  \centering
+  \caption{Backend Technology Stack}
+  \label{tab:backend_stack}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{ll}
+    \hline
+    \textbf{Component}      & \textbf{Technology} \\
+    \hline
+    Web Framework           & ASP.NET Core 8.0 / .NET 8 (Kestrel) \\
+    Database                & Microsoft SQL Server \\
+    ORM                     & Entity Framework Core (Code-First, Migrations) \\
+    Authentication          & ASP.NET Core Identity + JWT Bearer \\
+    Object Mapping          & AutoMapper \\
+    Validation              & FluentValidation + DataAnnotations \\
+    Logging                 & Serilog (Console / File sinks) \\
+    API Documentation       & Swagger / OpenAPI 3.0 \\
+    AI Services             & Azure Custom Vision, Azure AI Vision (OCR), Azure OpenAI \\
+    Cloud Storage           & Azure Blob Storage \\
+    Deployment              & Docker / Render Cloud \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\noindent
+Azure AI services are consumed through dedicated service wrappers
+(\texttt{CustomVisionService}, \texttt{ComputerVisionService},
+\texttt{OpenAIService}) registered in the DI container as singletons. The
+parallel orchestration pattern (\texttt{await Task.WhenAll(ocrTask,
+classificationTask)}) ensures that OCR extraction and image classification
+execute concurrently, minimising per-request latency.
+
+% ──────────────────────────────────────
+\subsection{Model Serving (FastAPI, Docker)}
+
+The trained PyTorch model is wrapped in a \textbf{FastAPI} microservice and
+deployed as a Docker container on \textbf{Google Cloud Platform (GCP) Cloud
+Run}. The inference pipeline within the microservice follows five stages:
+
+\begin{enumerate}
+  \item \textbf{Request} — The FastAPI endpoint receives a multipart image
+        payload.
+  \item \textbf{Preprocessing} — The image is resized to 224\,×\,224 pixels
+        and normalised using ImageNet channel-wise mean
+        $\mu = [0.485, 0.456, 0.406]$ and standard deviation
+        $\sigma = [0.229, 0.224, 0.225]$.
+  \item \textbf{Model Inference} — The ResNet-50 model processes the tensor
+        and produces class logits.
+  \item \textbf{Post-processing} — Softmax converts logits to probabilities;
+        OpenCV routines extract the 17 DUS parameters; variety matching is
+        performed against the 12-variety reference database.
+  \item \textbf{Response} — A structured JSON payload containing the
+        prediction label, confidence score, physical parameters, DUS
+        classification, and top-3 variety matches is returned.
+\end{enumerate}
+
+\noindent
+The model is exported in three formats to maximise deployment flexibility:
+PyTorch native (\texttt{.pth}, ${\sim}$98\,MB), TorchScript (\texttt{.pt},
+${\sim}$97\,MB for C++ runtimes), and ONNX (\texttt{.onnx}, ${\sim}$98\,MB
+for cross-platform inference). Continuous delivery is automated via a
+\textbf{GitHub Actions} CI/CD pipeline that triggers a Docker build-and-push
+to GCP Artifact Registry on every push to the \texttt{main} branch.
+
+% ──────────────────────────────────────
+\subsection{Frontend Stack (Next.js, TypeScript, TanStack Query)}
+
+The user-facing application is a \textbf{Next.js 14 App Router} single-page
+application written in \textbf{TypeScript}. The key technology choices are
+summarised below.
+
+\begin{itemize}
+  \item \textbf{Next.js 14 App Router} — Provides file-system-based routing
+        with route groups that cleanly separate the three role namespaces
+        (\texttt{(farmer)}, \texttt{(officer)}, \texttt{(admin)}). Server
+        components are used for initial data fetching; client components handle
+        interactive UI.
+
+  \item \textbf{TypeScript} — Enforces strict compile-time type safety across
+        all layers, including shared DTO interfaces (\texttt{src/types/}),
+        domain service modules (\texttt{src/services/}), and custom hooks
+        (\texttt{src/hooks/}).
+
+  \item \textbf{TanStack Query (React Query v5)} — Manages all asynchronous
+        server state: cache invalidation, background refetch, pagination, and
+        optimistic mutation rollback. Query hooks are co-located with domain
+        modules, with a global \texttt{QueryClient} that disables
+        refetch-on-window-focus to reduce incidental network requests.
+
+  \item \textbf{Zustand} — Lightweight client-side state store for
+        authentication state (\texttt{user}, \texttt{token}, \texttt{role},
+        \texttt{isAuthenticated}). The store is initialised from
+        \texttt{localStorage} on the client side and exposes \texttt{setAuth}
+        and \texttt{clearAuth} actions.
+
+  \item \textbf{Axios} — Centralised HTTP client configured with a base URL
+        of \texttt{/api/proxy}. A request interceptor automatically injects the
+        Bearer token from storage; a response interceptor handles 401 errors
+        by transparently attempting a token refresh before replaying the failed
+        request.
+
+  \item \textbf{Next.js API Route (Proxy)} — A server-side proxy route at
+        \texttt{/api/proxy/[...path]} forwards browser requests to the
+        ASP.NET backend at the URL stored in \texttt{BACKEND\_API\_URL},
+        preventing credential exposure in the browser environment.
+
+  \item \textbf{Tailwind CSS} — Utility-first styling with extended design
+        tokens (colours, radii, shadows) defined in \texttt{tailwind.config.ts}.
+
+  \item \textbf{Shadcn/UI + Custom Primitives} — A compact local component
+        library providing Button, Input, Select, Dialog, Sheet, Table, Badge,
+        Tabs, Skeleton, and Progress components implemented on native HTML with
+        minimal abstraction overhead.
+\end{itemize}
+
+% ──────────────────────────────────────────────────────────────
+\section{System Architecture Diagrams}
+% ──────────────────────────────────────────────────────────────
+
+\subsection{High-Level Architecture}
+
+Figure~\ref{fig:high_level_arch} illustrates the end-to-end system topology.
+The user's browser communicates exclusively with the Next.js frontend server.
+All backend calls are proxied server-side to the ASP.NET Core API, which in
+turn delegates to the ML microservice on GCP and to the suite of Azure AI
+services. Data is persisted in Microsoft SQL Server via Entity Framework Core,
+and seed images are stored in Azure Blob Storage.
+
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}[
+      node distance=1.6cm and 2.2cm,
+      box/.style={rectangle, draw, rounded corners=3pt,
+                  minimum width=3.4cm, minimum height=0.9cm,
+                  align=center, font=\small},
+      cloud/.style={box, fill=blue!8},
+      api/.style={box, fill=green!10},
+      ml/.style={box, fill=orange!12},
+      db/.style={box, fill=gray!12},
+      arr/.style={->, >=stealth, thick}
+    ]
+
+    % Row 1 — Browser
+    \node[box, fill=yellow!15] (browser) {Browser / Mobile\\ (Farmer / Officer / Admin)};
+
+    % Row 2 — Frontend
+    \node[cloud, below=of browser] (nextjs) {Next.js 14\\ App Router};
+
+    % Row 3 — Backend
+    \node[api, below=of nextjs] (aspnet) {ASP.NET Core 8\\ REST API};
+
+    % Row 4 — Services (horizontal)
+    \node[ml, below left=1.6cm and 1.5cm of aspnet]   (fastapi)  {FastAPI\\ ResNet-50\\ (GCP Cloud Run)};
+    \node[cloud, below=1.6cm of aspnet]               (azure)    {Azure AI Services\\ (Custom Vision,\\ OCR, OpenAI)};
+    \node[db, below right=1.6cm and 1.5cm of aspnet]  (sqlserver){SQL Server\\ + Azure Blob};
+
+    % Arrows
+    \draw[arr] (browser) -- node[right, font=\tiny]{HTTPS} (nextjs);
+    \draw[arr] (nextjs)  -- node[right, font=\tiny]{Proxy Route} (aspnet);
+    \draw[arr] (aspnet)  -- node[above left,  font=\tiny]{REST/JSON} (fastapi);
+    \draw[arr] (aspnet)  -- node[right, font=\tiny]{SDK} (azure);
+    \draw[arr] (aspnet)  -- node[above right, font=\tiny]{EF Core} (sqlserver);
+
+    % Return arrows (dashed)
+    \draw[arr, dashed] (fastapi)  -- (aspnet);
+    \draw[arr, dashed] (azure)    -- (aspnet);
+    \draw[arr, dashed] (sqlserver)-- (aspnet);
+  \end{tikzpicture}
+  \caption{High-level system architecture of the AgriVerify platform.}
+  \label{fig:high_level_arch}
+\end{figure}
+
+% ──────────────────────────────────────
+\subsection{Data Flow Diagram}
+
+Figure~\ref{fig:dfd} shows the data flow for the primary seed verification use
+case.  When a farmer submits seed images, the request flows from the browser
+through the Next.js proxy, enters the ASP.NET verification pipeline, and is
+fanned out in parallel to the ML microservice and two Azure services before
+the combined result is persisted and returned.
+
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}[
+      node distance=1.2cm,
+      proc/.style={rectangle, draw, rounded corners=3pt,
+                   minimum width=4.0cm, minimum height=0.8cm,
+                   align=center, fill=blue!7, font=\small},
+      ext/.style={proc, fill=orange!12},
+      store/.style={proc, fill=gray!15},
+      arr/.style={->, >=stealth},
+      wide/.style={arr, line width=0.8pt}
+    ]
+
+    \node[ext]   (farmer)     {Farmer — Upload Images};
+    \node[proc, below=of farmer]  (proxy)  {Next.js Proxy Route\\ \texttt{/api/proxy/verification/upload}};
+    \node[proc, below=of proxy]   (api)    {VerificationService\\ (ASP.NET Core 8)};
+
+    % Fork
+    \node[proc, below left=1.2cm and 1.8cm of api]  (cv)     {Azure Custom Vision\\ Image Classification};
+    \node[proc, below=1.2cm of api]                  (ocr)    {Azure AI Vision\\ OCR Extraction};
+    \node[proc, below right=1.2cm and 1.8cm of api]  (resnet) {FastAPI / ResNet-50\\ DUS Parameters};
+
+    % Join / LLM
+    \node[proc, below=4.2cm of api]                  (openai) {Azure OpenAI\\ Contextual Synthesis};
+    \node[store, below=of openai]                     (db)     {SQL Server\\ VerificationHistory};
+    \node[ext,   below=of db]                         (resp)   {JSON Response → Frontend};
+
+    \draw[wide] (farmer) -- (proxy);
+    \draw[wide] (proxy)  -- (api);
+    \draw[wide] (api)    -- (cv);
+    \draw[wide] (api)    -- (ocr);
+    \draw[wide] (api)    -- (resnet);
+    \draw[wide] (cv)     -- (openai);
+    \draw[wide] (ocr)    -- (openai);
+    \draw[wide] (resnet) -- (openai);
+    \draw[wide] (openai) -- (db);
+    \draw[wide] (db)     -- (resp);
+  \end{tikzpicture}
+  \caption{Data flow diagram for the seed verification pipeline.}
+  \label{fig:dfd}
+\end{figure}
+
+% ──────────────────────────────────────
+\subsection{Entity-Relationship Diagram}
+
+Figure~\ref{fig:erd} presents the simplified entity-relationship diagram for
+the core domain model persisted in Microsoft SQL Server.
+
+\begin{figure}[h!]
+  \centering
+  \begin{tikzpicture}[
+      entity/.style={rectangle, draw, minimum width=3.2cm,
+                     minimum height=0.9cm, align=center,
+                     fill=green!8, font=\small\bfseries},
+      attr/.style={font=\scriptsize, align=left},
+      rel/.style={->, >=stealth, thick},
+      label/.style={font=\scriptsize, midway, above}
+    ]
+
+    %% Entities
+    \node[entity] (user)     at (0, 0)      {User};
+    \node[entity] (vh)       at (6, 1.5)    {VerificationHistory};
+    \node[entity] (pc)       at (6, -1.5)   {ProductComplaint};
+    \node[entity] (ca)       at (11, -1.5)  {ComplaintAction};
+    \node[entity] (brr)      at (11,  1.5)  {BatchRiskRegistry};
+    \node[entity] (rd)       at (0,  -4)    {ReferenceData};
+    \node[entity] (rt)       at (6,  -4)    {RefreshToken};
+
+    %% Attributes (abbreviated)
+    \node[attr, below=0.05cm of user] {%
+      \texttt{UserId (PK)}\\
+      \texttt{Username, Email}\\
+      \texttt{PasswordHash}\\
+      \texttt{Role: Farmer|Officer|Admin}\\
+      \texttt{State, District}\\
+      \texttt{CreatedAt, UpdatedAt}
+    };
+
+    \node[attr, below=0.05cm of vh] {%
+      \texttt{VerificationHistoryId (PK)}\\
+      \texttt{ImageUrl (Blob), OCRText}\\
+      \texttt{ClassificationResult}\\
+      \texttt{ConfidenceScore}\\
+      \texttt{VerifiedAt, UserId (FK)}
+    };
+
+    \node[attr, below=0.05cm of pc] {%
+      \texttt{ProductComplaintId (PK)}\\
+      \texttt{IssueType, District}\\
+      \texttt{BatchNumber, Severity}\\
+      \texttt{Status (Open|Investigation|}\\
+      \texttt{\ \ Resolved|Closed)}\\
+      \texttt{UserId (FK), OfficerId (FK)}
+    };
+
+    \node[attr, below=0.05cm of ca] {%
+      \texttt{ActionId (PK)}\\
+      \texttt{ComplaintId (FK)}\\
+      \texttt{Description, Evidence}\\
+      \texttt{ActionDate}
+    };
+
+    \node[attr, below=0.05cm of brr] {%
+      \texttt{BatchNumber (PK)}\\
+      \texttt{TotalComplaints}\\
+      \texttt{AffectedDistricts}\\
+      \texttt{AvgSeverityScore}\\
+      \texttt{RiskLevel}
+    };
+
+    %% Relationships
+    \draw[rel] (user) -- node[label]{1\quad submits\quad *} (vh);
+    \draw[rel] (user) -- node[label, below]{1\quad files\quad *}  (pc);
+    \draw[rel] (pc)   -- node[label]{1\quad has\quad *}     (ca);
+    \draw[rel] (vh)   -- node[label]{0..1\quad refs\quad *} (pc);
+    \draw[rel] (user) -- node[label, right]{1\quad owns\quad *} (rt);
+
+  \end{tikzpicture}
+  \caption{Simplified entity-relationship diagram for the AgriVerify domain model.}
+  \label{fig:erd}
+\end{figure}
+
+\noindent
+Key design decisions reflected in the ER model include:
+
+\begin{itemize}
+  \item \textbf{Soft delete} via \texttt{IsDeleted} and \texttt{DeletedAt}
+        fields on \texttt{VerificationHistory} and \texttt{ProductComplaint}
+        to preserve audit trails.
+  \item \textbf{3NF normalisation}: seed package information, verification
+        records, and complaint data are stored in separate tables to eliminate
+        redundancy.
+  \item \textbf{Indexed columns}: \texttt{User.Email}, \texttt{VerificationHistory.UserId},
+        \texttt{ProductComplaint.Status}, and
+        \texttt{ProductComplaint.District} carry non-clustered indices to
+        support dashboard query performance.
+  \item \textbf{BatchRiskRegistry} is updated by a background aggregation job
+        triggered on every complaint state change, acting as a denormalised
+        risk summary table for fast officer-facing analytics.
+\end{itemize}
