@@ -1,24 +1,54 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces High-level system architecture of the AgriVerify platform. Solid arrows indicate request direction; dashed arrows indicate response direction.\relax }}{18}{figure.caption.12}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Data flow diagram for the seed verification pipeline. The three inference calls (Custom Vision, OCR, ResNet-50) execute in parallel; results are aggregated before OpenAI synthesis.\relax }}{20}{figure.caption.13}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Simplified entity-relationship diagram for the AgriVerify domain model. Cardinality notation follows UML conventions.\relax }}{21}{figure.caption.14}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces High-level system architecture of the AgriVerify platform. Solid arrows indicate request direction; dashed arrows indicate response direction.\relax }}{10}{figure.caption.9}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Data flow diagram for the seed verification pipeline. The three inference calls (Custom Vision, OCR, ResNet-50) execute in parallel; results are aggregated before OpenAI synthesis.\relax }}{11}{figure.caption.10}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Simplified entity-relationship diagram for the AgriVerify domain model. Cardinality notation follows UML conventions.\relax }}{12}{figure.caption.11}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces End-to-end model request processing flow. Raw image bytes undergo ASGI validation and tensor transformation before parallel deep learning classification and morphological DUS extraction.\relax }}{35}{figure.caption.23}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Containerisation and automated deployment workflow. Source code changes trigger multi-stage container builds that are pushed to Artifact Registry before serverless GCP Cloud Run deployment.\relax }}{39}{figure.caption.26}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Asynchronous model request processing flow. Tensor classification and OpenCV feature extraction execute concurrently to minimize latency.\relax }}{25}{figure.caption.20}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Automated CI/CD pipeline and Serverless GCP Deployment Architecture.\relax }}{27}{figure.caption.23}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Layered frontend architecture illustrating data flow from presentation UI through custom query hooks and domain services to the server-side Next.js API proxy route.\relax }}{44}{figure.caption.27}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Logical folder organization of the AgriVerify frontend source tree, highlighting the separation between App Router navigation and core domain modules.\relax }}{47}{figure.caption.30}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Authentication lifecycle diagram detailing JWT token persistence in Zustand and automated refresh token recovery via Axios HTTP 401 interception.\relax }}{53}{figure.caption.32}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Clean Architecture Layer Hierarchy\relax }}{64}{figure.caption.38}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Backend Clean Architecture Layers\relax }}{31}{figure.caption.24}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Simplified Entity Relationship Structure\relax }}{37}{figure.caption.29}%
+\contentsline {figure}{\numberline {7.3}{\ignorespaces JWT Authentication Flow\relax }}{39}{figure.caption.31}%
+\contentsline {figure}{\numberline {7.4}{\ignorespaces Seed Verification Workflow\relax }}{40}{figure.caption.32}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {8.1}{\ignorespaces End-to-End Request Flow from Browser to Machine Learning Pipeline\relax }}{85}{figure.caption.40}%
-\contentsline {figure}{\numberline {8.2}{\ignorespaces Frontend and Backend Proxy Communication Workflow\relax }}{88}{figure.caption.41}%
-\contentsline {figure}{\numberline {8.3}{\ignorespaces Backend Model Serving and AI Inference Workflow\relax }}{91}{figure.caption.42}%
-\contentsline {figure}{\numberline {8.4}{\ignorespaces Azure Service Integration Workflow\relax }}{94}{figure.caption.43}%
-\contentsline {figure}{\numberline {8.5}{\ignorespaces Docker and Azure Container Apps Deployment Architecture\relax }}{97}{figure.caption.44}%
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Frontend Layered Architecture and Request Execution Flow\relax }}{43}{figure.caption.33}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {9.1}{\ignorespaces Unified End-to-End System Integration and Deployment Architecture\relax }}{49}{figure.caption.37}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {10.1}{\ignorespaces Diagnostic performance curves illustrating validation accuracy and loss trajectories across training epochs.\relax }}{51}{figure.caption.39}%
+\contentsline {figure}{\numberline {10.2}{\ignorespaces Binary confusion matrix visualizing empirical classification performance and inter-class error distributions.\relax }}{53}{figure.caption.42}%
+\contentsline {figure}{\numberline {10.3}{\ignorespaces Visual comparative benchmarking of classification metrics and execution times across evaluated neural architectures.\relax }}{56}{figure.caption.45}%
+\contentsline {figure}{\numberline {10.4}{\ignorespaces Public portal interfaces designed for seamless onboarding and localized accessibility.\relax }}{60}{figure.caption.51}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Public landing page showcasing platform value proposition and fake seed detection capabilities.}}}{60}{subfigure.4.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Multilingual localization interface providing regional dialect selection for rural accessibility.}}}{60}{subfigure.4.2}%
+\contentsline {figure}{\numberline {10.5}{\ignorespaces Authentication landing and farmer registration workflows.\relax }}{61}{figure.caption.52}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Secure authentication landing portal for user role selection.}}}{61}{subfigure.5.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Farmer account registration interface capturing demographic and district metadata.}}}{61}{subfigure.5.2}%
+\contentsline {figure}{\numberline {10.6}{\ignorespaces Secure administrative login interface enforcing multi-factor authentication for privileged roles.\relax }}{61}{figure.caption.53}%
+\contentsline {figure}{\numberline {10.7}{\ignorespaces Farmer portal overview and profile management interface.\relax }}{62}{figure.caption.54}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Main dashboard aggregating verification history, crop quality metrics, and recent activity logs.}}}{62}{subfigure.7.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Farmer profile management interface displaying registered credentials and verification badges.}}}{62}{subfigure.7.2}%
+\contentsline {figure}{\numberline {10.8}{\ignorespaces Account modification and dual-image seed packet verification submission workflow.\relax }}{62}{figure.caption.55}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Profile editing and account detail modification interface.}}}{62}{subfigure.8.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Responsive camera capture and image upload workflow for front and back seed packet analysis.}}}{62}{subfigure.8.2}%
+\contentsline {figure}{\numberline {10.9}{\ignorespaces Automated AI seed quality assessment diagnostic reports.\relax }}{63}{figure.caption.56}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Verification report indicating genuine seed packaging with extracted DUS physical parameters.}}}{63}{subfigure.9.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {High-risk counterfeit seed alert displaying confidence breakdowns and immediate reporting instructions.}}}{63}{subfigure.9.2}%
+\contentsline {figure}{\numberline {10.10}{\ignorespaces Farmer grievance submission form and active complaint tracking queue.\relax }}{63}{figure.caption.57}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Interactive product quality complaint form with narrative description and adjustable severity slider.}}}{63}{subfigure.10.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {User complaint tracking queue displaying real-time investigation statuses and historical resolutions.}}}{63}{subfigure.10.2}%
+\contentsline {figure}{\numberline {10.11}{\ignorespaces Agricultural Officer management portal and regional investigation queue.\relax }}{64}{figure.caption.58}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Officer primary dashboard summarizing regional dispute distributions and active workload.}}}{64}{subfigure.11.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Regional investigation queue supporting multi-parameter filtering by severity and district.}}}{64}{subfigure.11.2}%
+\contentsline {figure}{\numberline {10.12}{\ignorespaces Detailed officer dispute inspection interface for reviewing farmer-submitted packaging evidence and updating investigation statuses.\relax }}{64}{figure.caption.59}%
+\contentsline {figure}{\numberline {10.13}{\ignorespaces Executive system administration and user governance dashboard.\relax }}{65}{figure.caption.60}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {System Administrator central telemetry dashboard displaying real-time system latency, active sessions, and database health.}}}{65}{subfigure.13.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Administrative user management interface for provisioning agricultural officers and overseeing farmer account statuses.}}}{65}{subfigure.13.2}%
+\contentsline {figure}{\numberline {10.14}{\ignorespaces Longitudinal reporting and platform analytics dashboards.\relax }}{65}{figure.caption.61}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Primary analytics dashboard aggregating system-wide verification trends and fake seed detection rates over time.}}}{65}{subfigure.14.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Detailed secondary analytics view visualizing district-level dispute patterns and counterfeit geographical distributions.}}}{65}{subfigure.14.2}%
 \addvspace {10\p@ }

@@ -1,57 +1,116 @@
-{\fontsize{12}{14}\selectfont
-    This appendix outlines the setup and dependencies required to execute the code presented in Appendix A. \\
+This appendix provides the comprehensive REST API contract specifications for the core microservices of the AgriVerify platform. The architecture separates the high-throughput Python inference API from the ASP.NET Core business orchestration backend. All API exchanges utilize JSON formatting over secure HTTPS connections.
 
-    This section provides a detailed guide on installing all necessary dependencies, initiating the runtime environment, and detailing optional bootstrapping steps to guarantee the seamless execution of the application \\
+\section*{1. Model Serving Microservice (FastAPI)}
 
-    \section*{Dependencies Installation }
-    To run the pose estimation and rep counting system described in Appendix A, the following Python dependencies must be installed. These libraries encompass computer vision, pose detection, numerical computations, audio and visual feedback, and the Flask web framework. \\
+\subsection*{POST /predict}
+Executes real-time visual seed classification and extracts physical DUS parameters from uploaded imagery.
 
-    \begin{table}[h!]
-    \centering
-    \caption{Libraries Used and Their Purpose}
-    \begin{tabular}{ll}
+\begin{table}[htbp]
+  \centering
+  \caption{Specification for \texttt{POST /predict} Endpoint}
+  \label{tab:api-predict}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
     \toprule
-    \textbf{Library} & \textbf{Purpose} \\
+    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
     \midrule
-    \texttt{opencv-python} & Capturing and processing video frames \\
-    \texttt{mediapipe} & Detecting body landmarks and calculating joint angles \\
-    \texttt{numpy} & Performing mathematical operations (e.g., angle calculation) \\
-    \texttt{playsound} & Playing sound alerts during incorrect form \\
-    \texttt{flask} & Serving the application via a local web interface \\
+    \textbf{Content-Type} & \texttt{multipart/form-data} & Requires binary file upload stream. \\
+    \addlinespace
+    \textbf{Payload Attribute} & \texttt{file} (Binary Stream) & JPEG or PNG seed sample imagery ($224 \times 224$ px optimized). \\
+    \addlinespace
+    \textbf{Success Response (200)} & \texttt{application/json} & Returns classified status, confidence, and DUS geometry. \\
+    \addlinespace
+    \textbf{Sample JSON Payload} & Object & \texttt{\{"QualityClass": "Healthy", "Confidence": 92.15, "DUSParameters": \{"Length": 9.4, "Width": 2.8, "AspectRatio": 3.36\}\}} \\
+    \addlinespace
+    \textbf{Error Response (400)} & \texttt{application/json} & \texttt{\{"detail": "Unsupported file format"\}} (Non-image uploads). \\
     \bottomrule
-    \end{tabular}
-    \end{table}
+  \end{tabularx}
+\end{table}
 
-    \section*{Installation Command }
-    Use the following command in your terminal to install all the required packages:
-    \begin{tcolorbox}[terminal shell]
-        pip install opencv-python mediapipe numpy playsound flask  
-    \end{tcolorbox}
+\section*{2. ASP.NET Core Business Orchestration API}
 
-    \section*{Running the application }
-    After successfully installing all dependencies, you can run the program using the following command: 
-    \begin{tcolorbox}[terminal shell]
-        python app.py
-    \end{tcolorbox}
-    This will:
-    \begin{itemize}
-        \item Initiate the Flask web server on \texttt{http://0.0.0.0:8080.} 
-        \item Open the default webcam via OpenCV (\texttt{cv2.VideoCapture(0)}).
-        \item Dynamically import the selected exercise module (e.g., bicep\_curl.py).
-        \item Commence streaming processed video frames with real-time rep and pose tracking.
-        \item Access the Web Interface.
-    \end{itemize}
+\subsection*{POST /api/v1/verification/submit}
+Accepts multipart uploads from client browsers, forwards imagery to the inference microservice, and logs immutable audit trails to SQL Server.
 
-    \section*{Accessing the web interface }
-    Open a browser and visit: \\
-    \texttt{http://localhost:8080 }
+\begin{table}[htbp]
+  \centering
+  \caption{Specification for \texttt{POST /api/v1/verification/submit} Endpoint}
+  \label{tab:api-verifysubmit}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
+    \midrule
+    \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Valid access token associated with registered farmer account. \\
+    \addlinespace
+    \textbf{Payload} & \texttt{multipart/form-data} & \texttt{frontImage} (Binary) and \texttt{backImage} (Binary). \\
+    \addlinespace
+    \textbf{Success Response (201)} & \texttt{application/json} & Returns committed database record ID alongside AI verdict. \\
+    \addlinespace
+    \textbf{Sample JSON Payload} & Object & \texttt{\{"recordId": "a89d3c-...", "qualityClass": "Healthy", "confidence": 92.15, "isGenuine": true\}} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
-    \begin{tcolorbox}[colback=gray!10, colframe=gray!80, title=]
-         Alternatively, if accessing from another device on the same network (e.g., mobile phone), replace localhost with the host machine’s IP address: \\
-        \texttt{http://<your\_computer\_ip>:8080 }
-\end{tcolorbox}
+\subsection*{POST /api/v1/complaints}
+Submits formal farmer grievances regarding counterfeit batches or observed germination failures.
 
-    Upon interface loading, the "BioMimic AI Pose Estimation Gym Tracker" is prepared for use.\\
-    
-    Users can now select exercises, initiate tracking, and obtain immediate feedback on their form and repetitions. \\
-}
+\begin{table}[htbp]
+  \centering
+  \caption{Specification for \texttt{POST /api/v1/complaints} Endpoint}
+  \label{tab:api-complaintpost}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
+    \midrule
+    \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer security context required for auditing. \\
+    \addlinespace
+    \textbf{Request Body (JSON)} & \texttt{ComplaintCreationDto} & \texttt{\{"batchId": "B-99812", "narrative": "Zero germination", "severity": 4\}} \\
+    \addlinespace
+    \textbf{Success Response (201)} & \texttt{application/json} & \texttt{\{"complaintId": "C-1049", "status": "Open", "submittedAt": "2026-05-17T09:00:00Z"\}} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection*{GET /api/v1/complaints/\{id\}}
+Retrieves complete audit histories and evidence artifacts for an assigned grievance.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Specification for \texttt{GET /api/v1/complaints/\{id\}} Endpoint}
+  \label{tab:api-complaintget}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
+    \midrule
+    \textbf{Path Parameter} & \texttt{id} (GUID / String) & Unique identifier assigned to the grievance record. \\
+    \addlinespace
+    \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer who created record or assigned Agricultural Officer. \\
+    \addlinespace
+    \textbf{Success Response (200)} & \texttt{application/json} & Returns complete audit details and current investigation milestones. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection*{POST /api/v1/auth/login}
+Validates user credentials and issues cryptographically signed JWT pairs.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Specification for \texttt{POST /api/v1/auth/login} Endpoint}
+  \label{tab:api-authlogin}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
+    \midrule
+    \textbf{Request Body (JSON)} & \texttt{LoginRequestDto} & \texttt{\{"email": "farmer@manipur.gov.in", "password": "SecurePassword123!"\}} \\
+    \addlinespace
+    \textbf{Success Response (200)} & \texttt{application/json} & \texttt{\{"accessToken": "eyJhbGciOi...", "refreshToken": "d8e9a...", "user": \{"role": "Farmer"\}\}} \\
+    \addlinespace
+    \textbf{Error Response (401)} & \texttt{application/json} & \texttt{\{"message": "Invalid email or authentication credentials"\}} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

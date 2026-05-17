@@ -1,681 +1,86 @@
+This chapter presents the integration and deployment architecture of the AgriVerify platform. To ensure high scalability, modularity, and robust security, the system decouples frontend presentation from backend business logic and AI inference pipelines.
 
+\section{System Integration Matrix}
 
-This chapter discusses the integration architecture of the AgriVerify Fake Seed Detection
-System. The platform combines a modern Next.js frontend, ASP.NET Core backend services,
-Azure cloud infrastructure, AI-powered seed verification pipelines, and containerized cloud
-deployment. The integration workflow was designed to ensure scalability, modularity, secure
-communication, and efficient coordination between frontend interfaces, backend APIs, machine
-learning models, and cloud-based infrastructure services.
+The platform operates across four primary integration boundaries, centralized through a secure proxy layer to prevent direct exposure of backend APIs to browser clients. Table~\ref{tab:integration_matrix} summarizes the communication protocols, data formats, and security mechanisms across all subsystems.
 
-The system follows a distributed layered architecture where frontend clients communicate with
-backend services through a secure proxy layer. The backend coordinates authentication,
-business logic execution, image processing workflows, AI inference pipelines, cloud storage
-operations, analytics generation, and complaint management systems. The overall integration
-design ensures reliable communication between all software components while maintaining
-clean separation of concerns and scalability for future expansion.
-
-\section{End-to-End Request Flow (Browser to ML Model)}
-
-The AgriVerify platform implements a complete request lifecycle beginning from the browser
-interface and terminating at the machine learning inference pipeline. The system was designed
-to support real-time seed verification through secure image upload, AI-powered image analysis,
-OCR extraction, confidence scoring, and intelligent result generation.
-
-\subsection{Overview of the Request Lifecycle}
-
-The complete request lifecycle involves multiple distributed components working together in a
-sequential processing pipeline. The workflow begins when users upload seed packet images
-through the frontend verification interface and ends when the processed verification results are
-rendered back to the user dashboard.
-
-The request processing pipeline includes the following stages:
-
-\begin{enumerate}
-    \item Image upload from the browser interface
-    \item Frontend request validation
-    \item API request generation through service modules
-    \item Request forwarding through the Next.js proxy layer
-    \item ASP.NET Core backend request processing
-    \item Image validation and preprocessing
-    \item OCR extraction and AI inference execution
-    \item Confidence score generation
-    \item Database persistence and audit logging
-    \item Structured response generation
-    \item Frontend rendering and analytics updates
-\end{enumerate}
-
-\subsection{Browser-Level Request Generation}
-
-The frontend application is implemented using Next.js App Router architecture with React and
-TypeScript. User interactions originate from dedicated dashboard pages, verification pages,
-and camera capture components responsible for image acquisition and submission.
-
-The frontend uses a layered communication structure where route pages delegate business
-operations to reusable hooks and service modules. The frontend architecture follows the
-sequence:
-
-\begin{center}
-\texttt{Page Component $\rightarrow$ Custom Hook $\rightarrow$ Service Module $\rightarrow$ Axios Client}
-\end{center}
-
-This separation improves:
-\begin{itemize}
-    \item frontend maintainability,
-    \item reusable business logic,
-    \item centralized API communication,
-    \item standardized error handling,
-    \item and scalable frontend architecture.
-\end{itemize}
-
-The uploaded images are converted into multipart form requests and transmitted securely to
-the backend verification pipeline.
-
-\subsection{Backend Request Reception}
-
-Once the request reaches the ASP.NET Core backend API, the Presentation Layer controllers
-validate the incoming request payloads and forward processing responsibilities to the
-Application Layer services.
-
-The backend processing stages include:
-
-\begin{itemize}
-    \item request validation,
-    \item authentication verification,
-    \item image quality analysis,
-    \item OCR extraction,
-    \item AI-based classification,
-    \item confidence score computation,
-    \item recommendation generation,
-    \item and database persistence.
-\end{itemize}
-
-The backend follows Clean Architecture principles with clear separation between:
-
-\begin{itemize}
-    \item Presentation Layer,
-    \item Application Layer,
-    \item Domain Layer,
-    \item and Infrastructure Layer.
-\end{itemize}
-
-This layered design improves scalability, modularity, and maintainability across the system.
-
-\subsection{AI Inference Execution Pipeline}
-
-The verification workflow is coordinated by dedicated application services such as:
-
-\begin{itemize}
-    \item \texttt{VerificationService.cs},
-    \item \texttt{CustomVisionService.cs},
-    \item \texttt{ComputerVisionService.cs},
-    \item \texttt{OpenAIService.cs},
-    \item and \texttt{ResNetPaddyClassifierService.cs}.
-\end{itemize}
-
-These services collectively perform:
-
-\begin{itemize}
-    \item image quality verification,
-    \item OCR extraction,
-    \item counterfeit detection,
-    \item classification confidence scoring,
-    \item recommendation generation,
-    \item and report creation.
-\end{itemize}
-
-The machine learning inference pipeline combines cloud-based Azure AI services and custom
-deep learning models optimized for agricultural seed verification tasks.
-
-\subsection{Request Flow Diagram}
-
-\begin{figure}[H]
+\begin{table}[htbp]
 \centering
+\caption{Architectural Integration Boundaries and Communication Protocols}
+\label{tab:integration_matrix}
+\small
+\begin{tabularx}{\linewidth}{@{} p{2.8cm} p{3.2cm} c X @{}}
+\toprule
+\textbf{Integration Boundary} & \textbf{Components} & \textbf{Protocol} & \textbf{Key Operations \& Security} \\
+\midrule
+\textbf{Client $\leftrightarrow$ Proxy} & Browser UI $\rightarrow$ Next.js Proxy & HTTPS, Multipart & Axios interceptors, automatic JWT injection, and refresh token recovery \\
+\addlinespace
+\textbf{Proxy $\leftrightarrow$ Backend} & Next.js Proxy $\rightarrow$ ASP.NET API & REST (HTTPS) & Centralized request forwarding, payload validation, and internal route abstraction \\
+\addlinespace
+\textbf{Backend $\leftrightarrow$ ML} & ASP.NET API $\rightarrow$ AI Models & HTTPS / gRPC & Preprocessing (blur/lighting check), OCR metadata extraction, and ResNet classification \\
+\addlinespace
+\textbf{Cloud Integration} & ASP.NET API $\rightarrow$ Azure AI & Azure SDK & Custom Vision (counterfeit check), OpenAI (insights), and Blob Storage (images) \\
+\addlinespace
+\textbf{Deployment Pipeline} & Docker $\rightarrow$ ACR $\rightarrow$ Container Apps & Container Engine & Multi-stage Docker builds, secure registry storage, and serverless auto-scaling \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{End-to-End Architectural Workflow}
+
+The complete request lifecycle transitions from browser capture to machine learning evaluation and cloud storage, while the deployment lifecycle manages automated container orchestration. Figure~\ref{fig:unified_integration_flow} illustrates both the operational verification workflow and the cloud deployment pipeline.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-node distance=1.6cm,
-every node/.style={
-rectangle,
-draw=black,
-rounded corners,
-minimum height=1cm,
-font=\small,
-text centered,
-text width=4.2cm
-},
-arrow/.style={
-->,
-thick,
->=stealth
-}
+    node distance=1.8cm and 2.2cm,
+    box/.style={rectangle, draw=black!80, rounded corners, minimum width=3.8cm, minimum height=1.1cm, align=center, font=\small, thick},
+    client/.style={box, fill=blue!10, draw=blue!80},
+    proxy/.style={box, fill=yellow!15, draw=yellow!80!black},
+    backend/.style={box, fill=orange!15, draw=orange!80!black},
+    ai/.style={box, fill=red!15, draw=red!80!black},
+    storage/.style={box, fill=purple!15, draw=purple!80!black},
+    deploy/.style={box, fill=green!15, draw=green!80!black},
+    arrow/.style={->, thick, >=stealth}
 ]
 
-\node[fill=blue!15] (browser) {Browser Interface};
+% Request Flow Nodes (Top Row)
+\node[client] (browser) {\textbf{Browser UI}\\(Image Upload)};
+\node[proxy, right=of browser] (proxy) {\textbf{Next.js Proxy}\\(Axios / JWT Auth)};
+\node[backend, right=of proxy] (backend) {\textbf{ASP.NET Core API}\\(Validation \& Logic)};
 
-\node[fill=green!15, below=of browser] (frontend) {Next.js Frontend Components};
+% AI & Storage Nodes (Middle Row)
+\node[ai, below=of backend] (ai) {\textbf{AI \& ML Services}\\(OCR, ResNet, OpenAI)};
+\node[storage, below=of proxy] (db) {\textbf{Cloud Storage}\\(Azure Blob \& SQL DB)};
 
-\node[fill=yellow!15, below=of frontend] (proxy) {Next.js Proxy Layer};
+% Deployment Nodes (Bottom Row)
+\node[deploy, below=4.5cm of browser] (docker) {\textbf{Docker Build}\\(Multi-stage CI/CD)};
+\node[deploy, right=of docker] (acr) {\textbf{Azure Registry}\\(Container Storage)};
+\node[deploy, right=of acr] (aca) {\textbf{Container Apps}\\(Serverless Scaling)};
 
-\node[fill=orange!15, below=of proxy] (backend) {ASP.NET Core Backend};
+% Request Flow Connections
+\draw[arrow] (browser) -- node[above, font=\footnotesize] {HTTPS / Multipart} (proxy);
+\draw[arrow] (proxy) -- node[above, font=\footnotesize] {REST API} (backend);
+\draw[arrow] (backend) -- node[right, font=\footnotesize] {Async Inference} (ai);
+\draw[arrow] (ai) -- node[above, font=\footnotesize] {Persistence} (db);
+\draw[arrow] (db) -- node[left, font=\footnotesize] {Status Response} (proxy);
 
-\node[fill=red!15, below=of backend] (ml) {AI Inference Pipeline};
+% Deployment Connections
+\draw[arrow, dashed, draw=green!60!black] (docker) -- (acr);
+\draw[arrow, dashed, draw=green!60!black] (acr) -- (aca);
 
-\node[fill=purple!15, below=of ml] (database) {Database and Storage Services};
+% Background grouping boxes
+\begin{scope}[on background layer]
+    \node[fill=gray!10, rounded corners, fit=(browser) (proxy) (backend) (ai) (db), inner sep=0.4cm] (bg1) {};
+    \node[above=0.1cm of bg1.north, font=\small\bfseries, color=gray!70!black] {Operational Verification Pipeline};
+    
+    \node[fill=green!5, rounded corners, fit=(docker) (acr) (aca), inner sep=0.4cm] (bg2) {};
+    \node[above=0.1cm of bg2.north, font=\small\bfseries, color=green!60!black] {Cloud Deployment Pipeline};
+\end{scope}
 
-\draw[arrow] (browser) -- (frontend);
-\draw[arrow] (frontend) -- (proxy);
-\draw[arrow] (proxy) -- (backend);
-\draw[arrow] (backend) -- (ml);
-\draw[arrow] (ml) -- (database);
-
-\end{tikzpicture}
-
-\caption{End-to-End Request Flow from Browser to Machine Learning Pipeline}
-\label{fig:end-to-end-request-flow}
-\end{figure}
-
-\section{Frontend - Backend Communication (Proxy Architecture)}
-
-The AgriVerify frontend does not directly communicate with backend services. Instead, the
-system uses a proxy-based communication architecture implemented using Next.js API routes.
-This design improves security, centralizes request forwarding, simplifies environment
-configuration, and prevents direct exposure of backend APIs to browser clients.
-
-\subsection{Centralized Communication Architecture}
-
-The frontend communication pipeline is built around a centralized Axios client configured with
-interceptors, authentication handlers, and request forwarding logic.
-
-The communication sequence follows:
-
-\begin{center}
-\texttt{Frontend UI $\rightarrow$ Axios Client $\rightarrow$ Next.js Proxy $\rightarrow$ ASP.NET Backend}
-\end{center}
-
-The proxy architecture provides multiple operational benefits including:
-
-\begin{itemize}
-    \item centralized authentication handling,
-    \item automatic token injection,
-    \item standardized request forwarding,
-    \item simplified backend abstraction,
-    \item and consistent error normalization.
-\end{itemize}
-
-\subsection{Axios Client Integration}
-
-The frontend uses a shared Axios client configured with:
-
-\begin{itemize}
-    \item request interceptors,
-    \item response interceptors,
-    \item automatic token injection,
-    \item refresh token recovery,
-    \item and centralized error handling.
-\end{itemize}
-
-JWT access tokens are automatically attached to outgoing requests using request interceptors.
-This design removes repetitive authentication handling logic from individual frontend pages and
-service modules.
-
-\subsection{Proxy Route Workflow}
-
-The Next.js proxy route dynamically forwards requests to backend endpoints configured using
-environment variables. The proxy layer preserves authorization headers and multipart image
-uploads during request forwarding.
-
-The proxy performs the following operations:
-
-\begin{enumerate}
-    \item receives frontend requests,
-    \item extracts dynamic route paths,
-    \item appends backend API prefixes,
-    \item forwards authentication headers,
-    \item preserves multipart form data,
-    \item and returns backend responses transparently.
-\end{enumerate}
-
-This architecture also simplifies deployment because frontend environments only need to know
-the proxy endpoint rather than internal backend service locations.
-
-\subsection{Authentication and Session Recovery}
-
-The frontend communication system includes automatic JWT refresh token workflows. When
-backend APIs return HTTP 401 responses, the Axios response interceptor automatically
-requests a new access token using the stored refresh token.
-
-The workflow includes:
-
-\begin{itemize}
-    \item token expiration detection,
-    \item refresh token validation,
-    \item access token regeneration,
-    \item local storage update,
-    \item and failed request retry execution.
-\end{itemize}
-
-This mechanism improves user experience and maintains uninterrupted authenticated sessions.
-
-\subsection{Proxy Architecture Diagram}
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-node distance=2.2cm,
-every node/.style={
-rectangle,
-draw=black,
-rounded corners,
-minimum height=1cm,
-font=\small,
-text centered,
-text width=4cm
-},
-arrow/.style={
-->,
-thick,
->=stealth
+\end{tikzpicture}%
 }
-]
-
-\node[fill=blue!15] (frontend) {Next.js Frontend};
-
-\node[fill=green!15, right=of frontend] (proxy) {Next.js Proxy Route};
-
-\node[fill=orange!15, right=of proxy] (backend) {ASP.NET Core Backend};
-
-\draw[arrow] (frontend) -- node[above]{HTTP Request} (proxy);
-
-\draw[arrow] (proxy) -- node[above]{Forwarded Request} (backend);
-
-\draw[arrow] (backend) to[bend left=20]
-node[below]{JSON Response} (proxy);
-
-\draw[arrow] (proxy) to[bend left=20]
-node[below]{Processed Response} (frontend);
-
-\end{tikzpicture}
-
-\caption{Frontend and Backend Proxy Communication Workflow}
-\label{fig:proxy-communication}
-\end{figure}
-
-\section{Backend - Model Serving API Integration}
-
-The backend integrates multiple AI and machine learning services responsible for seed packet
-analysis, OCR extraction, counterfeit detection, and intelligent recommendation generation.
-These integrations are managed within the Infrastructure Layer of the backend architecture.
-
-\subsection{AI Service Integration Architecture}
-
-The backend communicates with several external AI services and internally deployed machine
-learning pipelines. Dedicated infrastructure services encapsulate communication logic for each
-AI provider.
-
-The primary AI integrations include:
-
-\begin{itemize}
-    \item Azure Custom Vision,
-    \item Azure Computer Vision OCR,
-    \item Azure OpenAI,
-    \item and custom ResNet-based classifiers.
-\end{itemize}
-
-Each integration is isolated within dedicated service classes, improving maintainability and
-modularity.
-
-\subsection{Image Validation Pipeline}
-
-Before expensive cloud-based AI processing begins, uploaded images undergo local validation
-and preprocessing operations including:
-
-\begin{itemize}
-    \item resolution validation,
-    \item brightness analysis,
-    \item sharpness detection,
-    \item image format verification,
-    \item and file size validation.
-\end{itemize}
-
-This preprocessing stage reduces unnecessary cloud inference costs while improving AI
-prediction quality.
-
-\subsection{OCR and Metadata Extraction}
-
-The OCR subsystem extracts textual metadata from uploaded seed packets including:
-
-\begin{itemize}
-    \item seed batch numbers,
-    \item manufacturer information,
-    \item certification labels,
-    \item product identifiers,
-    \item and packaging details.
-\end{itemize}
-
-OCR results are combined with image classification outputs to improve counterfeit detection
-accuracy.
-
-\subsection{Seed Classification Workflow}
-
-The seed classification subsystem performs counterfeit detection using Azure Custom Vision
-and specialized ResNet-based models trained on agricultural seed datasets.
-
-The classification workflow includes:
-
-\begin{enumerate}
-    \item image preprocessing,
-    \item feature extraction,
-    \item classification inference,
-    \item confidence score generation,
-    \item risk analysis,
-    \item and verification result aggregation.
-\end{enumerate}
-
-The final verification result includes:
-\begin{itemize}
-    \item prediction labels,
-    \item confidence percentages,
-    \item OCR metadata,
-    \item recommendation summaries,
-    \item and verification risk indicators.
-\end{itemize}
-
-\subsection{Model Serving Workflow Diagram}
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-node distance=1.8cm,
-every node/.style={
-rectangle,
-draw=black,
-rounded corners,
-minimum height=1cm,
-font=\small,
-text centered,
-text width=4.3cm
-},
-arrow/.style={
-->,
-thick,
->=stealth
-}
-]
-
-\node[fill=blue!15] (upload) {Uploaded Seed Images};
-
-\node[fill=green!15, below=of upload] (validation) {Image Validation};
-
-\node[fill=yellow!15, below=of validation] (ocr) {OCR Extraction};
-
-\node[fill=orange!15, below=of ocr] (classification) {AI Classification Models};
-
-\node[fill=red!15, below=of classification] (analysis) {Risk and Confidence Analysis};
-
-\node[fill=purple!15, below=of analysis] (response) {Verification Response};
-
-\draw[arrow] (upload) -- (validation);
-\draw[arrow] (validation) -- (ocr);
-\draw[arrow] (ocr) -- (classification);
-\draw[arrow] (classification) -- (analysis);
-\draw[arrow] (analysis) -- (response);
-
-\end{tikzpicture}
-
-\caption{Backend Model Serving and AI Inference Workflow}
-\label{fig:model-serving-api}
-\end{figure}
-
-\section{Azure Service Integration Workflow}
-
-The AgriVerify platform uses multiple Microsoft Azure services for AI inference, OCR
-processing, cloud storage, and scalable infrastructure deployment. Azure integration enables
-cloud-native scalability while reducing the complexity of managing locally hosted AI
-infrastructure.
-
-\subsection{Azure Services Used in the Platform}
-
-The system integrates the following Azure cloud services:
-
-\begin{itemize}
-    \item Azure Blob Storage,
-    \item Azure Custom Vision,
-    \item Azure Computer Vision OCR,
-    \item Azure OpenAI,
-    \item Azure Container Registry,
-    \item and Azure Container Apps.
-\end{itemize}
-
-Each Azure service performs specialized operations within the verification pipeline.
-
-\subsection{Azure Blob Storage Workflow}
-
-Seed packet images and complaint evidence files are uploaded to Azure Blob Storage rather
-than stored locally on backend servers.
-
-The Blob Storage subsystem performs:
-
-\begin{itemize}
-    \item secure image uploads,
-    \item cloud-based file retrieval,
-    \item unique blob management,
-    \item and scalable image persistence.
-\end{itemize}
-
-This design improves:
-\begin{itemize}
-    \item storage scalability,
-    \item fault tolerance,
-    \item deployment portability,
-    \item and cloud-based image access.
-\end{itemize}
-
-\subsection{Azure AI Service Coordination}
-
-The backend integrates Azure AI services through dedicated infrastructure components:
-
-\begin{description}
-    \item[CustomVisionService.cs]
-    Performs counterfeit detection and seed classification.
-
-    \item[ComputerVisionService.cs]
-    Performs OCR extraction and image quality analysis.
-
-    \item[OpenAIService.cs]
-    Generates farmer-friendly recommendation summaries and intelligent explanations.
-\end{description}
-
-The backend orchestrates these services sequentially to generate complete verification reports.
-
-\subsection{Cloud-Based AI Processing Pipeline}
-
-The Azure AI workflow includes:
-
-\begin{enumerate}
-    \item image upload,
-    \item image storage,
-    \item OCR extraction,
-    \item classification inference,
-    \item confidence analysis,
-    \item recommendation generation,
-    \item and verification result aggregation.
-\end{enumerate}
-
-This architecture enables:
-\begin{itemize}
-    \item scalable cloud inference,
-    \item modular AI integration,
-    \item centralized AI management,
-    \item and efficient distributed processing.
-\end{itemize}
-
-\subsection{Azure Integration Diagram}
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-node distance=2cm,
-every node/.style={
-rectangle,
-draw=black,
-rounded corners,
-minimum height=1cm,
-font=\small,
-text centered,
-text width=4cm
-},
-arrow/.style={
-->,
-thick,
->=stealth
-}
-]
-
-\node[fill=blue!15] (frontend) {Frontend Application};
-
-\node[fill=green!15, below left=of frontend] (blob) {Azure Blob Storage};
-
-\node[fill=yellow!15, below=of frontend] (vision) {Azure Custom Vision};
-
-\node[fill=orange!15, below right=of frontend] (ocr) {Azure OCR Service};
-
-\node[fill=red!15, below=of vision] (openai) {Azure OpenAI};
-
-\node[fill=purple!15, below=of openai] (backend) {ASP.NET Core Backend};
-
-\draw[arrow] (frontend) -- (blob);
-\draw[arrow] (frontend) -- (vision);
-\draw[arrow] (frontend) -- (ocr);
-
-\draw[arrow] (vision) -- (backend);
-\draw[arrow] (ocr) -- (backend);
-\draw[arrow] (backend) -- (openai);
-
-\end{tikzpicture}
-
-\caption{Azure Service Integration Workflow}
-\label{fig:azure-service-integration}
-\end{figure}
-
-\section{Deployment Architecture (Docker, Azure Container Apps)}
-
-The AgriVerify system was designed using a cloud-native deployment strategy based on Docker
-containerization and Azure Container Apps. This deployment model ensures portability,
-environment consistency, scalability, and simplified infrastructure management.
-
-\subsection{Containerization Strategy}
-
-The platform uses Docker containers to package frontend and backend applications into isolated
-runtime environments.
-
-Separate containers are maintained for:
-
-\begin{itemize}
-    \item Next.js frontend services,
-    \item ASP.NET Core backend APIs,
-    \item and optional AI inference services.
-\end{itemize}
-
-Containerization provides:
-\begin{itemize}
-    \item dependency isolation,
-    \item deployment consistency,
-    \item simplified scaling,
-    \item and infrastructure portability.
-\end{itemize}
-
-\subsection{Docker-Based Build Workflow}
-
-The deployment workflow begins with Docker image generation for all application services.
-
-The build process includes:
-
-\begin{enumerate}
-    \item source code compilation,
-    \item dependency installation,
-    \item application bundling,
-    \item Docker image creation,
-    \item and image tagging.
-\end{enumerate}
-
-The resulting images are uploaded to Azure Container Registry for centralized image
-management.
-
-\subsection{Azure Container Registry Integration}
-
-Azure Container Registry (ACR) stores versioned Docker images used during deployment.
-
-The registry provides:
-
-\begin{itemize}
-    \item secure image hosting,
-    \item version management,
-    \item deployment integration,
-    \item and centralized container storage.
-\end{itemize}
-
-Azure Container Apps retrieves images directly from ACR during deployment operations.
-
-\subsection{Azure Container Apps Deployment}
-
-Azure Container Apps provides serverless container orchestration for scalable cloud deployment.
-
-The deployment workflow includes:
-
-\begin{enumerate}
-    \item container image retrieval,
-    \item runtime environment initialization,
-    \item environment variable injection,
-    \item autoscaling configuration,
-    \item networking setup,
-    \item and application exposure.
-\end{enumerate}
-
-The platform benefits from:
-\begin{itemize}
-    \item automatic scaling,
-    \item cloud-native orchestration,
-    \item simplified infrastructure management,
-    \item and reduced operational overhead.
-\end{itemize}
-
-\subsection{Deployment Workflow Diagram}
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-node distance=2cm,
-every node/.style={
-rectangle,
-draw=black,
-rounded corners,
-minimum height=1cm,
-font=\small,
-text centered,
-text width=4.2cm
-},
-arrow/.style={
-->,
-thick,
->=stealth
-}
-]
-
-\node[fill=blue!15] (source) {Application Source Code};
-
-\node[fill=green!15, below=of source] (docker) {Docker Image Build};
-
-\node[fill=yellow!15, below=of docker] (acr) {Azure Container Registry};
-
-\node[fill=orange!15, below=of acr] (aca) {Azure Container Apps};
-
-\node[fill=red!15, below=of aca] (users) {End Users};
-
-\draw[arrow] (source) -- (docker);
-\draw[arrow] (docker) -- (acr);
-\draw[arrow] (acr) -- (aca);
-\draw[arrow] (aca) -- (users);
-
-\end{tikzpicture}
-
-\caption{Docker and Azure Container Apps Deployment Architecture}
-\label{fig:deployment-workflow}
+\caption{Unified End-to-End System Integration and Deployment Architecture}
+\label{fig:unified_integration_flow}
 \end{figure}

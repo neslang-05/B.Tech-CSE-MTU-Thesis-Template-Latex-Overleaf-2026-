@@ -1,673 +1,211 @@
+% ============================================================
+% CHAPTER 9: FRONTEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
+% ============================================================
 
-% \chapter{Backend System Architecture and Implementation}
-% \label{ch:backend-architecture}
 
-\section{Architectural Overview}
+The AgriVerify frontend serves as the critical presentation layer, bridging deep learning inference engines and backend microservices. Engineered for high responsiveness, it delivers an intuitive interface tailored for diverse stakeholders—from farmers operating in low-resource environments to state administrators overseeing supply chains \cite{singh2026impact}. To meet enterprise scalability and real-time synchronization requirements, the architecture is constructed using Next.js~14, React~18, TypeScript~5, and Tailwind CSS. This stack enforces strict presentation logic separation, ensuring maintainability and robust cross-platform accessibility \cite{salim2024microservices}.
 
-The AI-Based Paddy Seed Quality Assessment And Farmer Feedback System employs a comprehensive backend architecture designed according to Clean Architecture principles, ensuring optimal separation of concerns and maintainability. This design paradigm facilitates loose coupling between core business logic and external dependencies such as databases, user interfaces, and third-party AI services. By adhering to these architectural principles, the system achieves high scalability, testability, and long-term maintainability essential for agricultural technology platforms.
+% ============================================================
+\section{Frontend Architecture and Design Patterns}
+\label{sec:frontend-architecture}
+
+The presentation architecture adheres to layered design principles, isolating UI rendering from data synchronization, API communication, and authorization domains.
 
 \subsection{Architectural Layers}
-
-The backend infrastructure is structured into four distinct, independent layers, each serving a specific purpose within the application ecosystem:
-
-\subsubsection{Domain Layer}
-
-The Domain Layer forms the foundation of the system, encapsulating core business entities, value objects, enums, and domain-specific exceptions. This layer remains completely independent from any external framework or infrastructure concern, representing the pure business logic of seed verification and quality assessment. It defines what the system does from a business perspective, free from technical implementation details.
-
-\subsubsection{Application Layer}
-
-The Application Layer orchestrates business logic by implementing application services and defining contracts through interfaces. It manages Data Transfer Objects (DTOs) for request-response mapping, establishes validation rules, and coordinates workflows between the Domain and Infrastructure layers. This layer depends exclusively on the Domain Layer, ensuring that business rules remain isolated and reusable.
-
-\subsubsection{Infrastructure Layer}
-
-The Infrastructure Layer implements concrete technical solutions including database access patterns using Entity Framework Core, integrations with Azure AI services (Custom Vision, Computer Vision OCR, and OpenAI), and cloud file storage mechanisms. It provides implementations for interfaces defined in higher layers while handling all external service integrations and data persistence operations.
-
-\subsubsection{Presentation Layer (API Layer)}
-
-The Presentation Layer serves as the application's entry point, handling HTTP requests, managing JWT-based authentication, and exposing RESTful API endpoints. This layer converts HTTP communication into application service calls and returns structured responses to clients while maintaining security through authorization and validation middleware.
-
-\subsection{Architectural Diagram}
-
-Figure~\ref{fig:arch-layers} illustrates the hierarchical relationship and dependency flow among architectural layers:
+The request lifecycle processes through four specialized layers before interacting with backend services (Figure~\ref{fig:frontend_architecture}):
+\begin{itemize}
+    \item \textbf{Presentation UI (React \& Next.js):} Manages component rendering, form validation, and responsive layouts \cite{react2024}.
+    \item \textbf{Client-Side State (TanStack Query):} Orchestrates asynchronous data fetching, intelligent caching, and optimistic mutations \cite{tanstack2024}.
+    \item \textbf{Service Client (Axios):} Encapsulates network operations, standardizing payloads and error handling.
+    \item \textbf{API Proxy (Next.js Routes):} Acts as a secure intermediary, routing client requests to ASP.NET Core endpoints while hiding internal URLs.
+\end{itemize}
 
 \begin{figure}[H]
 \centering
+\begin{adjustbox}{max width=0.95\textwidth}
 \begin{tikzpicture}[
-  node distance=2cm,
-  every node/.style={
-    rectangle,
-    draw=black,
-    thick,
-    text width=5cm,
-    text centered,
-    minimum height=1cm,
-    font=\small
-  },
-  arrow/.style={
-    ->,
-    thick,
-    >=stealth
-  }
+    node distance=0.6cm and 1.2cm,
+    every node/.style={
+        draw=black!80, thick, rounded corners=3pt, align=center,
+        minimum width=4cm, minimum height=0.9cm, font=\scriptsize, fill=white
+    },
+    arrow/.style={->, thick, >=stealth, draw=blue!80!black}
 ]
+\node[fill=blue!10] (ui) {\textbf{UI Component Layer}\\(Next.js \& React)};
+\node[fill=green!10, below=of ui] (hooks) {\textbf{State Synchronization}\\(TanStack Query)};
+\node[fill=yellow!10, below=of hooks] (services) {\textbf{Service Layer}\\(Axios API Client)};
+\node[fill=orange!10, below=of services] (proxy) {\textbf{API Proxy Route}\\(Next.js Intermediary)};
+\node[fill=red!10, right=1.2cm of services] (backend) {\textbf{ASP.NET Backend}\\(Business \& Data)};
+\node[fill=purple!10, right=1.2cm of proxy] (ml) {\textbf{AI Inference}\\(Model Engine)};
 
-\node[fill=blue!15] (api) {Presentation Layer (API)\\REST Endpoints, Controllers};
-\node[fill=green!15, below=of api] (app) {Application Layer\\Business Workflows, DTOs};
-\node[fill=yellow!15, below=of app] (domain) {Domain Layer\\Entities, Interfaces, Rules};
-\node[fill=red!15, below=of domain] (infra) {Infrastructure Layer\\Database, Migrations, Repos};
-
-\draw[arrow] (api) -- node[right]{\small depends on} (app);
-\draw[arrow] (app) -- node[right]{\small depends on} (domain);
-\draw[arrow] (infra) -- node[right]{\small implements} (domain);
-\draw[arrow] (infra) -- node[left]{\small supports} (app);
-
+\draw[arrow] (ui) -- (hooks);
+\draw[arrow] (hooks) -- (services);
+\draw[arrow] (services) -- (proxy);
+\draw[arrow] (proxy) -| (backend);
+\draw[arrow] (backend) -- (ml);
 \end{tikzpicture}
-\caption{Clean Architecture Layer Hierarchy}
-\label{fig:arch-layers}
+\end{adjustbox}
+\caption{Frontend Layered Architecture and Request Execution Flow}
+\label{fig:frontend_architecture}
 \end{figure}
 
+\subsection{Secure Proxy Architecture}
+To neutralize Cross-Origin Resource Sharing (CORS) vulnerabilities, outbound communications are routed through internal Next.js serverless endpoints (\texttt{/api/proxy/*}). This endpoint obfuscation conceals internal microservice topologies, keeps cryptographic secrets server-side, and normalizes security headers before browser delivery \cite{masue2024quantifying}.
 
-\section{Technology Stack}
+% ============================================================
+\section{Technology Stack Analysis}
+\label{sec:technology-stack}
 
-The backend system leverages a modern, enterprise-grade technology stack specifically selected for scalability, maintainability, security, and high performance in agricultural technology contexts. Table~\ref{tab:tech-stack} summarizes the critical technology components:
+The technology stack is optimized for static type safety, developer velocity, and runtime execution speed (Table~\ref{tab:frontend-stack}).
 
 \begin{table}[H]
 \centering
-\small
-\caption{Backend Technology Stack Components}
-\label{tab:tech-stack}
-
-\begin{tabular}{|p{4cm}|p{9cm}|}
-\hline
-\textbf{Category} & \textbf{Technology} \\
-\hline
-
-Backend Framework & ASP.NET Core Web API \\ \hline
-Programming Language & C\# \\ \hline
-Architecture Pattern & Clean Architecture \\ \hline
-Object-Relational Mapping & Entity Framework Core \\ \hline
-Database & SQL Server \\ \hline
-Authentication & JWT Bearer Authentication \\ \hline
-Identity Management & ASP.NET Core Identity \\ \hline
-AI/ML Integration & Azure Custom Vision, Azure Computer Vision OCR, Azure OpenAI \\ \hline
-Cloud Storage & Azure Blob Storage \\ \hline
-Input Validation & FluentValidation \\ \hline
-Object Mapping & AutoMapper \\ \hline
-Logging & Serilog \\ \hline
-API Documentation & Swagger / OpenAPI \\ \hline
-Dependency Injection & Built-in ASP.NET Core DI Container \\ \hline
-Caching & In-Memory Caching \\ \hline
-Version Control & Git \& GitHub \\ \hline
-
-\end{tabular}
-
+\footnotesize
+\caption{Frontend Technology Stack and Functional Rationale}
+\label{tab:frontend-stack}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{Technology} & \textbf{Architectural Rationale} \\
+\midrule
+Next.js 14 & Enables Server-Side Rendering (SSR) and built-in API proxy routing \cite{nextjs2024}. \\
+React 18 & Facilitates declarative UI rendering and efficient Virtual DOM reconciliation. \\
+TypeScript 5 & Enforces strict compile-time type checking and backend DTO parity. \\
+Tailwind CSS & Utility-first styling optimized for minimal production bundle sizes \cite{tailwind2024}. \\
+Axios \& TanStack & Manages HTTP pipelines, token injection, and cache synchronization \cite{tanstack2024}. \\
+Zustand 4.5 & Provides lightweight atomic state slices for session persistence. \\
+\bottomrule
+\end{tabularx}
 \end{table}
 
-The selection of ASP.NET Core enables cross-platform deployment while maintaining enterprise-level performance characteristics. Integration with Azure services provides robust AI capabilities and cloud-native scalability, essential for processing agricultural image data and maintaining secure authentication systems.
-
-
-\section{Project Structure Analysis}
-
-\subsection{Domain Layer Architecture}
-
-The Domain Layer encapsulates the fundamental business concepts of the Fake Seed Detection System. This layer contains core entities representing agricultural and administrative concepts, enums defining system states, interfaces specifying service contracts, and shared base classes providing common functionality.
-
-\subsubsection{Entities Folder --- Core Business Models}
-
-The Entities folder contains the primary business objects used throughout the system. Each entity represents a key concept in the seed verification and complaint management workflow:
-
-\begin{description}
-\item[BaseEntity.cs] Serves as the foundation for most domain entities, providing common audit properties including unique identifier, creation timestamp, modification timestamp, and audit trail information about entity lifecycle changes.
-
-\item[Seed.cs] Represents the core seed entity containing agricultural product details necessary for verification operations.
-
-\item[SeedBatch.cs] Models collections of seeds from a single production batch, enabling batch-level analysis and risk assessment across multiple products.
-
-\item[DetectionResult.cs] Encapsulates the outcome of AI-based seed analysis, including confidence scores, classification results, and quality metrics.
-
-\item[AnalysisReport.cs] Aggregates detection results and generates comprehensive reports suitable for farmer communication and administrative review.
-
-\item[AuditLog.cs] Maintains detailed records of system operations and user actions for compliance, security auditing, and dispute resolution.
-\end{description}
-
-\subsubsection{Enums Folder --- System Classifications}
-
-Enums maintain consistency by restricting values to predefined sets, preventing invalid state combinations:
-
-\begin{description}
-\item[SeedStatus.cs] Defines lifecycle states for seeds (Active, Suspended, Verified, Rejected).
-
-\item[QualityLevel.cs] Classifies seeds into quality categories (Excellent, Good, Fair, Poor, Counterfeit) based on AI analysis.
-
-\item[ImageFormat.cs] Enumerates supported image formats (JPG, JPEG, PNG) for seed packet analysis.
-
-\item[DetectionAlgorithm.cs] Specifies available AI algorithms (Custom Vision, ResNet, Hybrid).
-
-\item[ReportType.cs] Categorizes generated reports (VerificationSummary, DetailedAnalysis, RiskAssessment).
-\end{description}
-
-\subsubsection{Interfaces Folder --- Service Contracts}
-
-Interfaces define contracts that promote testability and loose coupling throughout the system:
-
-\begin{description}
-\item[IRepository\textless T\textgreater] Generic repository interface providing standard CRUD (Create, Read, Update, Delete) operations while abstracting data access complexity from business logic.
-
-\item[ISeedRepository] Extends the generic repository with seed-specific query operations optimized for verification workflows.
-
-\item[IBatchRepository] Specializes repository operations for batch-level queries including batch risk assessment and historical analysis.
-
-\item[IDetectionService] Defines contracts for image analysis and seed classification operations utilizing AI services.
-
-\item[IReportService] Specifies interfaces for generating structured reports in various formats (PDF, Excel, JSON).
-
-\item[IUnitOfWork] Implements the Unit of Work pattern for coordinating multiple repository operations within atomic transactions.
-
-\item[IAuthenticationService] Defines security-related operations including user verification and access control.
-\end{description}
-
-\subsubsection{Common Folder --- Shared Base Classes}
-
-The Common folder provides reusable base classes reducing code duplication:
-
-\begin{description}
-\item[BaseEntity.cs] Base class providing common audit fields (Id, CreatedAt, UpdatedAt, CreatedBy, UpdatedBy).
-
-\item[Result\textless T\textgreater] Generic result wrapper enabling consistent error handling and operation status communication throughout the application.
-
-\item[PagedResult\textless T\textgreater] Wrapper class supporting pagination in list operations, reducing database load for large result sets.
-
-\item[ApiResponse] Standardizes HTTP response structure across all API endpoints.
-
-\item[Pagination] Data transfer object containing pagination metadata (PageNumber, PageSize, TotalRecords).
-\end{description}
-
-\subsubsection{Exceptions Folder --- Error Handling Strategy}
-
-Custom exceptions provide semantic meaning to error conditions:
-
-\begin{description}
-\item[DomainException] Base class for all domain-level business rule violations.
-
-\item[EntityNotFoundException] Raised when requested entities do not exist in the system.
-
-\item[ValidationException] Aggregates multiple validation failures with field-level details.
-
-\item[UnauthorizedAccessException] Indicates insufficient permissions for requested operations.
-
-\item[InvalidOperationException] Represents invalid state transitions or business logic violations.
-\end{description}
-
-\subsection{Infrastructure Layer Architecture}
-
-The Infrastructure Layer implements technical solutions and external service integrations. It translates domain interfaces into concrete implementations while managing data persistence and cloud service communications.
-
-\subsubsection{Persistence Folder --- Data Management}
-
-The Persistence folder encapsulates all database-related operations:
-
-\paragraph{ApplicationDbContext.cs}
-
-The ApplicationDbContext class serves as the central Entity Framework Core context, mapping C\# domain entities to database tables. It manages:
-
-\begin{itemize}
-\item Entity-to-table mappings through DbSet properties
-\item Database change tracking and automatic timestamp management
-\item Soft delete functionality preserving historical records
-\item Relationship configurations and constraints
-\item Audit field population (CreatedAt, UpdatedAt automatically)
-\end{itemize}
-
-\paragraph{UnitOfWork.cs}
-
-Implements the Unit of Work pattern coordinating multiple database operations as atomic transactions. When processing seed complaints with simultaneous investigation record creation, UnitOfWork ensures both operations commit together or both rollback, preventing data inconsistency.
-
-\paragraph{Repository Implementation}
-
-\begin{description}
-\item[Repository\textless T\textgreater.cs] Generic repository implementing standard CRUD operations and reducing code duplication across entity-specific repositories.
-
-\item[SeedRepository.cs] Provides seed-specific queries including batch-level searches and quality assessment lookups.
-
-\item[BatchRepository.cs] Manages batch operations including risk analysis and historical trend queries.
-
-\item[DetectionResultRepository.cs] Specializes in verification result retrieval and analysis queries.
-\end{description}
-
-\subsubsection{Configurations Folder --- Database Mapping}
-
-Entity Framework Core configuration classes define database schema, indexes, and relationships:
-
-\begin{description}
-\item[SeedEntityTypeConfiguration] Defines table schema, column types, constraints, and indexes for optimal seed query performance.
-
-\item[BatchEntityTypeConfiguration] Configures batch table structure with relationships to seed and result entities.
-
-\item[ResultEntityTypeConfiguration] Maps detection result schema with confidence score storage and enum conversions.
-
-\item[AuditLogConfiguration] Establishes audit log structure with timestamp indexing for efficient historical queries.
-\end{description}
-
-\subsubsection{Migrations Folder --- Schema Version Control}
-
-Database migrations enable safe schema evolution without data loss:
-
-\begin{itemize}
-\item Initial migrations create core tables and relationships
-\item Incremental migrations add features (new columns, tables, indexes) as application requirements evolve
-\item Migration history enables rollback to previous schema versions if necessary
-\item Each migration is timestamped and sequenced for deterministic application
-\end{itemize}
-
-Example migrations include:
-
-\begin{description}
-\item[20240101000000\_InitialCreate.cs] Creates foundational entities (Seed, Batch, User, DetectionResult).
-
-\item[20240115000000\_AddDetectionTables.cs] Introduces AI analysis and verification result tables.
-
-\item[20240201000000\_AddAuditLog.cs] Adds comprehensive audit logging capability.
-\end{description}
-
-\subsubsection{Services Folder --- External Integrations}
-
-External service integration classes manage cloud and AI service communications:
-
-\begin{description}
-\item[CustomVisionService.cs] Interfaces with Azure Custom Vision API for seed image classification, returning confidence scores and classification results.
-
-\item[ComputerVisionService.cs] Validates image quality (brightness, sharpness, resolution) before expensive cloud processing, reducing costs and protecting privacy.
-
-\item[OpenAIService.cs] Utilizes GPT models to generate farmer-friendly explanations from technical verification results.
-
-\item[BlobStorageService.cs] Manages Azure Blob Storage operations for secure image uploads and retrievals without local server storage.
-
-\item[ResNetPaddyClassifierService.cs] Provides custom-trained deep learning model specifically for rice seed classification, offering superior accuracy compared to general-purpose models.
-\end{description}
-
-\subsubsection{Extensions Folder --- Dependency Injection}
-
-The InfrastructureServiceCollectionExtensions class centralizes service registration:
-
-\begin{itemize}
-\item Registers database contexts and Entity Framework Core configuration
-\item Configures repository instances and Unit of Work pattern
-\item Registers external service implementations (AI, storage, authentication)
-\item Organizes dependency injection into logical, reusable extension methods
-\item Maintains clean Program.cs by centralizing infrastructure setup
-\end{itemize}
-
-\subsection{Application Layer Architecture}
-
-The Application Layer orchestrates business workflows and coordinates communication between Presentation, Domain, and Infrastructure layers.
-
-\subsubsection{Services Subfolder}
-
-\paragraph{Service Interfaces}
-
-\begin{description}
-\item[IVerificationService] Defines contracts for seed verification operations including authenticated and anonymous verification, history retrieval, and statistics calculation.
-
-\item[IAuthService] Manages authentication workflows including farmer/officer registration, credential-based login, token refresh, and profile management.
-
-\item[IAdminService] Specifies administrative operations including officer management, farmer oversight, dashboard statistics, and audit log retrieval.
-
-\item[IComplaintService] Defines complaint lifecycle management including creation, assignment to officers, status transitions, and statistics generation.
-
-\item[IAnalyticsService] Specifies reporting and analytics capabilities including verification metrics, complaint trends, high-risk batch identification, and export functionality.
-
-\item[IOpenAIService] Integrates GPT-based features including farmer-friendly summaries, recommendations, and chatbot interactions.
-
-\item[IComputerVisionService] Defines image quality analysis operations performed locally before cloud processing.
-
-\item[IBlobStorageService] Manages cloud storage operations including upload, download, and secure access control.
-
-\item[IReferenceDataService] Manages system dropdown data with memory caching for performance optimization.
-
-\item[ICustomVisionService] Defines Azure Custom Vision integration for seed image classification.
-\end{description}
-
-\paragraph{Service Implementations}
-
-Each service implementation contains business logic orchestrating domain operations and infrastructure calls:
-
-\begin{description}
-\item[VerificationService.cs] Processes seed packet images through multiple AI pipelines, saves results, and generates verification responses with confidence metrics.
-
-\item[ComplaintService.cs] Manages complaint workflows including creation, officer assignment, status tracking, and statistics aggregation.
-
-\item[ReferenceDataService.cs] Manages dropdown data with 24-hour caching reducing database queries for frequently accessed reference information.
-
-\item[AuthService.cs] Handles authentication including registration validation, credential verification, JWT token generation, and session management.
-
-\item[AdminService.cs] Implements administrative operations for officer management, user status updates, and dashboard statistics.
-
-\item[AnalyticsService.cs] Aggregates system metrics for verification accuracy, complaint resolution, and officer performance reporting.
-
-\item[BaseService.cs] Provides shared functionality including logging, exception handling, and repository dependency injection.
-\end{description}
-
-\subsubsection{DTOs Subfolder --- Data Transfer Objects}
-
-\paragraph{Request DTOs}
-
-Request objects define input validation contracts:
-
-\begin{description}
-\item[VerificationRequest] Contains seed packet images (front and back), crop type, and location for verification initiation.
-
-\item[CreateComplaintRequest] Includes batch number, crop type, issue classification, severity rating, and optional field imagery.
-
-\item[CreateOfficerRequest] Specifies officer details including email, 12-digit ID, name, and assigned districts.
-
-\item[UpdateOfficerRequest] Allows modification of officer information and district assignments.
-
-\item[UpdateComplaintRequest] Enables investigation details addition including findings and supporting evidence.
-
-\item[UpdateProfileRequest] Allows farmers and officers to update personal information.
-
-\item[LoginRequest] Specifies farmer email-password credentials.
-
-\item[RegisterRequest] Contains farmer registration details including contact information and role selection.
-
-\item[OfficerLoginRequest] Specifies officer 12-digit ID and password for specialized officer authentication.
-\end{description}
-
-\paragraph{Response DTOs}
-
-Response objects structure output data:
-
-\begin{description}
-\item[VerificationResponse] Provides complete verification results including AI analysis, OCR data, quality metrics, risk assessment, and farmer recommendations.
-
-\item[AuthResponse] Returns JWT access token, refresh token, expiry timestamp, and user profile information.
-
-\item[UserProfileResponse] Delivers user public profile including ID, email, name, role, and district.
-
-\item[OfficerDto] Presents officer information including ID, name, phone, assigned districts, and performance metrics.
-
-\item[FarmerDto] Shows farmer information including contact details, profile completion status, and activity metrics.
-
-\item[ComplaintInvestigationResponse] Provides investigation details including action type, findings, evidence, and approval status.
-
-\item[AdminDashboardResponse] Aggregates system overview statistics including user counts and complaint metrics.
-
-\item[ComplaintStatsResponse] Delivers complaint workflow statistics including status breakdown and resolution metrics.
-\end{description}
-
-\subsubsection{Validators Subfolder}
-
-FluentValidation rules ensure input quality:
-
-\begin{description}
-\item[VerificationRequestValidator] Validates image format (JPG/JPEG/PNG), file size (\(\leq 5\) MB), required fields, and district selection.
-
-\item[RegisterRequestValidator] Enforces password complexity (8+ characters, mixed case, digits, special characters), email format, and phone validation.
-
-\item[CreateOfficerValidator] Validates email format, 12-digit officer ID pattern, phone number, and district assignment.
-
-\item[CreateComplaintValidator] Ensures batch number format, issue type validity, severity range (1--5), and image constraints.
-
-\item[LoginRequestValidator] Validates presence of required credentials.
-\end{description}
-
-\subsubsection{Mappings Subfolder}
-
-AutoMapper profiles automate entity-to-DTO transformations:
-
-\begin{description}
-\item[MappingProfile.cs] Configures automated transformations including VerificationHistory~$\rightarrow$~VerificationResponse and User~$\rightarrow$~UserResponse.
-
-\item[MappingExtensions.cs] Provides helper methods for complex nested object transformations.
-\end{description}
-
-\subsubsection{Exceptions Subfolder}
-
-Application-layer exceptions provide semantic error information:
-
-\begin{description}
-\item[ApplicationException] Base class for application errors returned as HTTP 400/422 responses.
-
-\item[ValidationException] Contains field-specific validation error details for client-side form validation.
-\end{description}
-
-\subsection{Presentation Layer (API) Architecture}
-
-The Presentation Layer exposes RESTful endpoints handling HTTP communication, authentication, and request orchestration.
-
-\subsubsection{Controllers Subfolder}
-
-\paragraph{BaseApiController.cs}
-
-The base controller provides common functionality inherited by all endpoint controllers:
-
-\begin{itemize}
-\item Extracts current user ID from JWT claims
-\item Provides current user email retrieval
-\item Enforces API versioning scheme (\texttt{/api/v1/[controller]})
-\item Standardizes JSON response formatting
-\item Implements consistent security handling
-\end{itemize}
-
-\paragraph{AuthController.cs}
-
-Manages user authentication operations:
-
-\begin{itemize}
-\item Farmer and officer registration with role validation
-\item Email-password farmer login
-\item 12-digit officer ID login for specialized officer authentication
-\item JWT token refresh for session persistence
-\item Logout and password reset functionality
-\item Profile management and updates
-\end{itemize}
-
-\paragraph{VerificationController.cs}
-
-Handles seed verification endpoints:
-
-\begin{itemize}
-\item Authenticated verification with history saving
-\item Anonymous verification without login requirement
-\item Verification history retrieval with pagination
-\item Detailed AI analysis results including confidence scores
-\item Risk factor identification and farmer recommendations
-\end{itemize}
-
-\paragraph{ComplaintsController.cs}
-
-Manages complaint operations:
-
-\begin{itemize}
-\item Complaint creation with field image upload to Azure Blob Storage
-\item User complaint retrieval and detail viewing
-\item Status updates (Open~$\rightarrow$~Investigating~$\rightarrow$~Resolved~$\rightarrow$~Closed)
-\item Complaint assignment to investigating officers
-\item Batch risk tracking and audit trail maintenance
-\end{itemize}
-
-\paragraph{AdminController.cs}
-
-Provides administration capabilities (Admin role restricted):
-
-\begin{itemize}
-\item Officer management (list, create, update, deactivate)
-\item Farmer management and status updates
-\item System dashboard with aggregate statistics
-\item Audit log retrieval for compliance tracking
-\item Pagination and filtering by status/district
-\end{itemize}
-
-\paragraph{AnalyticsController.cs}
-
-Delivers role-specific dashboard statistics:
-
-\begin{itemize}
-\item Verification summary (total, genuine, counterfeit, suspicious counts)
-\item Confidence metrics and verification performance
-\item Recent verification history
-\item Officer-specific complaint assignments and resolution rates
-\item High-risk batch identification
-\end{itemize}
-
-\paragraph{AnalyticsControllerV2.cs}
-
-Provides comprehensive admin-level reporting:
-
-\begin{itemize}
-\item System-wide statistics and metrics
-\item Verification performance trends
-\item Complaint trend analysis
-\item User metrics and performance insights
-\item High-risk batch identification
-\item Export functionality (JSON/CSV formats)
-\end{itemize}
-
-\paragraph{ReferenceDataController.cs}
-
-Exposes public dropdown data endpoints:
-
-\begin{itemize}
-\item States, Districts, and Crops with 24-hour memory caching
-\item No authentication required for data access
-\item Admin operations for reference data management
-\item Dynamic dropdown updates without code changes
-\end{itemize}
-
-\subsubsection{Middleware Subfolder}
-
-\paragraph{ExceptionHandlingMiddleware.cs}
-
-Global exception handling implements consistent error response formatting:
-
-\begin{itemize}
-\item Catches all unhandled exceptions across the application pipeline
-\item Maps exception types to appropriate HTTP status codes (400, 404, 422, 500)
-\item Logs errors for debugging and monitoring
-\item Returns user-friendly error messages
-\item Prevents server stack traces from reaching clients
-\end{itemize}
-
-\paragraph{RequestLoggingMiddleware.cs}
-
-Implements comprehensive request-response logging using Serilog:
-
-\begin{itemize}
-\item Captures HTTP method, path, and status code
-\item Records response time and user identification
-\item Enables performance monitoring and request tracing
-\item Supports security auditing and troubleshooting
-\item Maintains audit trails for compliance
-\end{itemize}
-
-\paragraph{AuthenticationMiddleware.cs}
-
-Validates JWT Bearer tokens and establishes authenticated context:
-
-\begin{itemize}
-\item Extracts and validates JWT tokens from request headers
-\item Extracts user claims (ID, email, role)
-\item Establishes authenticated context for protected endpoints
-\item Permits anonymous access to public endpoints
-\item Integrates with ASP.NET Core Identity
-\end{itemize}
-
-\subsubsection{Configuration Files}
-
-\paragraph{appsettings.json}
-
-Default configuration containing:
-
-\begin{itemize}
-\item AI service provider selection (Azure or Custom Model)
-\item Database connection string
-\item JWT token settings (Key, Issuer, Audience, ExpiryHours)
-\item Azure service credentials (Custom Vision, OpenAI, Blob Storage)
-\item Custom model endpoint
-\item Serilog logging configuration
-\end{itemize}
-
-\paragraph{appsettings.Development.json}
-
-Development environment overrides:
-
-\begin{itemize}
-\item HTTP without HTTPS validation for local development
-\item Localhost database connections
-\item Development JWT keys and tokens
-\item Verbose logging configuration
-\item Relaxed CORS policies
-\end{itemize}
-
-\paragraph{appsettings.Production.json}
-
-Production environment settings:
-
-\begin{itemize}
-\item HTTPS metadata validation enabled
-\item Production database connection
-\item Secure JWT configuration
-\item Production Azure endpoints
-\item Restricted CORS policies (specific domain origins only)
-\item Optimized logging configuration
-\end{itemize}
-
-\subsubsection{Program.cs --- Application Entry Point}
-
-The Program.cs orchestrates comprehensive application startup in 15+ configuration steps:
-
-\begin{enumerate}
-\item Environment variable loading from \texttt{.env} files
-\item Serilog logging initialization (before any other operations)
-\item Kestrel server configuration with dynamic PORT support for deployment
-\item SQL Server database setup with automatic migration execution
-\item ASP.NET Core Identity configuration with password policies
-\item JWT authentication configuration with token validation parameters
-\item CORS policy configuration (development allows all, production restricts)
-\item Dependency injection registration for all application services
-\item AI services setup (Azure or Custom Model selection)
-\item Swagger documentation generation
-\item Health check configuration with database connectivity verification
-\item Middleware pipeline assembly in correct order
-\item Database initialization with role seeding
-\item Admin user creation with secure defaults
-\item Comprehensive error logging throughout startup process
-\end{enumerate}
-
-This multi-step initialization ensures the application starts in a known, verified state with all dependencies properly configured and initialized.
-
-
-\section{Data Flow and Integration Points}
-
-\subsection{Verification Workflow}
-
-The seed verification workflow demonstrates the integration of architectural layers:
-
-\begin{enumerate}
-\item \textbf{API Request:} Farmer uploads seed packet images through VerificationController.
-\item \textbf{Request Validation:} VerificationRequestValidator ensures image format and size compliance.
-\item \textbf{Service Orchestration:} VerificationService coordinates multiple processing steps.
-\item \textbf{Image Quality Analysis:} ComputerVisionService evaluates image quality locally.
-\item \textbf{AI Classification:} CustomVisionService classifies seed authenticity via Azure API.
-\item \textbf{Text Extraction:} Computer Vision OCR extracts batch numbers and brand information.
-\item \textbf{Result Explanation:} OpenAIService generates farmer-friendly summaries.
-\item \textbf{Data Persistence:} Repository pattern saves verification results to database.
-\item \textbf{Response Mapping:} AutoMapper transforms domain entities to VerificationResponse DTO.
-\item \textbf{API Response:} Controller returns structured response to farmer with verification results.
-\end{enumerate}
-
-\subsection{Security Architecture}
-
-The system implements multiple security layers:
-
-\begin{description}
-\item[Authentication] JWT Bearer tokens issued upon login, validated in every protected request.
-\item[Authorization] Role-based access control (Farmer, Officer, Admin) enforced per endpoint.
-\item[Password Security] ASP.NET Core Identity manages hashing and complexity validation.
-\item[Session Management] Refresh tokens enable persistent sessions with expiration enforcement.
-\item[API Security] Middleware validates tokens, prevents unauthorized access.
-\item[Data Encryption] Sensitive data encrypted in transit (HTTPS) and at rest (database).
-\end{description}
-% \section{Summary}
-
-% The Fake Seed Detection System backend architecture demonstrates a professionally designed, layered approach to enterprise application development. The Clean Architecture pattern ensures separation of concerns, maintainability, and testability throughout all layers. Integration of Azure AI services provides robust verification capabilities, while comprehensive security measures protect user data and system integrity. The modular project structure, organized into four independent layers with clear responsibility boundaries, enables efficient development, testing, and maintenance of the complex agricultural verification platform.
-
+% ============================================================
+\section{Modular Project Structure}
+\label{sec:project-structure}
+
+To prevent architectural drift, the source tree utilizes strict domain-driven modularity. Key directories include \texttt{src/app} (Next.js routing), \texttt{src/components} (reusable UI primitives), \texttt{src/hooks} (data synchronization logic), and \texttt{src/types} (TypeScript DTO contracts matching backend entities). This decoupling isolates business logic from presentation constraints.
+
+% ============================================================
+\section{Routing Topology and Access Control}
+\label{sec:routing-access}
+
+The frontend leverages Role-Based Access Control (RBAC) to enforce security across public domains and protected administrative boundaries.
+
+\subsection{Role Partitioning}
+The application supports four hierarchical profiles: \textbf{Farmers} (verification access and dispute lodging), \textbf{Agricultural Officers} (inspection queues and evidence review), \textbf{Administrators} (system governance and telemetry), and \textbf{Public Users} (anonymous checks). 
+
+\subsection{Route Protection Middleware}
+A client-side \texttt{RoleGuard} component prevents privilege escalation by evaluating JSON Web Token (JWT) claims against required permissions before mounting React components.
+
+\begin{lstlisting}[
+    language=TypeScript,
+    caption={Core Logic of the Role-Based Route Protection Guard},
+    label={lst:role_guard},
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    frame=single
+]
+export const RoleGuard: React.FC<{ children: React.ReactNode; allowedRoles: Role[] }> = ({ children, allowedRoles }) => {
+    const { token, role, isLoading } = useAuthStore();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading) {
+            if (!token) return router.replace('/login');
+            if (role && !allowedRoles.includes(role)) return router.replace('/unauthorized');
+        }
+    }, [token, role, isLoading, router, allowedRoles]);
+
+    if (isLoading || !token) return <Loader />;
+    return <>{children}</>;
+};
+\end{lstlisting}
+
+% ============================================================
+\section{Authentication and Secure Persistence}
+\label{sec:authentication}
+
+The platform secures user sessions using a dual-token JWT exchange, protecting against common client-side vulnerabilities like Cross-Site Scripting (XSS) \cite{masue2024quantifying}.
+
+\subsection{Token Storage Architecture}
+Short-lived access tokens are strictly held in the in-memory Zustand store to prevent malicious script extraction. Long-lived refresh tokens are persisted in encrypted caches (or \texttt{HttpOnly} cookies), facilitating background session renewal without compromising token integrity.
+
+\subsection{Automated Token Rotation}
+To maintain seamless UX during field operations, Axios interceptors autonomously detect \texttt{401 Unauthorized} responses, pause the network queue, execute a token refresh cycle, and seamlessly replay pending requests.
+
+\begin{lstlisting}[
+    language=TypeScript,
+    caption={Axios Interceptor for Automated JWT Token Rotation},
+    label={lst:axios_interceptor},
+    basicstyle=\ttfamily\scriptsize,
+    breaklines=true,
+    frame=single
+]
+apiClient.interceptors.response.use(res => res, async (error) => {
+    const origReq = error.config;
+    if (error.response?.status === 401 && !origReq._retry) {
+        origReq._retry = true;
+        try {
+            const res = await axios.post('/api/proxy/auth/refresh', { token: useAuthStore.getState().refreshToken });
+            useAuthStore.getState().setTokens(res.data.accessToken, res.data.refreshToken);
+            origReq.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
+            return apiClient(origReq);
+        } catch (err) {
+            useAuthStore.getState().logout();
+            return Promise.reject(err);
+        }
+    }
+    return Promise.reject(error);
+});
+\end{lstlisting}
+
+% ============================================================
+\section{API Integration and Type Safety}
+\label{sec:api-integration}
+
+To eliminate data corruption and runtime mapping errors, strict TypeScript Data Transfer Objects (DTOs) enforce compile-time verification of HTTP payloads. Integration modules (Auth, Verification, Analytics, and Complaint Services) mirror the ASP.NET Core backend schema, ensuring zero-defect data rendering across dashboards.
+
+% ============================================================
+\section{State Management}
+\label{sec:state-management}
+
+State architecture is bifurcated based on data volatility:
+
+\subsection{Asynchronous Server State (TanStack Query)}
+Network-driven data (e.g., dispute queues, telemetry) is managed by TanStack Query. It handles stale-while-revalidate caching, background polling, and optimistic UI updates, drastically reducing perceived network latency \cite{tanstack2024}.
+
+\subsection{Synchronous Client State (Zustand)}
+Client-local states, such as active UI themes and user session contexts, utilize Zustand. Its atomic state slices minimize React re-rendering cycles, conserving device battery and memory in resource-constrained field environments.
+
+% ============================================================
+\section{Responsive UI Design and Field Usability}
+\label{sec:responsive-ui}
+
+Recognizing the hardware limitations and environmental challenges of rural agriculture, the UI adopts a strict mobile-first design system utilizing Tailwind CSS \cite{singh2026impact}.
+
+\subsection{Standardized UI Library}
+To accelerate development and maintain cohesion, the system uses reusable primitives (Table~\ref{tab:ui-components}).
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Standardized UI Components}
+\label{tab:ui-components}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{Component} & \textbf{Interaction Role} \\
+\midrule
+\textbf{Data Table} & Scrollable grids with sticky headers and dynamic pagination for inspection data. \\
+\textbf{Status Badge} & Semantic color indicators (e.g., Green/Genuine) for rapid cognitive parsing. \\
+\textbf{Loading Skeleton} & Animated structural placeholders preventing layout shifts during network latency. \\
+\textbf{Input Modal} & Focused workflow overlays that trap keyboard navigation for accessible data entry. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Accessibility Enhancements}
+Usability optimizations include strict adherence to WCAG AAA contrast ratios for visibility under direct sunlight, enlarged touch targets ($48\times 48$px minimum) to minimize physical input errors, and full ARIA semantic tagging for assistive screen-reader compatibility.
+
+% ============================================================
+\section{Summary}
+\label{sec:frontend-summary}
+
+This chapter outlined the AgriVerify frontend architecture. By integrating Next.js, TypeScript, and state-of-the-art token rotation mechanisms, the platform delivers a secure, accessible, and performant user experience. Its decoupled layered design and mobile-first responsive framework successfully overcome the operational constraints of rural field deployments, bridging advanced AI analytics with practical agricultural workflows.

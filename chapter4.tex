@@ -9,7 +9,7 @@ The dataset used in this project was assembled from two distinct sources on Kagg
 \subsubsection{Public Source}
 The first source is the Paddy Seeds Quality Classification dataset published on Kaggle by Ayyan Arkadalkani:
 \begin{center}
-\url{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}
+\href{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}{\nolinkurl{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}}
 \end{center}
 
 This dataset comprises 1,213 labeled images distributed across three quality classes---Healthy, Damaged, and Fake/Low Quality---with a total storage footprint of approximately 183\,MB. It provided a strong baseline of labeled examples captured under varied lighting and background conditions, making it suitable as a general-purpose foundation for transfer learning.
@@ -17,7 +17,7 @@ This dataset comprises 1,213 labeled images distributed across three quality cla
 \subsubsection{Custom Source}
 The second source is a custom dataset collected directly from ICAR, Manipur. Images of paddy seeds were captured under controlled laboratory conditions at the ICAR facility to reflect the specific seed varieties cultivated in the northeastern region of India. This collection totals 350 images and occupies approximately 24.7\,MB of storage. The dataset has been published on Kaggle as an open-access resource to support future research in regional paddy seed analysis:
 \begin{center}
-\url{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}
+\href{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}{\nolinkurl{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}}
 \end{center}
 
 By merging both datasets, we obtained a combined corpus of 1,563 images that is both larger and more geographically diverse than either source alone, better reflecting the range of seed conditions encountered in real agricultural settings across India.
@@ -26,29 +26,32 @@ By merging both datasets, we obtained a combined corpus of 1,563 images that is 
 
 After merging both datasets, the combined corpus contains 1,563 paddy seed images distributed across three quality classes. Table~\ref{tab:dataset_source_summary} summarises the source-wise composition, and Table~\ref{tab:class_distribution} presents the class-wise distribution.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Dataset Source Summary}
 \label{tab:dataset_source_summary}
-\begin{tabular}{|l|c|c|c|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|p{6cm}|}
 \hline
 \textbf{Source} & \textbf{Images} & \textbf{Size} & \textbf{Kaggle Identifier} \\
 \hline
-Paddy Seeds Quality Classification & 1,213 & $\sim$183\,MB & \texttt{ayyanarkadalkani/} \\
-(Ayyan Arkadalkani) & & & \texttt{paddy-seeds-quality-...} \\
+Paddy Seeds Quality Classification & 1,213 & $\sim$183\,MB & \nolinkurl{ayyanarkadalkani/paddy-seeds-quality-classification-dataset} \\
+(Ayyan Arkadalkani) & & & \\
 \hline
-ICAR Manipur Custom Dataset & 350 & $\sim$23.7\,MB & \texttt{nilambarelangbam/} \\
-(Our Collection) & & & \texttt{paddy-seed-images-...} \\
+ICAR Manipur Custom Dataset & 350 & $\sim$23.7\,MB & \nolinkurl{nilambarelangbam/paddy-seed-images-collected-from-icar-manipur} \\
+(Our Collection) & & & \\
 \hline
 \textbf{Combined Total} & \textbf{1,563} & \textbf{$\sim$208\,MB} & --- \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Class-wise Distribution of the Combined Dataset}
 \label{tab:class_distribution}
+\resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{|l|c|c|}
 \hline
 \textbf{Class} & \textbf{Number of Images} & \textbf{Percentage (\%)} \\
@@ -61,7 +64,8 @@ Fake/Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
 \hline
 \textbf{Total} & \textbf{1,563} & \textbf{100.0} \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 The dataset exhibits a moderate class imbalance, with Healthy seeds being the most represented class and Fake/Low Quality seeds the least. To prevent the model from developing a bias toward the majority class, weighted random sampling was applied during training, ensuring that each class contributes proportionally to every training batch regardless of its raw frequency in the dataset.
@@ -70,11 +74,12 @@ The dataset exhibits a moderate class imbalance, with Healthy seeds being the mo
 
 We partitioned the 1,563 images into three non-overlapping subsets following a stratified split strategy. Stratified splitting ensures that the class proportions observed in the full dataset are preserved in each subset, preventing any split from being inadvertently dominated by a single quality class. Table~\ref{tab:dataset_split} summarises the split.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Dataset Split Statistics}
 \label{tab:dataset_split}
-\begin{tabular}{|c|c|c|l|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|p{7cm}|}
 \hline
 \textbf{Split} & \textbf{Proportion} & \textbf{Approx. Images} & \textbf{Purpose} \\
 \hline
@@ -84,7 +89,8 @@ Validation Set & 10\% & $\sim$157 & Hyperparameter tuning and early stopping \\
 \hline
 Test Set & 10\% & $\sim$156 & Final unbiased evaluation on unseen data \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 The training set is used exclusively for updating model weights. The validation set is monitored at the end of every epoch to guide hyperparameter decisions and to detect the onset of overfitting. The test set is held out entirely until the final evaluation stage, ensuring that all reported performance metrics reflect genuine generalisation to previously unseen examples.
@@ -202,11 +208,12 @@ Training was halted at epoch~15 when early stopping criteria were triggered (val
 
 Table~\ref{tab:hyperparameters} summarises the complete hyperparameter configuration used during training.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hyperparameter Configuration and Training Settings}
 \label{tab:hyperparameters}
-\begin{tabular}{|l|c|l|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|p{7.5cm}|}
 \hline
 \textbf{Hyperparameter} & \textbf{Value} & \textbf{Notes} \\
 \hline
@@ -232,7 +239,8 @@ Input Resolution & $224 \times 224$ pixels & ResNet50 standard input \\
 \hline
 Total Epochs & 15 & Halted at overfitting onset \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 The AdamW optimiser was selected for its adaptive learning rate properties and decoupled weight decay, which provides better generalisation compared to standard L2 regularisation in the original Adam implementation.
@@ -241,11 +249,12 @@ The AdamW optimiser was selected for its adaptive learning rate properties and d
 
 Upon completion of training, the final model was exported in multiple formats to support deployment across different runtime environments. Table~\ref{tab:export_formats} lists the export formats and their intended use cases.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Model Export Formats}
 \label{tab:export_formats}
-\begin{tabular}{|c|c|c|l|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|p{6.5cm}|}
 \hline
 \textbf{Format} & \textbf{Extension} & \textbf{Size} & \textbf{Use Case} \\
 \hline
@@ -259,7 +268,8 @@ Configuration & \texttt{.json} & $\sim$2\,KB & Model metadata, labels, hyperpara
 \hline
 DUS Reference DB & \texttt{.csv} & $<$1\,MB & 12 reference varieties for matching \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \section{Model Deployment}
@@ -290,17 +300,18 @@ The entire application---model weights, FastAPI server, and all dependencies---i
 
 GCP Cloud Run was selected for its serverless auto-scaling model, which eliminates idle resource costs while handling concurrent inference requests elastically. The live API endpoint is publicly accessible at:
 \begin{center}
-\url{https://resnet-api-297419987783.asia-south1.run.app/}
+\href{https://resnet-api-297419987783.asia-south1.run.app/}{\nolinkurl{https://resnet-api-297419987783.asia-south1.run.app/}}
 \end{center}
 
 \section{Model Comparison and Selection}
 
 To justify the selection of ResNet50 as the final architecture, a comparative evaluation of four widely used convolutional neural network architectures was conducted on the same dataset, training split, and hyperparameter configuration. The models evaluated were ResNet50, MobileNetV2, DenseNet121, and GoogleNet. Table~\ref{tab:architecture_comparison} presents the results.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Architecture Comparison on Test Set}
 \label{tab:architecture_comparison}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
 \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Time (min)} \\
@@ -313,7 +324,8 @@ GoogleNet & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 12.2 \\
 \hline
 MobileNetV2 & 99.13\% & 99.15\% & 99.13\% & 99.13\% & 8.5 \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 ResNet50, DenseNet121, and GoogleNet achieved identical peak accuracy of 99.57\% on the test set, demonstrating that the dataset is well within the representational capacity of all three architectures. MobileNetV2 achieved a slightly lower accuracy of 99.13\% but completed training in only 8.5\,minutes---approximately half the time of ResNet50---making it a viable alternative in resource-constrained deployment scenarios.
@@ -334,11 +346,12 @@ The 4.4-minute training overhead compared to GoogleNet is a negligible cost give
 
 The final ResNet50 model was evaluated on the held-out test set following the completion of Phase~2 training. Table~\ref{tab:final_test_performance} presents the overall performance metrics, and Table~\ref{tab:training_behaviour} summarises key training behaviour observed across both phases.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Final Test Set Performance---ResNet50}
 \label{tab:final_test_performance}
-\begin{tabular}{|l|c|l|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|p{8cm}|}
 \hline
 \textbf{Metric} & \textbf{Value} & \textbf{Status} \\
 \hline
@@ -352,14 +365,16 @@ F1 Score & $\sim$0.99 & Excellent---strong harmonic balance \\
 \hline
 Train-Validation Gap & $<$5\% & Excellent generalisation; overfitting controlled \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Training Behaviour Summary}
 \label{tab:training_behaviour}
-\begin{tabular}{|l|l|}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|p{4cm}|p{11.5cm}|}
 \hline
 \textbf{Observation} & \textbf{Detail} \\
 \hline
@@ -373,7 +388,8 @@ Overfitting Control & Train-validation gap remained below the critical 5\% thres
 \hline
 Training Stopped at & Epoch 15---onset of overfitting detected; best weights preserved \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 The final accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality classification systems. The near-perfect precision, recall, and F1 score across all three quality classes confirm that the model can reliably distinguish healthy seeds from damaged and fake/low quality seeds---a critical requirement for practical agricultural deployment at Manipur Technical University and partner ICAR facilities.

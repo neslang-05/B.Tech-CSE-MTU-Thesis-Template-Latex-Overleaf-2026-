@@ -1,0 +1,124 @@
+This appendix provides the complete production deployment instructions, containerization specifications, and CI/CD automation pipelines required to host the distributed AgriVerify ecosystem across cloud infrastructure.
+
+\section*{1. Containerization Specifications (Dockerfiles)}
+
+\subsection*{FastAPI ResNet50 Inference Container}
+Packages the Python runtime, PyTorch tensor libraries, and fine-tuned model checkpoints into a lightweight production container.
+
+\begin{lstlisting}[style=mystyle, language=bash]
+# Base image optimized for PyTorch execution
+FROM python:3.11-slim as runtime
+
+WORKDIR /app
+
+# Install system dependencies required for OpenCV and tensor processing
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency specification and install Python packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy microservice application source code and model weights
+COPY . .
+
+# Expose production port and execute Uvicorn ASGI server
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+\end{lstlisting}
+
+\subsection*{ASP.NET Core Business Backend Container}
+Utilizes a multi-stage Docker build to compile the .NET 8 C\# projects and produce an optimized minimal runtime footprint.
+
+\begin{lstlisting}[style=mystyle, language=bash]
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution and project files for layer caching
+COPY ["AgriVerify.API/AgriVerify.API.csproj", "AgriVerify.API/"]
+COPY ["AgriVerify.Core/AgriVerify.Core.csproj", "AgriVerify.Core/"]
+COPY ["AgriVerify.Infrastructure/AgriVerify.Infrastructure.csproj", "AgriVerify.Infrastructure/"]
+RUN dotnet restore "AgriVerify.API/AgriVerify.API.csproj"
+
+# Copy full source and execute release build
+COPY . .
+WORKDIR "/src/AgriVerify.API"
+RUN dotnet publish "AgriVerify.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Runtime Production Stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "AgriVerify.API.dll"]
+\end{lstlisting}
+
+\subsection*{Next.js 15 Frontend Production Container}
+Compiles the React TypeScript application into static standalone bundles optimized for CDN distribution and serverless edge rendering.
+
+\begin{lstlisting}[style=mystyle, language=bash]
+# Build Stage
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Standalone Runner Stage
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV production
+ENV PORT 3000
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+EXPOSE 3000
+CMD ["node", "server.js"]
+\end{lstlisting}
+
+\section*{2. Cloud Run Serverless Deployment Execution}
+
+The following automated shell execution commands deploy the built Docker images directly to Google Cloud Run serverless infrastructure, provisioning HTTPS termination and auto-scaling capabilities.
+
+\begin{lstlisting}[style=mystyle, language=bash]
+#!/bin/bash
+# ====================================================================
+# AgriVerify Automated Production Deployment Script (GCP Cloud Run)
+# ====================================================================
+
+PROJECT_ID="agriverify-production"
+REGION="asia-south1" # Mumbai Data Center
+
+echo "1. Authenticating with Google Cloud Platform..."
+gcloud auth configure-docker $REGION-docker.pkg.dev
+
+echo "2. Building and Tagging Production Container Images..."
+docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/repo/model-api:latest ./model-serving
+docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/repo/backend-api:latest ./backend
+docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/repo/frontend-app:latest ./frontend
+
+echo "3. Pushing Artifacts to GCP Artifact Registry..."
+docker push $REGION-docker.pkg.dev/$PROJECT_ID/repo/model-api:latest
+docker push $REGION-docker.pkg.dev/$PROJECT_ID/repo/backend-api:latest
+docker push $REGION-docker.pkg.dev/$PROJECT_ID/repo/frontend-app:latest
+
+echo "4. Deploying Model Serving Microservice to Serverless Cloud Run..."
+gcloud run deploy agriverify-model-api \
+    --image $REGION-docker.pkg.dev/$PROJECT_ID/repo/model-api:latest \
+    --platform managed \
+    --region $REGION \
+    --allow-unauthenticated \
+    --memory 2Gi \
+    --cpu 2 \
+    --min-instances 0 \
+    --max-instances 10
+
+echo "Production Deployment Completed Successfully!"
+\end{lstlisting}

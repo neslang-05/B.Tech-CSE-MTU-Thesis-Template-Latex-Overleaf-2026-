@@ -1,501 +1,686 @@
 % ============================================================
-%  CHAPTER 6: FRONTEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
-%  AgriVerify — AI-Powered Fake Seed Detection System
-%  Manipur Technical University, Final Year Project Report
+% CHAPTER 6: BACKEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
+% AgriVerify — AI-Powered Fake Seed Detection System
 % ============================================================
 
-% \chapter{Frontend System Architecture and Implementation}
-% \label{ch:frontend-architecture}
+\chapter{Backend System Architecture and Implementation}
+\label{ch:backend-architecture}
 
-Modern agricultural platforms operating across rural and semi-urban environments demand responsive, intuitive, and highly reliable user interfaces. While the deep learning microservice (Chapter~5) executes complex classification algorithms and the ASP.NET Core backend (Chapter~7) manages business orchestration and relational persistence, the frontend application serves as the tangible contact point for farmers, agricultural officers, and system administrators~\cite{fowler2002patterns}. The primary software engineering objective for the AgriVerify frontend is to deliver a role-partitioned, highly responsive web application capable of capturing high-resolution seed imagery in the field, displaying complex multi-model AI inference reports, and managing multi-stage administrative workflows over varying network bandwidths.
+The backend of the AgriVerify system is responsible for managing business logic, AI model integration, authentication, database operations, and communication between frontend clients and cloud services. The system was developed using ASP.NET Core Web API following the Clean Architecture approach to achieve modularity, maintainability, and scalability.
 
-This chapter details the architectural design and technical implementation of the AgriVerify frontend built using Next.js~15, React~19, TypeScript, and Tailwind CSS~\cite{nextjs2024, react2013, typescript2012, tailwind2024}. The discussion explores the decoupled component-service architecture, the file-system-based routing hierarchy leveraging Next.js route groups, and rigorous client-side role enforcement. Furthermore, robust authentication workflows including Zustand in-memory state management and automated Axios refresh-token recovery are presented alongside comprehensive API integration contracts and UI component design systems~\cite{axios2024, tanstack2024query, zustand2024}.
+The backend integrates multiple services including SQL Server, Azure AI services, JWT authentication, and cloud storage. The architecture separates core business logic from infrastructure and presentation concerns, enabling easier maintenance and future system expansion.
 
-% ──────────────────────────────────────────────────────────────
-\section{Architecture and Design Principles}
-\label{sec:frontend-architecture}
-% ──────────────────────────────────────────────────────────────
+% ============================================================
+\section{Architectural Design}
+\label{sec:backend-architecture}
+% ============================================================
 
-The AgriVerify frontend is structured around a decoupled, layered component-service architecture~\cite{fowler2002patterns}. In contrast to tightly coupled web applications where data fetching, state mutation, and business logic are embedded directly within presentation components, AgriVerify enforces strict separation of concerns across four discrete functional layers: presentation UI, query orchestration, domain service modules, and transport proxying.
+The backend follows a layered architecture based on Clean Architecture principles. Each layer performs a dedicated responsibility while maintaining loose coupling between components.
 
-\begin{enumerate}
-    \item \textbf{Presentation UI Layer:} Composed of thin React Server Components and interactive Client Components. This layer declares layout structures and visual styling but delegates all asynchronous state transitions to dedicated custom hooks.
-    \item \textbf{Query Orchestration Layer:} Encapsulated within custom React hooks powered by TanStack Query (React Query v5)~\cite{tanstack2024query}. This layer manages server-state caching, background refetching, cache invalidation, and optimistic UI updates.
-    \item \textbf{Domain Service Layer:} A collection of modular TypeScript service files (\texttt{authService.ts}, \texttt{verificationService.ts}, \texttt{complaintService.ts}, \texttt{adminService.ts}) that encapsulate backend REST API endpoints and data transfer object (DTO) validation.
-    \item \textbf{Transport and Proxy Layer:} Configured via a centralized Axios HTTP client that automatically handles authentication token injection and error interception, forwarding requests to a secure Next.js server-side proxy route.
-\end{enumerate}
+\begin{figure}[H]
+\centering
 
-This architectural separation significantly enhances maintainability and testability. UI components can be developed and tested in isolation using mock query hooks; backend endpoint modifications require updates only within the corresponding domain service file without disrupting the presentation layer.
-
-\begin{figure}[htbp]
-  \centering
-  \begin{adjustbox}{max width=0.9\textwidth}
-    \includegraphics[width=\textwidth]{figures/frontend_architecture.png}
-  \end{adjustbox}
-  \caption{Layered frontend architecture illustrating data flow from presentation UI through custom query hooks and domain services to the server-side Next.js API proxy route.}
-  \label{fig:frontend-arch}
-\end{figure}
-
-% ──────────────────────────────────────────────────────────────
-\section{Technology Stack}
-\label{sec:frontend-stack}
-% ──────────────────────────────────────────────────────────────
-
-The technology stack underpinning the AgriVerify frontend was selected to maximize compile-time type safety, client-side rendering performance, and developer productivity. Table~\ref{tab:frontend-stack} details the primary frameworks and libraries integrated into the frontend ecosystem.
-
-\begin{table}[H]
-  \centering
-  \caption{Core Technology Stack of the AgriVerify Frontend Application}
-  \label{tab:frontend-stack}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Component / Library} & \textbf{Version} & \textbf{Architectural Role and System Function} \\
-    \midrule
-    \textbf{Next.js} & 15.2.4 & Core application framework providing file-system routing, server components, route groups, and the API proxy pipeline~\cite{nextjs2024}. \\
-    \addlinespace
-    \textbf{React} & 19.2.5 & UI rendering engine supporting concurrent mode and reactive client state~\cite{react2013}. \\
-    \addlinespace
-    \textbf{TypeScript} & 5.7.3 & Enforces rigorous compile-time type safety across DTO contracts, UI props, and state models~\cite{typescript2012}. \\
-    \addlinespace
-    \textbf{Tailwind CSS} & 3.4.17 & Utility-first CSS framework managing responsive layouts and design tokens~\cite{tailwind2024}. \\
-    \addlinespace
-    \textbf{Axios} & 1.7.9 & Centralized HTTP client managing request headers and token interception~\cite{axios2024}. \\
-    \addlinespace
-    \textbf{TanStack Query} & 5.59.0 & Manages asynchronous server state, cache invalidation, and optimistic mutations~\cite{tanstack2024query}. \\
-    \addlinespace
-    \textbf{Zustand} & 5.0.1 & Lightweight in-memory global state store managing authentication profiles~\cite{zustand2024}. \\
-    \addlinespace
-    \textbf{Framer Motion} & 12.38.0 & Orchestrates fluid page transitions and micro-animations across dashboard views. \\
-    \addlinespace
-    \textbf{Lucide React} & 1.14.0 & Comprehensive iconography library providing standardized visual glyphs. \\
-    \addlinespace
-    \textbf{\texttt{react-webcam}} & 7.2.0 & HTML5 media device interface enabling mobile and desktop camera capture for seed scanning. \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-Application typography is managed via Next.js native Google Font optimization (\texttt{next/font/google}). The root layout preloads \texttt{DM Sans} for body copy and \texttt{Sora} for display headings, injecting both font families as CSS custom properties into the DOM. This technique eliminates render-blocking external web font requests, ensuring instant text rendering and preventing cumulative layout shifts (CLS).
-
-% ──────────────────────────────────────────────────────────────
-\section{Folder Structure and Repository Layout}
-\label{sec:folder-structure}
-% ──────────────────────────────────────────────────────────────
-
-The source code repository is organized inside a dedicated \texttt{src/} root directory to cleanly separate application code from configuration files (\texttt{tsconfig.json}, \texttt{tailwind.config.ts}, \texttt{package.json}). Table~\ref{tab:repo-layout} outlines the primary structural subdivisions within the repository.
-
-\begin{table}[H]
-  \centering
-  \caption{Directory Structure and Component Responsibilities within \texttt{src/}}
-  \label{tab:repo-layout}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l X @{}}
-    \toprule
-    \textbf{Directory Path} & \textbf{Architectural Responsibility and Encapsulated Modules} \\
-    \midrule
-    \textbf{\texttt{src/app/}} & Contains all Next.js App Router route definitions (\texttt{page.tsx}), nested layout wrappers (\texttt{layout.tsx}), role route groups, and the backend proxy route. \\
-    \addlinespace
-    \textbf{\texttt{src/components/}} & Houses reusable UI primitives (\texttt{src/components/ui/}) and complex feature components (\texttt{CameraCapture}, \texttt{VerificationResult}, \texttt{RoleGuard}). \\
-    \addlinespace
-    \textbf{\texttt{src/hooks/}} & Encapsulates TanStack Query custom hooks (\texttt{useVerification.ts}, \texttt{useComplaints.ts}, \texttt{useAuth.ts}) for data fetching and state mutations. \\
-    \addlinespace
-    \textbf{\texttt{src/services/}} & Contains domain-specific API clients that interface with the Axios instance. \\
-    \addlinespace
-    \textbf{\texttt{src/lib/}} & Utility functions, including Axios error normalization and role route mapping helpers. \\
-    \addlinespace
-    \textbf{\texttt{src/store/}} & Houses the Zustand authentication store (\texttt{authStore.ts}). \\
-    \addlinespace
-    \textbf{\texttt{src/types/}} & TypeScript interface definitions for entities, DTOs, and API error contracts. \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-Within \texttt{src/app/}, Next.js route groups---designated by parentheses---are used to partition the application by user persona: \texttt{(auth)}, \texttt{(farmer)}, \texttt{(officer)}, and \texttt{(admin)}. Route groups do not affect the public URL path; consequently, a component located at \texttt{src/app/(farmer)/farmer/dashboard/page.tsx} renders cleanly at the URL \texttt{/farmer/dashboard}. A specialized dynamic catch-all route at \texttt{src/app/api/proxy/[...path]/route.ts} acts as the server-side API gateway.
-
-\begin{figure}[htbp]
-  \centering
-  \begin{adjustbox}{max width=0.85\textwidth}
-    \includegraphics[width=\textwidth]{figures/folder_structure.png}
-  \end{adjustbox}
-  \caption{Logical folder organization of the AgriVerify frontend source tree, highlighting the separation between App Router navigation and core domain modules.}
-  \label{fig:folder-structure}
-\end{figure}
-
-% ──────────────────────────────────────────────────────────────
-\section{Routing System and Access Control}
-\label{sec:routing}
-% ──────────────────────────────────────────────────────────────
-
-\subsection{App Router Namespace and Access Hierarchy}
-
-The Next.js App Router enforces a clear, hierarchical navigation structure. Each route layout injects shared headers, navigation sidebars, and authentication providers. Table~\ref{tab:frontend_routes} summarizes the active URL namespace and associated role permissions.
-
-\begin{table}[H]
-  \centering
-  \caption{Frontend Application Route Namespace and Access Hierarchy}
-  \label{tab:frontend_routes}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Route Namespace} & \textbf{Endpoint Paths} & \textbf{Access Scope and Functional Role} \\
-    \midrule
-    \textbf{Public Domain} & \texttt{/}, \texttt{/verify} & Unauthenticated landing page and anonymous mobile field scanner. \\
-    \addlinespace
-    \textbf{Authentication} & \texttt{/login}, \texttt{/register} & Secure entry points for farmer onboarding and credential verification. \\
-    \addlinespace
-    \textbf{Farmer Portal} & \texttt{/farmer/dashboard} & Primary farmer overview and metric aggregation.\\
-    & \texttt{/farmer/verify} & Authenticated dual-image seed verification submission.\\
-    & \texttt{/farmer/history} & Paginated archive of historical verification reports.\\
-    & \texttt{/farmer/complaints} & Submission and tracking of product quality grievances.\\
-    \addlinespace
-    \textbf{Officer Portal} & \texttt{/officer/dashboard} & Regional risk assessment and workload queue.\\
-    & \texttt{/officer/complaints} & Investigation workflow and status management interface.\\
-    \addlinespace
-    \textbf{Admin Portal} & \texttt{/admin/dashboard} & System-wide analytics and platform oversight.\\
-    & \texttt{/admin/officers} & Provisioning, role assignment, and officer deactivation.\\
-    & \texttt{/admin/farmers} & Farmer account monitoring and account status oversight.\\
-    & \texttt{/admin/analytics} & Aggregated longitudinal verification and complaint trends.\\
-    & \texttt{/admin/audit-logs} & Immutable chronological trail of administrative actions.\\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\subsection{Role-Based Access Control Implementation}
-
-Client-side endpoint protection is enforced through a centralized higher-order layout wrapper named \texttt{RoleGuard}. Rather than duplicating authentication verification logic across dozens of individual route files, every protected layout wraps its component tree in \texttt{RoleGuard}. On component mount, the guard queries the Zustand in-memory store for current user credentials. If the user is unauthenticated, they are immediately redirected to \texttt{/login}. If the user is authenticated but attempts to access a layout reserved for a different role (e.g., a Farmer attempting to access \texttt{/admin/dashboard}), the guard computes the correct redirection path via \texttt{getDashboardPathByRole()} and routes them to their authorized home screen.
-
-\begin{lstlisting}[
-  language=TypeScript,
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=\color{blue!70!black}\bfseries,
-  commentstyle=\color{gray!60},
-  stringstyle=\color{red!70!black},
-  backgroundcolor=\color{gray!5},
-  frame=single, rulecolor=\color{gray!30},
-  breaklines=true, columns=fullflexible,
-  caption={RoleGuard component enforcing client-side route access control},
-  label={lst:roleguard}
-]
-export default function RoleGuard({ allowedRole, children }: RoleGuardProps) {
-  const router   = useRouter();
-  const pathname = usePathname();
-  const token    = useAuthStore((s) => s.token);
-  const role     = useAuthStore((s) => s.role);
-
-  const localToken = typeof window !== 'undefined'
-    ? window.localStorage.getItem('accessToken') : null;
-  const localRole  = typeof window !== 'undefined'
-    ? JSON.parse(window.localStorage.getItem('user') ?? 'null')?.role ?? null
-    : null;
-
-  const effectiveToken = token ?? localToken;
-  const effectiveRole  = role  ?? localRole;
-  const isAllowed      = effectiveRole === allowedRole;
-
-  useEffect(() => {
-    if (!effectiveToken) {
-      router.replace('/login');
-      return;
-    }
-    if (!isAllowed) {
-      const fallback = getDashboardPathByRole(effectiveRole);
-      if (pathname !== fallback) router.replace(fallback);
-    }
-  }, [effectiveToken, isAllowed, effectiveRole, pathname, router]);
-
-  if (!isAllowed) {
-    return <div className="p-8 text-center text-gray-500">Verifying access permissions...</div>;
-  }
-  return <>{children}</>;
+\begin{tikzpicture}[
+node distance=2cm,
+every node/.style={
+draw,
+rounded corners,
+minimum width=5cm,
+minimum height=1cm,
+align=center,
+font=\small
 }
-\end{lstlisting}
-
-The mapping function \texttt{getDashboardPathByRole()} guarantees deterministic routing: \texttt{Admin} resolves to \texttt{/admin/dashboard}, \texttt{Officer} to \texttt{/officer/dashboard}, and \texttt{Farmer} to \texttt{/farmer/dashboard}.
-
-\subsection{User Role Workflows and Portal Functionality}
-
-\subsubsection{Farmer Portal --- Verification and Complaint Workflows}
-
-The Farmer portal is designed for simplicity and immediate operational feedback. Upon authentication, farmers enter a central dashboard presenting aggregated metrics: total verifications conducted, percentages of genuine vs. counterfeit packaging discovered, and open dispute statuses. The core feature is the Verification Submission workflow (\texttt{/farmer/verify}). Farmers upload front and back images of seed packaging, select the target crop variety, and specify their agricultural district. The submission is processed asynchronously; once complete, the user is navigated to the results panel displaying confidence percentages, extracted OCR batch text, and physical DUS parameters.
-
-If a farmer receives a questionable verification report or experiences poor crop yield from verified seeds, they can initiate a product grievance via \texttt{/farmer/complaints}. The complaint submission form captures detailed narrative descriptions, batch identification numbers, district metadata, and an adjustable severity rating slider.
-
-\subsubsection{Officer Portal --- Regional Investigation Queue}
-
-Agricultural Officers require high-density analytical dashboards to manage field investigations. The Officer portal (\texttt{/officer/dashboard}) displays a dynamic workload queue listing all unresolved complaints within their assigned regional jurisdiction. The interface provides advanced client-side filtering by severity level, district, and investigation status (\texttt{Open}, \texttt{Under Investigation}, \texttt{Resolved}, \texttt{Closed}). Clicking a complaint record expands an in-depth audit drawer showcasing the farmer's submitted evidence images, extraction history, and prior administrative actions. Officers update the investigation status through a controlled dropdown menu; each update triggers an optimistic TanStack Query cache mutation, instantly updating the UI while synchronizing with the backend.
-
-\subsubsection{Admin Portal --- System Governance and Analytics}
-
-System Administrators oversee the operational health and security of the entire AgriVerify ecosystem. The Admin dashboard (\texttt{/admin/dashboard}) provides platform-wide telemetry, including active user distributions, system latency metrics, and database health indicators. Under \texttt{/admin/officers}, administrators manage officer provisioning, assigning regional jurisdictions and executing account deactivations when personnel depart. The \texttt{/admin/audit-logs} view renders an immutable chronological ledger of all critical state transitions across the platform, providing comprehensive traceability for regulatory compliance.
-
-\subsubsection{Public Verification --- Anonymous Field Scanner}
-
-To support unauthenticated farmers performing rapid spot-checks in rural markets, the platform provides an anonymous mobile verification route at \texttt{/verify}. This screen integrates a responsive media capture wrapper (\texttt{CameraCapture}) powered by \texttt{react-webcam}. The component requests HTML5 video stream permissions and guides the user through capturing front and back packaging photos using smartphone cameras. The captured image buffers are transmitted directly to the \texttt{/verification/verify-anonymous} endpoint. The resulting analysis panel displays the authenticity determination and confidence breakdown, alongside explicit advisory instructions directing farmers to regional agricultural extension offices if counterfeit packaging is detected.
-
-% ──────────────────────────────────────────────────────────────
-\section{Authentication Flow and Session Management}
-\label{sec:auth-flow}
-% ──────────────────────────────────────────────────────────────
-
-\subsection{Token Storage Strategy and Zustand Auth Store}
-
-AgriVerify implements a secure JWT-based authentication architecture. When a user successfully authenticates via the login endpoint, the ASP.NET Core backend issues a cryptographically signed access token, a long-lived refresh token, session expiry timestamps, and a user profile payload. To ensure persistence across page reloads while maintaining high-speed reactive access within React components, these session credentials are simultaneously committed to browser \texttt{localStorage} and loaded into an in-memory Zustand global store~\cite{owasp2021session, zustand2024}.
-
-\begin{lstlisting}[
-  language=TypeScript,
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=\color{blue!70!black}\bfseries,
-  commentstyle=\color{gray!60},
-  stringstyle=\color{red!70!black},
-  backgroundcolor=\color{gray!5},
-  frame=single, rulecolor=\color{gray!30},
-  breaklines=true, columns=fullflexible,
-  caption={Zustand reactive authentication store managing session credentials},
-  label={lst:authstore}
 ]
-export const useAuthStore = create<AuthStore>((set) => ({
-  ...getInitialAuthState(),
-  setAuth: (token, refreshToken, user) => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('accessToken',  token);
-      window.localStorage.setItem('refreshToken', refreshToken);
-      window.localStorage.setItem('user',         JSON.stringify(user));
-    }
-    set({ user, token, role: user.role ?? null, isAuthenticated: true });
-  },
-  clearAuth: () => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('accessToken');
-      window.localStorage.removeItem('refreshToken');
-      window.localStorage.removeItem('user');
-    }
-    set({ user: null, token: null, role: null, isAuthenticated: false });
-  },
-}));
-\end{lstlisting}
 
-While \texttt{localStorage} guarantees session survival across browser sessions, it is accessible to client-side JavaScript execution. In highly hardened enterprise deployments, transitioning token storage to \texttt{httpOnly}, \texttt{SameSite=Strict} secure cookies managed by the Next.js server proxy would eliminate cross-site scripting (XSS) token theft vulnerabilities~\cite{owasp2021session}.
+\node[fill=blue!10] (api) {Presentation Layer\\REST APIs and Middleware};
 
-\subsection{Automated Refresh Token Recovery (Axios 401 Interceptor)}
+\node[fill=green!10, below of=api] (application) {Application Layer\\Services, DTOs and Validation};
 
-To provide uninterrupted user sessions without compromising security through long-lived access tokens, the frontend implements automated refresh token rotation. When an access token reaches its expiration window, outgoing requests to the ASP.NET backend fail with an HTTP \texttt{401 Unauthorized} status code. An Axios response interceptor catches this rejection before it reaches the UI components.
+\node[fill=yellow!10, below of=application] (domain) {Domain Layer\\Entities and Interfaces};
 
-The interceptor pauses all queued outgoing requests and executes an automated call to \texttt{/api/proxy/auth/refresh} using the stored refresh token. If the backend validates the refresh token and issues a fresh credential pair, the interceptor updates \texttt{localStorage} and the Zustand store, resumes the paused request queue, and replays the originally failed request with the new access token attached. If the refresh request itself fails (e.g., due to refresh token revocation or expiration), the interceptor executes \texttt{clearAuth()}, purging all local session data and redirecting the browser to \texttt{/login}.
+\node[fill=orange!10, below of=domain] (infra) {Infrastructure Layer\\Database and External Services};
 
-\begin{figure}[htbp]
-  \centering
-  \begin{adjustbox}{max width=0.85\textwidth}
-    \includegraphics[width=\textwidth]{figures/auth_flow.png}
-  \end{adjustbox}
-  \caption{Authentication lifecycle diagram detailing JWT token persistence in Zustand and automated refresh token recovery via Axios HTTP 401 interception.}
-  \label{fig:auth-flow}
+\draw[->, thick] (api) -- (application);
+\draw[->, thick] (application) -- (domain);
+\draw[->, thick] (infra) -- (domain);
+\draw[->, thick] (infra) -- (application);
+
+\end{tikzpicture}
+
+\caption{Backend Clean Architecture Layers}
+\label{fig:backend-clean-architecture}
+
 \end{figure}
 
-% ──────────────────────────────────────────────────────────────
-\section{API Integration and Client Layer}
-\label{sec:api-integration}
-% ──────────────────────────────────────────────────────────────
-
-\subsection{Centralized Axios HTTP Client and Server Proxy Route}
-
-All client-side network communication is channeled through a centralized Axios instance configured with a base URL of \texttt{/api/proxy}~\cite{axios2024}. A dedicated Axios request interceptor attaches the user's JWT Bearer token to the \texttt{Authorization} header of every outgoing HTTP request.
-
-\begin{lstlisting}[
-  language=TypeScript,
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=\color{blue!70!black}\bfseries,
-  commentstyle=\color{gray!60},
-  stringstyle=\color{red!70!black},
-  backgroundcolor=\color{gray!5},
-  frame=single, rulecolor=\color{gray!30},
-  breaklines=true, columns=fullflexible,
-  caption={Centralized Axios client enforcing automated Bearer token injection},
-  label={lst:axios}
-]
-export const apiClient = axios.create({
-  baseURL: '/api/proxy',
-  headers: { 'Content-Type': 'application/json' },
-});
-
-apiClient.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = window.localStorage.getItem('accessToken');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
-\end{lstlisting}
-
-When a request reaches the Next.js server at \texttt{/api/proxy/[...path]}, the proxy route handler reconstructs the target endpoint by prepending \texttt{/api/v1/} and forwarding the call to the destination ASP.NET Core backend defined in the secure server environment variable \texttt{BACKEND\_API\_URL}. The proxy strictly preserves HTTP method semantics, status codes, and headers. For multipart form uploads containing high-resolution seed images, the proxy forwards the incoming byte stream without re-encoding, preserving the MIME boundary delimiters required by the backend parser.
-
-\subsection{API Endpoint Integration Summary}
-
-The domain service layer exposes structured TypeScript functions that interface with the API routes summarized in Tables~\ref{tab:ep-auth} through \ref{tab:ep-analytics}.
-
-\begin{table}[H]
-  \centering
-  \caption{Authentication Service API Endpoint Integration Contracts}
-  \label{tab:ep-auth}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Service Function} & \textbf{HTTP Method} & \textbf{Endpoint Path and Contractual Description} \\
-    \midrule
-    \textbf{\texttt{login()}} & \texttt{POST} & \textbf{\texttt{/auth/login}}\newline Accepts farmer email and password credentials; returns JWT pair and user profile; unauthenticated public access. \\
-    \addlinespace
-    \textbf{\texttt{officerLogin()}} & \texttt{POST} & \textbf{\texttt{/auth/officer-login}}\newline Authenticates agricultural officers via ID and TOTP multi-factor passcode; unauthenticated public access. \\
-    \addlinespace
-    \textbf{\texttt{register()}} & \texttt{POST} & \textbf{\texttt{/auth/register}}\newline Creates a new farmer account record with demographic metadata; unauthenticated public access. \\
-    \addlinespace
-    \textbf{\texttt{refreshToken()}} & \texttt{POST} & \textbf{\texttt{/auth/refresh}}\newline Renews access token using a valid refresh token; consumed automatically by Axios interceptor. \\
-    \addlinespace
-    \textbf{\texttt{logout()}} & \texttt{POST} & \textbf{\texttt{/auth/logout}}\newline Revokes active refresh tokens on the server and terminates user session; requires Bearer token. \\
-    \addlinespace
-    \textbf{\texttt{getMe()}} & \texttt{GET} & \textbf{\texttt{/auth/me}}\newline Retrieves current authenticated user profile and role metadata; requires Bearer token. \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}[H]
-  \centering
-  \caption{Seed Verification Service API Endpoint Integration Contracts}
-  \label{tab:ep-verify}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Service Function} & \textbf{HTTP Method} & \textbf{Endpoint Path and Contractual Description} \\
-    \midrule
-    \textbf{\texttt{uploadVerification()}} & \texttt{POST} & \textbf{\texttt{/verification/upload}}\newline Multipart form submission containing front/back packaging images and crop metadata; requires Bearer token. \\
-    \addlinespace
-    \textbf{\texttt{verifyAnonymous()}} & \texttt{POST} & \textbf{\texttt{/verification/verify-anonymous}}\newline Public unauthenticated multipart form submission for mobile field spot-checks. \\
-    \addlinespace
-    \textbf{\texttt{getHistory()}} & \texttt{GET} & \textbf{\texttt{/verification/history}}\newline Retrieves paginated verification history for the authenticated farmer profile; requires Bearer token. \\
-    \addlinespace
-    \textbf{\texttt{getVerification()}} & \texttt{GET} & \textbf{\texttt{/verification/\{id\}}}\newline Retrieves a single complete verification report including DUS metrics and AI confidence scores. \\
-    \addlinespace
-    \textbf{\texttt{getStatistics()}} & \texttt{GET} & \textbf{\texttt{/verification/statistics}}\newline Aggregates dashboard counter statistics (total verifications, counterfeit ratios) for the active user. \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}[H]
-  \centering
-  \caption{Complaint Management Service API Endpoint Integration Contracts}
-  \label{tab:ep-complaints}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Service Function} & \textbf{HTTP Method} & \textbf{Endpoint Path and Contractual Description} \\
-    \midrule
-    \textbf{\texttt{createComplaint()}} & \texttt{POST} & \textbf{\texttt{/Complaints}}\newline Submits a product quality grievance including narrative description and severity score; requires Bearer token. \\
-    \addlinespace
-    \textbf{\texttt{getMyComplaints()}} & \texttt{GET} & \textbf{\texttt{/Complaints/my-complaints}}\newline Retrieves paginated list of complaints filed by the active farmer profile; requires Bearer token. \\
-    \addlinespace
-    \textbf{\texttt{getAllComplaints()}} & \texttt{GET} & \textbf{\texttt{/Complaints}}\newline Retrieves filtered complaint master list for Officer and Admin oversight; requires role authorization. \\
-    \addlinespace
-    \textbf{\texttt{getComplaint()}} & \texttt{GET} & \textbf{\texttt{/Complaints/\{id\}}}\newline Retrieves complete audit trail and evidence images for a specific complaint ID; requires Bearer token. \\
-    \addlinespace
-    \textbf{\texttt{updateStatus()}} & \texttt{PUT} & \textbf{\texttt{/Complaints/\{id\}/status}}\newline Updates investigation state (\texttt{Under Investigation}, \texttt{Resolved}); restricted to Officer and Admin roles. \\
-    \addlinespace
-    \textbf{\texttt{assignOfficer()}} & \texttt{POST} & \textbf{\texttt{/complaints/\{id\}/assign}}\newline Assigns a specific agricultural officer to oversee a pending complaint; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{getBatchRisks()}} & \texttt{GET} & \textbf{\texttt{/Complaints/batch-risks}}\newline Retrieves aggregated risk scoring across seed batch numbers; requires Bearer token. \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}[H]
-  \centering
-  \caption{Administration and Analytics Service API Endpoint Integration Contracts}
-  \label{tab:ep-analytics}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Service Function} & \textbf{HTTP Method} & \textbf{Endpoint Path and Contractual Description} \\
-    \midrule
-    \textbf{\texttt{getOfficers()}} & \texttt{GET} & \textbf{\texttt{/admin/officers}}\newline Retrieves paginated roster of registered agricultural officers; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{createOfficer()}} & \texttt{POST} & \textbf{\texttt{/admin/officers}}\newline Provisions a new officer account with regional district assignments; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{updateOfficer()}} & \texttt{PUT} & \textbf{\texttt{/admin/officers/\{id\}}}\newline Updates officer profile information and regional metadata; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{deactivateOfficer()}} & \texttt{POST} & \textbf{\texttt{/admin/officers/\{id\}/deactivate}}\newline Revokes officer access credentials and locks account; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{getFarmers()}} & \texttt{GET} & \textbf{\texttt{/admin/farmers}}\newline Retrieves paginated list of registered farmer accounts; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{updateFarmerStatus()}} & \texttt{PUT} & \textbf{\texttt{/admin/farmers/\{id\}/status}}\newline Modifies farmer account status (\texttt{Active}, \texttt{Suspended}); restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{getAuditLogs()}} & \texttt{GET} & \textbf{\texttt{/admin/audit-logs}}\newline Retrieves immutable chronological audit log of all system administrative actions; restricted to Admin role. \\
-    \addlinespace
-    \textbf{\texttt{getSystemAnalytics()}} & \texttt{GET} & \textbf{\texttt{/analytics/system}}\newline Retrieves platform-wide longitudinal activity metrics across date ranges; restricted to Admin role. \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-% ──────────────────────────────────────────────────────────────
-\section{State Management and UI Design System}
-\label{sec:state-mgmt}
-% ──────────────────────────────────────────────────────────────
-
-\subsection{Asynchronous Server State Management}
-
-AgriVerify decouples server state from client UI state~\cite{tanstack2024query}. TanStack Query (React Query v5) manages all data originating from backend APIs. The query client is configured with specific behavioral rules tailored for rural agricultural connectivity:
+The layered architecture improves:
 
 \begin{itemize}
-    \item \textbf{Window-Focus Refetching Disabled:} Automatic refetching on browser window focus is disabled globally (\texttt{refetchOnWindowFocus: false}). This prevents unnecessary network bandwidth consumption when farmers switch between browser tabs or mobile applications in areas with intermittent cellular coverage.
-    \item \textbf{Infinite Reference Data Stale Time:} Immutable reference data queries---such as state names, agricultural districts, and registered crop varieties---are assigned an infinite stale time (\texttt{staleTime: Infinity}). Once fetched during initial application load, this data remains cached in browser memory permanently, eliminating repeated network calls.
-    \item \textbf{Optimistic UI Mutations:} Complex state-changing operations, such as an officer updating a complaint investigation status, execute optimistic UI updates. When a status mutation is triggered, the query hook immediately patches the local data cache to reflect the new state instantly. The mutation is then sent to the backend asynchronously; if the HTTP request fails, the query hook automatically rolls back the optimistic update and triggers an error notification toast.
+    \item Separation of concerns
+    \item Code maintainability
+    \item Scalability
+    \item Testability
+    \item Reusability
 \end{itemize}
 
-Network error normalization is handled centrally by the \texttt{extractErrorMessage()} utility located in \texttt{src/lib/}. Whenever an HTTP request fails, this utility parses the rejected Axios response. If the backend returns a structured Problem Details JSON object (\texttt{RFC 7807}), the utility extracts the specific \texttt{detail} or \texttt{title} property. If an unstructured HTML error or network timeout occurs, it formats a standardized, user-friendly failure string. This central normalization ensures that error toasts displayed to end-users are consistently formatted and actionable.
+% ============================================================
+\section{Technology Stack}
+\label{sec:backend-tech-stack}
+% ============================================================
 
-\subsection{UI Component Library and Design Tokens}
-
-The frontend repository implements a highly modular local component library located inside \texttt{src/components/ui/}. Built upon atomic design principles, these components wrap native HTML5 elements with standardized Tailwind CSS utility classes, guaranteeing uniform aesthetic styling and accessible interactive behaviors across all application views. Table~\ref{tab:ui-primitives} outlines the core UI primitive components.
+The backend uses modern technologies for API development, authentication, AI integration, and database management.
 
 \begin{table}[H]
-  \centering
-  \caption{Shared Core UI Primitive Components in \texttt{src/components/ui/}}
-  \label{tab:ui-primitives}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Component Name} & \textbf{UI Element Type} & \textbf{Styling and Functional Implementation Details} \\
-    \midrule
-    \textbf{\texttt{Button}} & Action Control & Implements primary, secondary, outline, and destructive visual variants with hover transition states. \\
-    \addlinespace
-    \textbf{\texttt{Input}} & Text Field & Standardized form input supporting focus rings, error border highlighting, and disabled states. \\
-    \addlinespace
-    \textbf{\texttt{Select}} & Dropdown Menu & Context-driven selection wrapper providing accessible keyboard navigation. \\
-    \addlinespace
-    \textbf{\texttt{Card}} & Content Container & Base structural component enforcing consistent drop shadows, border radii, and internal padding. \\
-    \addlinespace
-    \textbf{\texttt{Badge}} & Status Pill & Color-coded semantic indicator used for verification confidence ratings and complaint states. \\
-    \addlinespace
-    \textbf{\texttt{Table}} & Data Grid & Responsive tabular layout wrapper supporting alternating row backgrounds and hover highlights. \\
-    \addlinespace
-    \textbf{\texttt{Dialog}} & Modal Overlay & Portal-based accessible modal window managing localized popup workflows. \\
-    \addlinespace
-    \textbf{\texttt{Sheet}} & Side Drawer & Sliding off-canvas side panel used for high-density complaint and audit log detail inspection. \\
-    \addlinespace
-    \textbf{\texttt{Skeleton}} & Loading State & Animated pulsing placeholder rendered during TanStack Query asynchronous network fetching. \\
-    \bottomrule
-  \end{tabularx}
+\centering
+\caption{Backend Technology Stack}
+\label{tab:backend-tech-stack}
+\renewcommand{\arraystretch}{1.3}
+
+\begin{tabularx}{0.95\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Technology} & \textbf{Purpose} \\
+\hline
+
+ASP.NET Core Web API & Backend API framework \\
+
+\hline
+
+C\# and .NET 8 & Backend programming environment \\
+
+\hline
+
+Entity Framework Core & Database ORM and migrations \\
+
+\hline
+
+SQL Server & Relational database management \\
+
+\hline
+
+JWT Authentication & Secure user authentication \\
+
+\hline
+
+ASP.NET Core Identity & User and role management \\
+
+\hline
+
+Azure Custom Vision & Seed authenticity classification \\
+
+\hline
+
+Azure OCR & Text extraction from seed packets \\
+
+\hline
+
+Azure OpenAI & AI-generated explanations \\
+
+\hline
+
+Azure Blob Storage & Cloud image storage \\
+
+\hline
+
+FluentValidation & Input validation \\
+
+\hline
+
+AutoMapper & DTO mapping \\
+
+\hline
+
+Swagger & API documentation \\
+
+\hline
+
+Serilog & Request logging and monitoring \\
+
+\hline
+
+\end{tabularx}
+
 \end{table}
 
-\subsection{Responsive Layouts and Accessibility}
+% ============================================================
+\section{Project Structure}
+\label{sec:project-structure}
+% ============================================================
 
-The application interface is styled exclusively using Tailwind CSS design tokens~\cite{tailwind2024}. The Tailwind configuration (\texttt{tailwind.config.ts}) extends the default browser color palette with a curated agricultural theme featuring deep forest greens, emerald highlights, and warm slate grays.
+The backend source code is divided into multiple layers and modules to maintain clear responsibility boundaries.
 
-Layout responsiveness is enforced via mobile-first breakpoint utilities. On mobile device viewports, multi-column dashboard metric grids automatically collapse into vertically scrolling single-column layouts, and wide data tables become horizontally scrollable within their card containers. On desktop monitors, complex detail panels open as sliding side sheets (\texttt{Sheet}) rather than full-screen modal overlays, maximizing screen real estate for agricultural officers managing large data queues.
+\begin{table}[H]
+\centering
+\caption{Backend Project Structure}
+\label{tab:backend-project-structure}
+\renewcommand{\arraystretch}{1.3}
 
-Accessibility (a11y) is integrated directly into the component primitives. All form inputs are explicitly linked to semantic \texttt{label} elements. Interactive clickable elements utilize native \texttt{button} tags rather than generic \texttt{div} elements to preserve default keyboard focus navigation. Data tables incorporate semantic \texttt{thead}, \texttt{tbody}, and \texttt{th} header tags, ensuring compatibility with screen-reader assistive technologies.
+\begin{tabularx}{0.95\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Folder / Layer} & \textbf{Purpose} \\
+\hline
 
-% ──────────────────────────────────────────────────────────────
+Domain & Business entities and interfaces \\
+
+\hline
+
+Application & Services, DTOs and validation \\
+
+\hline
+
+Infrastructure & Database and cloud integrations \\
+
+\hline
+
+Presentation & API controllers and middleware \\
+
+\hline
+
+Persistence & Repositories and migrations \\
+
+\hline
+
+Services & AI and Azure integrations \\
+
+\hline
+
+Configurations & Application configuration files \\
+
+\hline
+
+Middleware & Authentication and exception handling \\
+
+\hline
+
+\end{tabularx}
+
+\end{table}
+
+% ============================================================
+\section{Domain Layer}
+\label{sec:domain-layer}
+% ============================================================
+
+The Domain Layer contains the core business entities and contracts of the application. This layer is independent from external frameworks and infrastructure components.
+
+\subsection{Core Entities}
+
+The major entities in the system include:
+
+\begin{itemize}
+    \item User
+    \item Farmer
+    \item Officer
+    \item Seed
+    \item SeedBatch
+    \item DetectionResult
+    \item Complaint
+    \item AuditLog
+\end{itemize}
+
+These entities represent the primary agricultural and administrative components of the platform.
+
+\subsection{Interfaces}
+
+Interfaces define contracts between layers and improve abstraction.
+
+\begin{itemize}
+    \item IRepository
+    \item IVerificationService
+    \item IAuthenticationService
+    \item IComplaintService
+    \item IAnalyticsService
+\end{itemize}
+
+This approach improves modularity and testing flexibility.
+
+% ============================================================
+\section{Application Layer}
+\label{sec:application-layer}
+% ============================================================
+
+The Application Layer coordinates business workflows and request processing.
+
+\subsection{Application Services}
+
+The system includes several services responsible for handling business operations:
+
+\begin{itemize}
+    \item Verification Service
+    \item Authentication Service
+    \item Complaint Service
+    \item Analytics Service
+    \item Admin Service
+\end{itemize}
+
+These services manage AI processing, validation, database interaction, and response generation.
+
+\subsection{DTOs}
+
+Data Transfer Objects (DTOs) are used for request and response communication between layers.
+
+\begin{table}[H]
+\centering
+\caption{Important DTOs}
+\label{tab:important-dtos}
+\renewcommand{\arraystretch}{1.3}
+
+\begin{tabularx}{0.95\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{DTO} & \textbf{Purpose} \\
+\hline
+
+VerificationRequest & Seed verification request \\
+
+\hline
+
+VerificationResponse & AI verification result \\
+
+\hline
+
+LoginRequest & User login request \\
+
+\hline
+
+AuthResponse & JWT authentication response \\
+
+\hline
+
+CreateComplaintRequest & Complaint submission \\
+
+\hline
+
+OfficerDto & Officer information \\
+
+\hline
+
+AdminDashboardResponse & Dashboard statistics \\
+
+\hline
+
+\end{tabularx}
+
+\end{table}
+
+\subsection{Validation}
+
+FluentValidation is integrated into the application layer to validate:
+
+\begin{itemize}
+    \item File formats
+    \item Image sizes
+    \item Email structure
+    \item Password complexity
+    \item Required fields
+\end{itemize}
+
+This reduces invalid requests and improves system reliability.
+
+% ============================================================
+\section{Infrastructure Layer}
+\label{sec:infrastructure-layer}
+% ============================================================
+
+The Infrastructure Layer manages database operations, external integrations, and cloud services.
+
+\subsection{Database Management}
+
+Entity Framework Core is used for:
+
+\begin{itemize}
+    \item Database migrations
+    \item Entity mapping
+    \item Relationship configuration
+    \item Query execution
+    \item Transaction management
+\end{itemize}
+
+\subsection{Repository Pattern}
+
+The repository pattern abstracts database operations from business logic.
+
+\begin{itemize}
+    \item Generic Repository
+    \item Seed Repository
+    \item Complaint Repository
+    \item Detection Result Repository
+\end{itemize}
+
+\subsection{AI and Cloud Integrations}
+
+The system integrates multiple Azure services for AI processing and storage.
+
+\begin{table}[H]
+\centering
+\caption{External Service Integrations}
+\label{tab:external-services}
+\renewcommand{\arraystretch}{1.3}
+
+\begin{tabularx}{0.95\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Service} & \textbf{Purpose} \\
+\hline
+
+Azure Custom Vision & Seed authenticity classification \\
+
+\hline
+
+Azure OCR & Text extraction from seed packets \\
+
+\hline
+
+Azure OpenAI & AI-generated recommendations \\
+
+\hline
+
+Azure Blob Storage & Cloud image storage \\
+
+\hline
+
+ResNet Classifier & Paddy seed classification \\
+
+\hline
+
+\end{tabularx}
+
+\end{table}
+
+% ============================================================
+\section{Database Schema}
+\label{sec:database-schema}
+% ============================================================
+
+The backend database maintains relationships between users, seed batches, verification results, complaints, and audit records.
+
+\begin{figure}[H]
+\centering
+
+\begin{tikzpicture}[
+node distance=2cm,
+every node/.style={
+draw,
+rounded corners,
+minimum width=3cm,
+minimum height=1cm,
+align=center,
+font=\small
+}
+]
+
+\node (user) {User};
+
+\node (farmer) [below left of=user, xshift=-1cm] {Farmer};
+
+\node (officer) [below right of=user, xshift=1cm] {Officer};
+
+\node (seed) [below of=farmer] {Seed};
+
+\node (batch) [right of=seed, xshift=3cm] {Seed Batch};
+
+\node (detection) [right of=batch, xshift=3cm] {Detection Result};
+
+\node (complaint) [below of=batch] {Complaint};
+
+\node (audit) [below of=detection] {Audit Log};
+
+\draw[->, thick] (user) -- (farmer);
+\draw[->, thick] (user) -- (officer);
+
+\draw[->, thick] (seed) -- (batch);
+
+\draw[->, thick] (batch) -- (detection);
+
+\draw[->, thick] (farmer) -- (complaint);
+
+\draw[->, thick] (officer) -- (complaint);
+
+\draw[->, thick] (user) -- (audit);
+
+\end{tikzpicture}
+
+\caption{Simplified Entity Relationship Structure}
+\label{fig:er-diagram}
+
+\end{figure}
+
+The database schema supports:
+
+\begin{itemize}
+    \item User management
+    \item Seed batch tracking
+    \item AI verification history
+    \item Complaint workflows
+    \item Audit logging
+\end{itemize}
+
+Foreign key relationships maintain referential integrity across all entities.
+
+% ============================================================
+\section{Presentation Layer}
+\label{sec:presentation-layer}
+% ============================================================
+
+The Presentation Layer exposes RESTful APIs for frontend communication.
+
+\subsection{API Controllers}
+
+The backend contains multiple API controllers responsible for different system modules.
+
+\begin{table}[H]
+\centering
+\caption{API Controllers}
+\label{tab:api-controllers}
+\renewcommand{\arraystretch}{1.3}
+
+\begin{tabularx}{0.95\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Controller} & \textbf{Purpose} \\
+\hline
+
+AuthController & Authentication operations \\
+
+\hline
+
+VerificationController & Seed verification endpoints \\
+
+\hline
+
+ComplaintsController & Complaint management \\
+
+\hline
+
+AdminController & Administrative operations \\
+
+\hline
+
+AnalyticsController & Dashboard analytics \\
+
+\hline
+
+ReferenceDataController & Dropdown reference data \\
+
+\hline
+
+\end{tabularx}
+
+\end{table}
+
+\subsection{Middleware}
+
+Middleware components manage authentication, logging, and centralized exception handling.
+
+\begin{itemize}
+    \item Authentication Middleware
+    \item Request Logging Middleware
+    \item Exception Handling Middleware
+\end{itemize}
+
+These middleware components improve system security and monitoring.
+
+% ============================================================
+\section{Authentication and Security}
+\label{sec:backend-security}
+% ============================================================
+
+The backend uses JWT-based authentication with role-based authorization.
+
+\begin{figure}[H]
+\centering
+
+\begin{tikzpicture}[
+node distance=2cm,
+every node/.style={
+draw,
+rounded corners,
+minimum width=3.5cm,
+minimum height=1cm,
+align=center,
+font=\small
+}
+]
+
+\node (login) {User Login};
+
+\node (jwt) [below of=login] {JWT Token Generation};
+
+\node (middleware) [below of=jwt] {Authentication Middleware};
+
+\node (api) [below of=middleware] {Protected API Access};
+
+\node (roles) [right of=middleware, xshift=4cm] {Role Validation};
+
+\draw[->, thick] (login) -- (jwt);
+\draw[->, thick] (jwt) -- (middleware);
+\draw[->, thick] (middleware) -- (api);
+\draw[->, thick] (middleware) -- (roles);
+
+\end{tikzpicture}
+
+\caption{JWT Authentication Flow}
+\label{fig:jwt-backend-flow}
+
+\end{figure}
+
+Security features include:
+
+\begin{itemize}
+    \item JWT Bearer authentication
+    \item Role-based authorization
+    \item Password hashing
+    \item Refresh token support
+    \item HTTPS communication
+    \item Protected API endpoints
+\end{itemize}
+
+The system supports multiple user roles:
+
+\begin{itemize}
+    \item Farmer
+    \item Officer
+    \item Administrator
+\end{itemize}
+
+% ============================================================
+\section{Verification Workflow}
+\label{sec:verification-workflow}
+% ============================================================
+
+The seed verification workflow integrates AI classification, OCR analysis, and database persistence.
+
+\begin{figure}[H]
+\centering
+
+\begin{tikzpicture}[
+node distance=1.7cm,
+every node/.style={
+draw,
+rounded corners,
+minimum width=3.5cm,
+minimum height=1cm,
+align=center,
+font=\small
+}
+]
+
+\node (upload) {Image Upload};
+
+\node (validation) [below of=upload] {Input Validation};
+
+\node (quality) [below of=validation] {Image Quality Analysis};
+
+\node (ai) [below of=quality] {AI Seed Classification};
+
+\node (ocr) [below of=ai] {OCR Text Extraction};
+
+\node (database) [below of=ocr] {Database Storage};
+
+\node (response) [below of=database] {Verification Response};
+
+\draw[->, thick] (upload) -- (validation);
+\draw[->, thick] (validation) -- (quality);
+\draw[->, thick] (quality) -- (ai);
+\draw[->, thick] (ai) -- (ocr);
+\draw[->, thick] (ocr) -- (database);
+\draw[->, thick] (database) -- (response);
+
+\end{tikzpicture}
+
+\caption{Seed Verification Workflow}
+\label{fig:verification-workflow}
+
+\end{figure}
+
+The workflow includes:
+
+\begin{enumerate}
+    \item Image upload
+    \item Request validation
+    \item Image quality analysis
+    \item AI classification
+    \item OCR text extraction
+    \item Database persistence
+    \item Response generation
+\end{enumerate}
+
+% ============================================================
+\section{Configuration and Deployment}
+\label{sec:configuration-deployment}
+% ============================================================
+
+The backend uses multiple configuration files for different deployment environments.
+
+\begin{itemize}
+    \item \texttt{appsettings.json}
+    \item \texttt{appsettings.Development.json}
+    \item \texttt{appsettings.Production.json}
+\end{itemize}
+
+These files manage:
+
+\begin{itemize}
+    \item Database connections
+    \item JWT settings
+    \item Azure credentials
+    \item Logging configuration
+    \item API endpoints
+\end{itemize}
+
+Application startup is configured through \texttt{Program.cs}, which initializes:
+
+\begin{itemize}
+    \item Database services
+    \item Authentication services
+    \item Dependency injection
+    \item Middleware pipeline
+    \item Swagger documentation
+    \item Logging services
+\end{itemize}
+
+% ============================================================
 \section{Summary}
-\label{sec:frontend-summary}
-% ──────────────────────────────────────────────────────────────
+\label{sec:backend-summary}
+% ============================================================
 
-This chapter presented the software architecture and technical implementation of the AgriVerify frontend application. By combining Next.js~15, React~19, TypeScript, and Tailwind CSS, the platform delivers a robust, responsive, and highly secure user interface tailored for diverse agricultural stakeholders. The decoupled component-service architecture cleanly isolates UI rendering from TanStack Query asynchronous state management and Axios REST API communication. Rigorous client-side role enforcement via \texttt{RoleGuard} ensures secure navigation across the Farmer, Officer, and Admin portals. Furthermore, the integration of a standardized UI primitive library, mobile camera scanning capabilities, and automated refresh-token rotation establishes a high-performance web client fully capable of reliable operation in real-world agricultural environments.
+This chapter presented the backend architecture and implementation of the AgriVerify system. The backend was developed using ASP.NET Core Web API following the Clean Architecture pattern.
+
+The system integrates database management, AI services, authentication, cloud storage, and REST APIs into a modular and scalable architecture. Entity Framework Core, JWT authentication, Azure AI services, and structured middleware improve system reliability, maintainability, and security.
+
+The backend successfully supports seed verification, complaint management, user authentication, analytics, and administrative operations within the AgriVerify platform.

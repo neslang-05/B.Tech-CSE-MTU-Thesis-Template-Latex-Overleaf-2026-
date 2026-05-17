@@ -1,111 +1,85 @@
  \documentclass[a4paper, 12pt]{report}
-\usepackage[dvipsnames]{xcolor}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
+\usepackage{courier}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{geometry}
-\usepackage[normalem]{ulem}
-\geometry{a4paper, top=25mm, left=38mm,bottom=25mm, right=25mm} 
-\usepackage{graphicx}
-\usepackage{setspace}
-\setstretch{1.8}
-\usepackage{seqsplit}
-\usepackage{ltxtable}
-\usepackage{array,longtable}
-\usepackage{hyphenat}
-\usepackage{algorithmic}
-\usepackage{algorithm}
-\usepackage{relsize}
+\geometry{a4paper, top=25mm, left=38mm, bottom=25mm, right=25mm} 
 
+% -------------------------------------------------
+% Document Formatting & Spacing
+% -------------------------------------------------
 \usepackage{setspace}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{longtable}
-\usepackage{array}
-\usepackage{multirow}
-\usepackage{caption}
-\usepackage{float}
-\usepackage{tabularx}
-\usepackage{array}
-\usepackage{booktabs}
-\usepackage{adjustbox}
-% -------------------------------------------------
-% Formatting
-% -------------------------------------------------
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
+\usepackage{indentfirst}
+\usepackage{microtype}
 
-% Better table spacing
-\renewcommand{\arraystretch}{1.3}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{url}
-\usepackage[hidelinks,colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref}
-\usepackage{enumitem}
-\usepackage{tabularx}
-\usepackage{makecell}
-\usepackage{titlesec}
-\usepackage{amsmath}
-\usepackage{varwidth}
+% -------------------------------------------------
+% Graphics & Figures
+% -------------------------------------------------
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.eps,.png,.jpg,.pdf}
 \usepackage{subfig}
-\usepackage{nicefrac}
-\usepackage{fixltx2e}
-\usepackage{amsfonts}
 \usepackage{float}
-\usepackage{multirow}
-\usepackage{cellspace}
 \usepackage{morefloats}
-\usepackage{amssymb}
 \usepackage{tikz}
-\usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, fit, backgrounds}
-\DeclareGraphicsExtensions{.eps}
-\usepackage{nomencl}
-\usepackage{import}
-\makenomenclature
-\usepackage[nottoc,numbib]{tocbibind}
+\usetikzlibrary{positioning, shapes.geometric, shapes.multipart, arrows.meta, calc, fit, backgrounds}
+
+% -------------------------------------------------
+% Tables & Layout
+% -------------------------------------------------
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{ltxtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{cellspace}
+\usepackage{caption}
+\usepackage{adjustbox}
+\usepackage{varwidth}
+\usepackage{multicol}
+\renewcommand{\arraystretch}{1.3}
+
+% -------------------------------------------------
+% Math & Text Utilities
+% -------------------------------------------------
 \usepackage{amsmath}
-\usepackage{fancyhdr}
-\setcounter{secnumdepth}{5}
-\setcounter{tocdepth}{5}
-\onehalfspacing
-\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref} % for hyperlinks in the document
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{nicefrac}
+\usepackage[normalem]{ulem}
+\usepackage{seqsplit}
+\usepackage[htt]{hyphenat}
+\usepackage{relsize}
+\setlength{\emergencystretch}{3em}
+
+% -------------------------------------------------
+% Algorithms, Code Listings & Terminal Boxes
+% -------------------------------------------------
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage{listings}
-\usepackage{color}
+\usepackage{tcolorbox}
+\tcbuselibrary{listingsutf8, skins}
+
 \definecolor{gb}{rgb}{0,0.5,0.5}
 \definecolor{red}{rgb}{0.5,0,0}
-\lstset{
-    keywordstyle=\small\bf\color{blue},
-    commentstyle=\small\color{gb},
-    stringstyle=\small\color{red},
-}
-
-
-% Customizing Chapter and Section Title Formats
-\usepackage{titlesec}
-\titleformat{\chapter}[display]
-  {\normalfont\huge\bfseries}{Chapter \thechapter}{20pt}{\Huge}
-\titleformat{\section}
-  {\normalfont\large\bfseries}{\thesection}{1em}{}
-  
-
-\usepackage{indentfirst}
-\usepackage{enumitem}
-
-\usepackage{multicol} % Package for multiple columns
-\usepackage{courier} % Use Courier font for code
-\usepackage{fontenc} % Load this package if needed for specific font encodings
-\usepackage{tcolorbox} % For the terminal box
-\tcbuselibrary{listingsutf8, skins} % Load the necessary tcolorbox libraries
-
-\setlength{\parindent}{0pt}
 \definecolor{myblue}{RGB}{0,0,128}
-
-
-% Code style
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+    keywordstyle=\small\bfseries\color{blue},
+    commentstyle=\small\color{gb},
+    stringstyle=\small\color{red},
+}
+
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
@@ -141,13 +115,12 @@
   morestring=[b]"
 }
 
-% -------Define the terminal shell block style-------
 \tcbset{
   terminal shell/.style={
     enhanced,
     colback=black!95!white,
     colframe=black!80!white,
-    colupper=white!90!black, % Text color similar to shell
+    colupper=white!90!black,
     boxrule=0.5mm,
     top=2mm,
     bottom=2mm,
@@ -168,36 +141,41 @@
   }
 }
 
+% -------------------------------------------------
+% Icons, Nomenclature, Navigation & Headers
+% -------------------------------------------------
 \usepackage{fontawesome}
 \usepackage{pifont}
-\usepackage{microtype}
-\usepackage{booktabs}
+\usepackage{import}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{nomencl}
+\makenomenclature
+\usepackage[nottoc,numbib]{tocbibind}
 
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}{Chapter \thechapter}{20pt}{\Huge}
+\titleformat{\section}
+  {\normalfont\large\bfseries}{\thesection}{1em}{}
 
-\usepackage[
-style=ieee,
-backend=biber
-]{biblatex}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
 
-\addbibresource{references.bib} % This links to your .bib file
-
+% -------------------------------------------------
+% Bibliography
+% -------------------------------------------------
+\usepackage[style=ieee, backend=biber]{biblatex}
+\addbibresource{references.bib}
 \DefineBibliographyStrings{english}{
   bibliography = {REFERENCES},
 }
 
-
-% -------------------------CENTERING CHAPTER------------------------------
-% \titleformat{\chapter}[display]
-%   {\normalfont\bfseries\centering}  % Format: bold + centered
-%   {\chaptername\ \thechapter}       % Label: Chapter 1
-%   {20pt}                            % Space between label and title
-%   {\Huge}  
-% ------------------------------------------------------------
-
-
-\makeatletter
-%\renewcommand\bibname{References}
-\makeatother
+% -------------------------------------------------
+% Hyperlinks (Must be loaded last)
+% -------------------------------------------------
+\usepackage{xurl}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref}
 
 \begin{document}
 
@@ -243,27 +221,27 @@ backend=biber
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{DECLARATION}
-\begin{center}
-    {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-\end{center}
+% \begin{center}
+%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
+% \end{center}
 \input{decleration-Nilambar}
 
 \newpage
-\begin{center}
-    {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-\end{center}
+% \begin{center}
+%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
+% \end{center}
 \input{decleration-Dayananda}
 
 \newpage
-\begin{center}
-    {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-\end{center}
+% \begin{center}
+%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
+% \end{center}
 \input{decleration-Joymangol}
 
 \newpage
-\begin{center}
-    {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-\end{center}
+% \begin{center}
+%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
+% \end{center}
 \input{decleration-Yaiphaba}
 % ---------------------------------------------------
 
@@ -271,9 +249,9 @@ backend=biber
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{ACKNOWLEDGEMENT}
-\begin{center}
-    {\fontsize{16}{19}\selectfont\bfseries ACKNOWLEDGEMENT}
-\end{center}
+% \begin{center}
+%     {\fontsize{16}{19}\selectfont\bfseries ACKNOWLEDGEMENT}
+% \end{center}
 \input{acknowledgement.tex}
 % -------------------------------------------------
 
@@ -348,13 +326,13 @@ backend=biber
 % % ----------------------------------
 
 % % -----------------CHAPTER-6-----------------
-\chapter{Frontend System Architecture and Implementation}
+\chapter{Backend System Architecture and Implementation}
 \input{chapter6.tex}
 % ----------------------------------
 
 % % -----------------CHAPTER-7-----------------
-\chapter{Backend System Architecture and Implementation}
- \input{chapter7.tex}
+\chapter{Frontend System Architecture and Implementation}
+\input{chapter7.tex}
 % ----------------------------------
 
 % % -----------------CHAPTER-8-----------------
@@ -382,17 +360,25 @@ backend=biber
 \printbibliography
 % -------------------------------------------------------
 
-% \chapter*{APPENDICES}
-% \addcontentsline{toc}{chapter}{APPENDICES}
-% \section*{APPENDIX A: CODE SECTION}
-% \addcontentsline{toc}{section}{APPENDIX A: SOURCE CODE}
+% \appendix
+% \chapter{Source Code}
+% \label{app:source-code}
 % \input{appendix-a.tex}
 
-% \newpage
-
-% % Appendix B
-% \section*{APPENDIX B: CALIBRATION AND SETUP GUIDE}
-% \addcontentsline{toc}{section}{APPENDIX B: CALIBRATION AND SETUP GUIDE}
+% \chapter{API Documentation}
+% \label{app:api-doc}
 % \input{appendix-b.tex}
+
+% \chapter{Database Schema and ERD}
+% \label{app:db-schema}
+% \input{appendix-c.tex}
+
+% \chapter{Model Configuration and DUS Database}
+% \label{app:model-config}
+% \input{appendix-d.tex}
+
+% \chapter{Deployment Guide}
+% \label{app:deployment}
+% \input{appendix-e.tex}
 
 \end{document}

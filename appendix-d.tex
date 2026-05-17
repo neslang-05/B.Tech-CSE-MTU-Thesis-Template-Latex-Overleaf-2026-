@@ -1,0 +1,77 @@
+This appendix details the deep learning model configuration parameters and the authoritative DUS (Distinctness, Uniformity, and Stability) physical baseline reference database compiled from Indian Council of Agricultural Research (ICAR) documentation.
+
+\section*{1. ResNet50 Deep Learning Hyperparameter Configuration}
+
+The classification neural network was trained utilizing a progressive two-phase fine-tuning schedule on pre-trained ImageNet weights. The complete parameter specification governing network optimization is detailed in Table~\ref{tab:app-modelconfig}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{ResNet50 Deep Learning Architecture and Optimization Configuration}
+  \label{tab:app-modelconfig}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l c X @{}}
+    \toprule
+    \textbf{Architectural Parameter} & \textbf{Configured Value} & \textbf{Engineering Rationale \& Execution Notes} \\
+    \midrule
+    \textbf{Backbone Network} & \texttt{ResNet-50} & 50-layer deep convolutional architecture with residual identity mappings. \\
+    \addlinespace
+    \textbf{Input Tensor Resolution} & $224 \times 224 \times 3$ & Standard normalized RGB dimensions optimized for feature extraction. \\
+    \addlinespace
+    \textbf{Optimization Algorithm} & \texttt{AdamW} & Adaptive moment estimation with decoupled L2 weight regularizer. \\
+    \addlinespace
+    \textbf{Phase 1 Learning Rate} & $1.0 \times 10^{-3}$ & Head-only optimization (epochs 1--8) with frozen backbone layers. \\
+    \addlinespace
+    \textbf{Phase 2 Learning Rate} & $1.0 \times 10^{-4}$ & End-to-end full fine-tuning (epochs 9--15) to prevent forgetting. \\
+    \addlinespace
+    \textbf{Decoupled Weight Decay} & $1.0 \times 10^{-4}$ & Applied across all trainable parameters to suppress memorization. \\
+    \addlinespace
+    \textbf{Loss Function} & Cross-Entropy + Smoothing & Label smoothing ($\alpha = 0.1$) prevents overconfident logit saturation. \\
+    \addlinespace
+    \textbf{Training Batch Size} & 32 Samples & Mini-batch execution optimized for GPU memory constraints. \\
+    \addlinespace
+    \textbf{Dropout Probability} & $0.50$ & Stochastic neuron deactivation prior to fully connected projection. \\
+    \addlinespace
+    \textbf{Total Training Epochs} & 15 Epochs & Early stopping threshold triggered at epoch 15 upon validation plateau. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section*{2. ICAR Physical DUS Baseline Reference Database}
+
+To execute morphological variety matching, the extracted seed geometry is compared against baseline physical descriptors established for 12 certified paddy varieties cultivated across Northeast India and Manipur agricultural zones.
+
+\begin{table}[htbp]
+  \centering
+  \caption{ICAR Baseline Reference Parameters for Paddy Seed Varieties}
+  \label{tab:app-dusdatabase}
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{@{} l c c c X @{}}
+    \toprule
+    \textbf{Paddy Variety Name} & \textbf{Length (mm)} & \textbf{Width (mm)} & \textbf{Aspect Ratio} & \textbf{Phenotypic Classification Description} \\
+    \midrule
+    \textbf{Chakhao Poireiton} & $9.20 \pm 0.30$ & $2.85 \pm 0.15$ & $3.23$ & Black aromatic sticky rice; distinct deep purple husk coloration. \\
+    \addlinespace
+    \textbf{Chakhao Amubi} & $9.45 \pm 0.25$ & $2.90 \pm 0.12$ & $3.26$ & Traditional black rice with elongated grain geometry and dark pigmentation. \\
+    \addlinespace
+    \textbf{Phoubi} & $8.80 \pm 0.20$ & $3.10 \pm 0.10$ & $2.84$ & Medium-slender grain cultivated extensively across Manipur valley wetlands. \\
+    \addlinespace
+    \textbf{KD-263 (Khao Dawk)} & $9.10 \pm 0.22$ & $2.75 \pm 0.14$ & $3.31$ & High-yielding slender variety displaying bright golden straw coloration. \\
+    \addlinespace
+    \textbf{RCM-9} & $8.95 \pm 0.18$ & $3.05 \pm 0.15$ & $2.93$ & ICAR Research Complex high-altitude cold-tolerant medium grain line. \\
+    \addlinespace
+    \textbf{RCM-10} & $9.05 \pm 0.20$ & $2.95 \pm 0.12$ & $3.07$ & Certified rainfed lowland variety with robust mechanical resistance. \\
+    \addlinespace
+    \textbf{Leimaphou} & $8.75 \pm 0.25$ & $3.15 \pm 0.18$ & $2.78$ & Short bold traditional grain displaying high milling recovery percentage. \\
+    \addlinespace
+    \textbf{Akhanphou} & $9.35 \pm 0.30$ & $2.80 \pm 0.15$ & $3.34$ & Aromatic slender landrace with pronounced apical awn structures. \\
+    \addlinespace
+    \textbf{Taothabi} & $8.60 \pm 0.22$ & $3.20 \pm 0.20$ & $2.69$ & Deep-water flood-resistant coarse grain displaying dark brown streaks. \\
+    \addlinespace
+    \textbf{Darram Phou} & $9.15 \pm 0.25$ & $2.88 \pm 0.14$ & $3.18$ & Highly uniform premium slender grain cultivated in upland terraces. \\
+    \addlinespace
+    \textbf{Ginphou} & $8.90 \pm 0.20$ & $3.00 \pm 0.15$ & $2.97$ & Early maturing drought-tolerant line exhibiting pale yellow husks. \\
+    \addlinespace
+    \textbf{Eriphou} & $9.50 \pm 0.35$ & $2.70 \pm 0.18$ & $3.52$ & Extra long slender premium variety with distinct translucent kernels. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
