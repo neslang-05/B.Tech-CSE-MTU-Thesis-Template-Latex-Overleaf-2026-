@@ -7,18 +7,18 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {5.1}{\ignorespaces End-to-end model request processing flow. Raw image bytes undergo ASGI validation and tensor transformation before parallel deep learning classification and morphological DUS extraction.\relax }}{35}{figure.caption.23}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Containerisation and automated deployment workflow. Source code changes trigger multi-stage container builds that are pushed to Artifact Registry before serverless GCP Cloud Run deployment.\relax }}{40}{figure.caption.26}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Containerisation and automated deployment workflow. Source code changes trigger multi-stage container builds that are pushed to Artifact Registry before serverless GCP Cloud Run deployment.\relax }}{39}{figure.caption.26}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Layered frontend architecture illustrating data flow from presentation UI through custom query hooks and domain services to the server-side Next.js API proxy route.\relax }}{45}{figure.caption.27}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Logical folder organization of the AgriVerify frontend source tree, highlighting the separation between App Router navigation and core domain modules.\relax }}{48}{figure.caption.30}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Authentication lifecycle diagram detailing JWT token persistence in Zustand and automated refresh token recovery via Axios HTTP 401 interception.\relax }}{54}{figure.caption.32}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Layered frontend architecture illustrating data flow from presentation UI through custom query hooks and domain services to the server-side Next.js API proxy route.\relax }}{44}{figure.caption.27}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Logical folder organization of the AgriVerify frontend source tree, highlighting the separation between App Router navigation and core domain modules.\relax }}{47}{figure.caption.30}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Authentication lifecycle diagram detailing JWT token persistence in Zustand and automated refresh token recovery via Axios HTTP 401 interception.\relax }}{53}{figure.caption.32}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Clean Architecture Layer Hierarchy\relax }}{65}{figure.caption.38}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Clean Architecture Layer Hierarchy\relax }}{64}{figure.caption.38}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {8.1}{\ignorespaces End-to-End Request Flow from Browser to Machine Learning Pipeline\relax }}{86}{figure.caption.40}%
-\contentsline {figure}{\numberline {8.2}{\ignorespaces Frontend and Backend Proxy Communication Workflow\relax }}{89}{figure.caption.41}%
-\contentsline {figure}{\numberline {8.3}{\ignorespaces Backend Model Serving and AI Inference Workflow\relax }}{92}{figure.caption.42}%
-\contentsline {figure}{\numberline {8.4}{\ignorespaces Azure Service Integration Workflow\relax }}{95}{figure.caption.43}%
-\contentsline {figure}{\numberline {8.5}{\ignorespaces Docker and Azure Container Apps Deployment Architecture\relax }}{98}{figure.caption.44}%
+\contentsline {figure}{\numberline {8.1}{\ignorespaces End-to-End Request Flow from Browser to Machine Learning Pipeline\relax }}{85}{figure.caption.40}%
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Frontend and Backend Proxy Communication Workflow\relax }}{88}{figure.caption.41}%
+\contentsline {figure}{\numberline {8.3}{\ignorespaces Backend Model Serving and AI Inference Workflow\relax }}{91}{figure.caption.42}%
+\contentsline {figure}{\numberline {8.4}{\ignorespaces Azure Service Integration Workflow\relax }}{94}{figure.caption.43}%
+\contentsline {figure}{\numberline {8.5}{\ignorespaces Docker and Azure Container Apps Deployment Architecture\relax }}{97}{figure.caption.44}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
