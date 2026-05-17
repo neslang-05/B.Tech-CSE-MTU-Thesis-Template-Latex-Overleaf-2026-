@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.5.17)  17 MAY 2026 09:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.5.17)  17 MAY 2026 09:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2454,9 +2454,6 @@ sheetseries .
  []
 
 [117] (./main.aux)
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 8ECA54630E91EAF9681D9E3EB493F796;50359.
 Package logreq Info: Writing requests to 'main.run.xml'.
@@ -2481,7 +2478,7 @@ mbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></
 usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (143 pages, 2966450 bytes).
+Output written on main.pdf (143 pages, 2966448 bytes).
 PDF statistics:
  2451 PDF objects out of 2487 (max. 8388607)
  2239 compressed objects within 23 object streams
