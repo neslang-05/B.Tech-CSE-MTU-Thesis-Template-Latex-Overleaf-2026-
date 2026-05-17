@@ -1,0 +1,62 @@
+# ==========================================
+# LaTeX Compilation & Auxiliary Files
+# ==========================================
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.nlo
+*.nls
+*.out
+*.run.xml
+*.toc
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+
+# Bibliography & Glossary Error / Backup Files
+*.bbl-SAVE-ERROR
+*.bcf-SAVE-ERROR
+*-SAVE-ERROR
+
+# Indices, Glossaries, Acronyms
+*.idx
+*.idx.tcw
+*.idy
+*.glo
+*.gls
+*.glsdefs
+*.glg
+*.acn
+*.acr
+*.alg
+*.ist
+
+# Output / Build Directories
+/out/
+/build/
+/dist/
+
+# Document PDFs (Uncomment if you want all PDFs ignored)
+# *.pdf
+
+# ==========================================
+# OS & IDE / Editor Temporary Files
+# ==========================================
+*~
+*.bak
+*.sav
+*.tmp
+*.swp
+*.swo
+._*
+.DS_Store
+Thumbs.db
