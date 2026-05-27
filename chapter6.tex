@@ -3,8 +3,7 @@
 % AgriVerify — AI-Powered Fake Seed Detection System
 % ============================================================
 
-\chapter{Backend System Architecture and Implementation}
-\label{ch:backend-architecture}
+
 
 The backend of the AgriVerify system is responsible for managing business logic, AI model integration, authentication, database operations, and communication between frontend clients and cloud services. The system was developed using ASP.NET Core Web API following the Clean Architecture approach to achieve modularity, maintainability, and scalability.
 
@@ -392,51 +391,144 @@ The backend database maintains relationships between users, seed batches, verifi
 
 \begin{figure}[H]
 \centering
-
+\usetikzlibrary{positioning,arrows.meta,shapes.multipart}
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-node distance=2cm,
-every node/.style={
-draw,
-rounded corners,
-minimum width=3cm,
-minimum height=1cm,
-align=center,
-font=\small
-}
+    entity/.style={
+        rectangle split,
+        rectangle split parts=2,
+        draw=black,
+        thick,
+        rounded corners,
+        fill=blue!10,
+        minimum width=4cm,
+        text width=4cm,
+        align=center,
+        font=\small
+    },
+    relation/.style={
+        -{Latex},
+        thick
+    },
+    every node/.style={font=\small}
 ]
 
-\node (user) {User};
+% ---- TOP ROW ----
+\node[entity] (users) {
+    \textbf{Users}
+    \nodepart{second}
+    PK: Id \\
+    FullName \\
+    Email \\
+    OfficerId \\
+    IsActive
+};
 
-\node (farmer) [below left of=user, xshift=-1cm] {Farmer};
+\node[entity, right=4cm of users] (profiles) {
+    \textbf{Profiles}
+    \nodepart{second}
+    PK: Id \\
+    FK: UserId \\
+    Role \\
+    District \\
+    Phone
+};
 
-\node (officer) [below right of=user, xshift=1cm] {Officer};
+\node[entity, right=4cm of profiles] (roles) {
+    \textbf{AspNetRoles}
+    \nodepart{second}
+    PK: Id \\
+    RoleName
+};
 
-\node (seed) [below of=farmer] {Seed};
+% ---- MIDDLE ROW ----
+\node[entity, below=3cm of users] (verification) {
+    \textbf{VerificationHistories}
+    \nodepart{second}
+    PK: Id \\
+    FK: UserId \\
+    BatchNumber \\
+    IsAuthentic \\
+    Confidence
+};
 
-\node (batch) [right of=seed, xshift=3cm] {Seed Batch};
+\node[entity, right=4cm of verification] (complaints) {
+    \textbf{ProductComplaints}
+    \nodepart{second}
+    PK: Id \\
+    FK: UserId \\
+    Status \\
+    IssueType \\
+    AssignedOfficerId
+};
 
-\node (detection) [right of=batch, xshift=3cm] {Detection Result};
+\node[entity, right=4cm of complaints] (actions) {
+    \textbf{ComplaintActions}
+    \nodepart{second}
+    PK: Id \\
+    FK: ComplaintId \\
+    FK: OfficerId \\
+    ActionType \\
+    RiskLevel
+};
 
-\node (complaint) [below of=batch] {Complaint};
+% ---- BOTTOM ROW ----
+\node[entity, below=3cm of verification] (audit) {
+    \textbf{AuditLogs}
+    \nodepart{second}
+    PK: Id \\
+    FK: ActorUserId \\
+    Action \\
+    EntityType
+};
 
-\node (audit) [below of=detection] {Audit Log};
+\node[entity, right=4cm of audit] (tokens) {
+    \textbf{RefreshTokens}
+    \nodepart{second}
+    PK: Id \\
+    FK: UserId \\
+    Token \\
+    ExpiresAt
+};
 
-\draw[->, thick] (user) -- (farmer);
-\draw[->, thick] (user) -- (officer);
+\node[entity, below=3cm of actions] (systemlogs) {
+    \textbf{SystemLogs}
+    \nodepart{second}
+    PK: Id \\
+    Level \\
+    Message \\
+    Timestamp
+};
 
-\draw[->, thick] (seed) -- (batch);
+% ---- RELATIONSHIPS ----
+\draw[relation] (users) -- node[left]{\scriptsize 1:N} (verification);
+\draw[relation] (users) -- node[above]{\scriptsize 1:1} (profiles);
+\draw[relation] (users) |- node[left, pos=0.75]{\scriptsize 1:N} (tokens);
+\draw[relation] (verification) -- node[above]{\scriptsize 1:N} (complaints);
+\draw[relation] (complaints) -- node[above]{\scriptsize 1:N} (actions);
+\draw[relation] (actions) -- node[left]{\scriptsize 1:N} (audit);
+\draw[relation] (roles) -- node[above]{\scriptsize M:N} (users);
 
-\draw[->, thick] (batch) -- (detection);
-
-\draw[->, thick] (farmer) -- (complaint);
-
-\draw[->, thick] (officer) -- (complaint);
-
-\draw[->, thick] (user) -- (audit);
+% ---- LEGEND ----
+\node[
+    draw,
+    rounded corners,
+    fill=gray!10,
+    text width=9cm,
+    align=left,
+    below=2cm of audit,
+    font=\small
+] {
+    \textbf{Legend:} \quad
+    PK = Primary Key \quad
+    FK = Foreign Key \\[2pt]
+    1:N = One-to-Many \quad
+    M:N = Many-to-Many
+};
 
 \end{tikzpicture}
-
-\caption{Simplified Entity Relationship Structure}
+}%
+\caption{Entity Relationship Diagram -- FakeSeedDetection System}
 \label{fig:er-diagram}
 
 \end{figure}

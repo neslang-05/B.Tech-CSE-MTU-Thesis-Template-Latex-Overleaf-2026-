@@ -2,22 +2,21 @@
 % CHAPTER 9: FRONTEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
 % ============================================================
 
-
-The AgriVerify frontend serves as the critical presentation layer, bridging deep learning inference engines and backend microservices. Engineered for high responsiveness, it delivers an intuitive interface tailored for diverse stakeholders—from farmers operating in low-resource environments to state administrators overseeing supply chains \cite{singh2026impact}. To meet enterprise scalability and real-time synchronization requirements, the architecture is constructed using Next.js~14, React~18, TypeScript~5, and Tailwind CSS. This stack enforces strict presentation logic separation, ensuring maintainability and robust cross-platform accessibility \cite{salim2024microservices}.
+The AgriVerify frontend connects the inference engine and backend services to a browser interface that has to work for two quite different users: farmers on mid-range Android handsets with variable connectivity, and state administrators managing supply chain dashboards. The stack --- Next.js~16, React~19`', TypeScript~5, and Tailwind CSS --- was chosen to handle that range without the interface becoming slow or hard to maintain \cite{salim2024microservices, singh2026impact}.
 
 % ============================================================
 \section{Frontend Architecture and Design Patterns}
 \label{sec:frontend-architecture}
 
-The presentation architecture adheres to layered design principles, isolating UI rendering from data synchronization, API communication, and authorization domains.
+The architecture separates UI rendering from data fetching, API communication, and authorization. Each concern lives in its own layer.
 
 \subsection{Architectural Layers}
-The request lifecycle processes through four specialized layers before interacting with backend services (Figure~\ref{fig:frontend_architecture}):
+A request passes through four layers before reaching backend services (Figure~\ref{fig:frontend_architecture}):
 \begin{itemize}
-    \item \textbf{Presentation UI (React \& Next.js):} Manages component rendering, form validation, and responsive layouts \cite{react2024}.
-    \item \textbf{Client-Side State (TanStack Query):} Orchestrates asynchronous data fetching, intelligent caching, and optimistic mutations \cite{tanstack2024}.
-    \item \textbf{Service Client (Axios):} Encapsulates network operations, standardizing payloads and error handling.
-    \item \textbf{API Proxy (Next.js Routes):} Acts as a secure intermediary, routing client requests to ASP.NET Core endpoints while hiding internal URLs.
+    \item \textbf{Presentation UI (React \& Next.js):} Handles component rendering, form validation, and responsive layout \cite{react2024}.
+    \item \textbf{Client-Side State (TanStack Query):} Manages async data fetching, caching, and optimistic mutations \cite{tanstack2024}.
+    \item \textbf{Service Client (Axios):} Wraps network calls, standardising payloads and error handling.
+    \item \textbf{API Proxy (Next.js Routes):} Routes client requests to ASP.NET Core endpoints without exposing internal URLs to the browser.
 \end{itemize}
 
 \begin{figure}[H]
@@ -50,29 +49,29 @@ The request lifecycle processes through four specialized layers before interacti
 \end{figure}
 
 \subsection{Secure Proxy Architecture}
-To neutralize Cross-Origin Resource Sharing (CORS) vulnerabilities, outbound communications are routed through internal Next.js serverless endpoints (\texttt{/api/proxy/*}). This endpoint obfuscation conceals internal microservice topologies, keeps cryptographic secrets server-side, and normalizes security headers before browser delivery \cite{masue2024quantifying}.
+All outbound requests route through internal Next.js serverless endpoints (\texttt{/api/proxy/*}), which avoids CORS issues by keeping cross-origin communication server-side. Internal microservice addresses stay out of the browser, secrets remain on the server, and security headers are applied before responses reach the client \cite{masue2024quantifying}.
 
 % ============================================================
 \section{Technology Stack Analysis}
 \label{sec:technology-stack}
 
-The technology stack is optimized for static type safety, developer velocity, and runtime execution speed (Table~\ref{tab:frontend-stack}).
+Table~\ref{tab:frontend-stack} summarises the stack and the reasoning behind each choice.
 
 \begin{table}[H]
 \centering
 \footnotesize
-\caption{Frontend Technology Stack and Functional Rationale}
+\caption{Frontend Technology Stack}
 \label{tab:frontend-stack}
 \begin{tabularx}{\textwidth}{@{}l X@{}}
 \toprule
-\textbf{Technology} & \textbf{Architectural Rationale} \\
+\textbf{Technology} & \textbf{Architectural Reasoning} \\
 \midrule
-Next.js 14 & Enables Server-Side Rendering (SSR) and built-in API proxy routing \cite{nextjs2024}. \\
-React 18 & Facilitates declarative UI rendering and efficient Virtual DOM reconciliation. \\
-TypeScript 5 & Enforces strict compile-time type checking and backend DTO parity. \\
-Tailwind CSS & Utility-first styling optimized for minimal production bundle sizes \cite{tailwind2024}. \\
-Axios \& TanStack & Manages HTTP pipelines, token injection, and cache synchronization \cite{tanstack2024}. \\
-Zustand 4.5 & Provides lightweight atomic state slices for session persistence. \\
+Next.js 14 & Provides Server-Side Rendering and built-in API proxy routing \cite{nextjs2024}. \\
+React 18 & Declarative UI rendering with efficient Virtual DOM reconciliation. \\
+TypeScript 5 & Compile-time type checking with backend DTO parity. \\
+Tailwind CSS & Utility-first styling with minimal production bundle output \cite{tailwind2024}. \\
+Axios \& TanStack & HTTP pipeline management, token injection, and cache synchronization \cite{tanstack2024}. \\
+Zustand 4.5 & Lightweight atomic state slices for session persistence. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -81,108 +80,108 @@ Zustand 4.5 & Provides lightweight atomic state slices for session persistence. 
 \section{Modular Project Structure}
 \label{sec:project-structure}
 
-To prevent architectural drift, the source tree utilizes strict domain-driven modularity. Key directories include \texttt{src/app} (Next.js routing), \texttt{src/components} (reusable UI primitives), \texttt{src/hooks} (data synchronization logic), and \texttt{src/types} (TypeScript DTO contracts matching backend entities). This decoupling isolates business logic from presentation constraints.
+The source tree follows domain-driven modularity. Key directories: \texttt{src/app} (Next.js routing), \texttt{src/components} (reusable UI primitives), \texttt{src/hooks} (data fetching logic), and \texttt{src/types} (TypeScript DTOs matching backend entities). Keeping these separate means business logic and presentation concerns do not bleed into each other.
 
 % ============================================================
-\section{Routing Topology and Access Control}
+\section{User Role-Based Access Control (RBAC)}
 \label{sec:routing-access}
 
-The frontend leverages Role-Based Access Control (RBAC) to enforce security across public domains and protected administrative boundaries.
+The frontend uses Role-Based Access Control (RBAC) to separate public and protected routes.
 
 \subsection{Role Partitioning}
-The application supports four hierarchical profiles: \textbf{Farmers} (verification access and dispute lodging), \textbf{Agricultural Officers} (inspection queues and evidence review), \textbf{Administrators} (system governance and telemetry), and \textbf{Public Users} (anonymous checks). 
+The application supports four user profiles: \textbf{Farmers} (verification and dispute submission), \textbf{Agricultural Officers} (inspection queues and evidence review), \textbf{Administrators} (system governance and telemetry), and \textbf{Public Users} (anonymous checks).
 
 \subsection{Route Protection Middleware}
-A client-side \texttt{RoleGuard} component prevents privilege escalation by evaluating JSON Web Token (JWT) claims against required permissions before mounting React components.
+A \texttt{RoleGuard} component checks JWT claims against required permissions before mounting any protected React component, preventing privilege escalation at the route level.
 
-\begin{lstlisting}[
-    language=TypeScript,
-    caption={Core Logic of the Role-Based Route Protection Guard},
-    label={lst:role_guard},
-    basicstyle=\ttfamily\scriptsize,
-    breaklines=true,
-    frame=single
-]
-export const RoleGuard: React.FC<{ children: React.ReactNode; allowedRoles: Role[] }> = ({ children, allowedRoles }) => {
-    const { token, role, isLoading } = useAuthStore();
-    const router = useRouter();
+% \begin{lstlisting}[
+%     language=TypeScript,
+%     caption={Core Logic of the Role-Based Route Protection Guard},
+%     label={lst:role_guard},
+%     basicstyle=\ttfamily\scriptsize,
+%     breaklines=true,
+%     frame=single
+% ]
+% export const RoleGuard: React.FC<{ children: React.ReactNode; allowedRoles: Role[] }> = ({ children, allowedRoles }) => {
+%     const { token, role, isLoading } = useAuthStore();
+%     const router = useRouter();
 
-    useEffect(() => {
-        if (!isLoading) {
-            if (!token) return router.replace('/login');
-            if (role && !allowedRoles.includes(role)) return router.replace('/unauthorized');
-        }
-    }, [token, role, isLoading, router, allowedRoles]);
+%     useEffect(() => {
+%         if (!isLoading) {
+%             if (!token) return router.replace('/login');
+%             if (role && !allowedRoles.includes(role)) return router.replace('/unauthorized');
+%         }
+%     }, [token, role, isLoading, router, allowedRoles]);
 
-    if (isLoading || !token) return <Loader />;
-    return <>{children}</>;
-};
-\end{lstlisting}
+%     if (isLoading || !token) return <Loader />;
+%     return <>{children}</>;
+% };
+% \end{lstlisting}
 
 % ============================================================
 \section{Authentication and Secure Persistence}
 \label{sec:authentication}
 
-The platform secures user sessions using a dual-token JWT exchange, protecting against common client-side vulnerabilities like Cross-Site Scripting (XSS) \cite{masue2024quantifying}.
+Sessions are secured using a dual-token JWT exchange designed to limit exposure to XSS attacks \cite{masue2024quantifying}.
 
 \subsection{Token Storage Architecture}
-Short-lived access tokens are strictly held in the in-memory Zustand store to prevent malicious script extraction. Long-lived refresh tokens are persisted in encrypted caches (or \texttt{HttpOnly} cookies), facilitating background session renewal without compromising token integrity.
+Short-lived access tokens are held in the Zustand in-memory store, keeping them out of reach of malicious scripts. Long-lived refresh tokens are persisted in encrypted storage or \texttt{HttpOnly} cookies, allowing background session renewal without exposing token values to client-side code.
 
 \subsection{Automated Token Rotation}
-To maintain seamless UX during field operations, Axios interceptors autonomously detect \texttt{401 Unauthorized} responses, pause the network queue, execute a token refresh cycle, and seamlessly replay pending requests.
+Axios interceptors handle token expiry without user intervention. On a \texttt{401 Unauthorized} response, the interceptor pauses pending requests, runs a refresh cycle, and replays the original request with the new token. From the user's side, the session continues uninterrupted.
 
-\begin{lstlisting}[
-    language=TypeScript,
-    caption={Axios Interceptor for Automated JWT Token Rotation},
-    label={lst:axios_interceptor},
-    basicstyle=\ttfamily\scriptsize,
-    breaklines=true,
-    frame=single
-]
-apiClient.interceptors.response.use(res => res, async (error) => {
-    const origReq = error.config;
-    if (error.response?.status === 401 && !origReq._retry) {
-        origReq._retry = true;
-        try {
-            const res = await axios.post('/api/proxy/auth/refresh', { token: useAuthStore.getState().refreshToken });
-            useAuthStore.getState().setTokens(res.data.accessToken, res.data.refreshToken);
-            origReq.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
-            return apiClient(origReq);
-        } catch (err) {
-            useAuthStore.getState().logout();
-            return Promise.reject(err);
-        }
-    }
-    return Promise.reject(error);
-});
-\end{lstlisting}
+% \begin{lstlisting}[
+%     language=TypeScript,
+%     caption={Axios Interceptor for Automated JWT Token Rotation},
+%     label={lst:axios_interceptor},
+%     basicstyle=\ttfamily\scriptsize,
+%     breaklines=true,
+%     frame=single
+% ]
+% apiClient.interceptors.response.use(res => res, async (error) => {
+%     const origReq = error.config;
+%     if (error.response?.status === 401 && !origReq._retry) {
+%         origReq._retry = true;
+%         try {
+%             const res = await axios.post('/api/proxy/auth/refresh', { token: useAuthStore.getState().refreshToken });
+%             useAuthStore.getState().setTokens(res.data.accessToken, res.data.refreshToken);
+%             origReq.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
+%             return apiClient(origReq);
+%         } catch (err) {
+%             useAuthStore.getState().logout();
+%             return Promise.reject(err);
+%         }
+%     }
+%     return Promise.reject(error);
+% });
+% \end{lstlisting}
 
 % ============================================================
 \section{API Integration and Type Safety}
 \label{sec:api-integration}
 
-To eliminate data corruption and runtime mapping errors, strict TypeScript Data Transfer Objects (DTOs) enforce compile-time verification of HTTP payloads. Integration modules (Auth, Verification, Analytics, and Complaint Services) mirror the ASP.NET Core backend schema, ensuring zero-defect data rendering across dashboards.
+TypeScript DTOs enforce compile-time verification of HTTP payloads across all integration modules --- Auth, Verification, Analytics, and Complaint Services. Each mirrors the corresponding ASP.NET Core schema, so data arriving at the frontend matches what the UI expects without runtime coercion or defensive casting.
 
 % ============================================================
 \section{State Management}
 \label{sec:state-management}
 
-State architecture is bifurcated based on data volatility:
+State is split by volatility: server-driven data and client-local data are managed separately.
 
 \subsection{Asynchronous Server State (TanStack Query)}
-Network-driven data (e.g., dispute queues, telemetry) is managed by TanStack Query. It handles stale-while-revalidate caching, background polling, and optimistic UI updates, drastically reducing perceived network latency \cite{tanstack2024}.
+Network-driven data (dispute queues, telemetry) is managed by TanStack Query, which handles stale-while-revalidate caching, background polling, and optimistic UI updates. On slow connections, this keeps the interface usable even when the server is slow to respond \cite{tanstack2024}.
 
 \subsection{Synchronous Client State (Zustand)}
-Client-local states, such as active UI themes and user session contexts, utilize Zustand. Its atomic state slices minimize React re-rendering cycles, conserving device battery and memory in resource-constrained field environments.
+UI state that doesn't touch the network (active theme, session context) lives in Zustand. Its atomic slices limit unnecessary re-renders, which matters on lower-end devices where battery and memory are constrained.
 
 % ============================================================
 \section{Responsive UI Design and Field Usability}
 \label{sec:responsive-ui}
 
-Recognizing the hardware limitations and environmental challenges of rural agriculture, the UI adopts a strict mobile-first design system utilizing Tailwind CSS \cite{singh2026impact}.
+The UI is built mobile-first using Tailwind CSS. Most farmers will access the application on a mid-range Android handset, often outdoors, so the interface is designed around that constraint rather than treating it as an edge case \cite{singh2026impact}.
 
 \subsection{Standardized UI Library}
-To accelerate development and maintain cohesion, the system uses reusable primitives (Table~\ref{tab:ui-components}).
+The interface is built from a set of reusable primitives (Table~\ref{tab:ui-components}) to keep visual behaviour consistent across screens.
 
 \begin{table}[H]
 \centering
@@ -191,21 +190,21 @@ To accelerate development and maintain cohesion, the system uses reusable primit
 \label{tab:ui-components}
 \begin{tabularx}{\textwidth}{@{}l X@{}}
 \toprule
-\textbf{Component} & \textbf{Interaction Role} \\
+\textbf{Component} & \textbf{Role} \\
 \midrule
 \textbf{Data Table} & Scrollable grids with sticky headers and dynamic pagination for inspection data. \\
-\textbf{Status Badge} & Semantic color indicators (e.g., Green/Genuine) for rapid cognitive parsing. \\
-\textbf{Loading Skeleton} & Animated structural placeholders preventing layout shifts during network latency. \\
-\textbf{Input Modal} & Focused workflow overlays that trap keyboard navigation for accessible data entry. \\
+\textbf{Status Badge} & Colour-coded indicators (e.g., Green/Genuine) for fast visual parsing. \\
+\textbf{Loading Skeleton} & Animated placeholders that prevent layout shifts during network delays. \\
+\textbf{Input Modal} & Focused overlays that trap keyboard navigation for accessible data entry. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \subsection{Accessibility Enhancements}
-Usability optimizations include strict adherence to WCAG AAA contrast ratios for visibility under direct sunlight, enlarged touch targets ($48\times 48$px minimum) to minimize physical input errors, and full ARIA semantic tagging for assistive screen-reader compatibility.
+The UI meets WCAG AAA contrast ratios for readability in bright outdoor conditions, uses a minimum touch target size of $48\times 48$px to reduce input errors, and includes full ARIA semantic tagging for screen-reader compatibility.
 
-% ============================================================
-\section{Summary}
-\label{sec:frontend-summary}
+% % ============================================================
+% \section{Summary}
+% \label{sec:frontend-summary}
 
-This chapter outlined the AgriVerify frontend architecture. By integrating Next.js, TypeScript, and state-of-the-art token rotation mechanisms, the platform delivers a secure, accessible, and performant user experience. Its decoupled layered design and mobile-first responsive framework successfully overcome the operational constraints of rural field deployments, bridging advanced AI analytics with practical agricultural workflows.
+% The AgriVerify frontend connects the AI inference engine and backend services to a browser interface designed for two distinct user groups: farmers operating on mid-range Android devices with potentially unstable internet connections, and state administrators managing administrative dashboards. The selection of the technology stack—specifically Next.js~16, React~19, TypeScript~5, and Tailwind CSS—is deliberate, aiming to deliver a high-performance, maintainable application that remains responsive and intuitive even under these challenging field conditions \cite{singh2026impact}.

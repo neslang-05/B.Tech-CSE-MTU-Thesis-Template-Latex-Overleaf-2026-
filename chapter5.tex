@@ -5,23 +5,23 @@
 % \chapter{Model Serving API}
 % \label{ch:model-serving-api}
 
-Translating offline trained machine learning models into operational real-time services requires robust, low-latency inference infrastructure. While model development prioritizes architectural optimization and empirical accuracy, the deployment tier dictates real-world responsiveness, concurrent throughput, and operational resilience \cite{martin2017clean}. Within the AgriVerify architecture, the PyTorch ResNet-50 classification model (Chapter 4) is encapsulated within a dedicated, high-performance microservice. 
+Deploying a trained model as a live service introduces a different set of problems than training it. Model development focuses on architecture and accuracy; the serving layer determines response latency, concurrent throughput, and uptime under real load \cite{martin2017clean}. In AgriVerify, the PyTorch ResNet-50 classifier from Chapter 4 runs inside a dedicated inference microservice built specifically for this purpose.
 
-This chapter details the architectural design of the Model Serving microservice, engineered using FastAPI and Uvicorn \cite{ramirez2023fastapi}. It examines the asynchronous request lifecycle, the rigorous tensor normalization pipeline, explicit API contractual specifications, and containerised deployment strategies using Docker multi-stage builds on Google Cloud Platform (GCP) Cloud Run \cite{merkel2014docker}.
+This chapter describes the design of that microservice, implemented with FastAPI and Uvicorn \cite{ramirez2023fastapi}. It covers the asynchronous request lifecycle, the tensor normalization pipeline, the API endpoint contracts, and the containerised deployment approach using Docker multi-stage builds on GCP Cloud Run \cite{merkel2014docker}.
 
 % ──────────────────────────────────────────────────────────────
 \section{API Architecture and Request Orchestration}
 \label{sec:api-architecture-overview}
 
 \subsection{FastAPI and ASGI Serving Stack}
-The inference microservice utilizes the FastAPI framework running atop the Uvicorn Asynchronous Server Gateway Interface (ASGI) runtime. FastAPI was selected for its exceptional asynchronous I/O concurrency, built-in Pydantic type validation, and automated OpenAPI schema generation \cite{ramirez2023fastapi}. Uvicorn provides a highly optimized event loop (via \texttt{uvloop}), enabling the handling of thousands of concurrent network connections with minimal memory overhead.
+The inference microservice runs on FastAPI atop the Uvicorn ASGI runtime. FastAPI was chosen for its native async I/O support, Pydantic-based request validation and automatic OpenAPI schema generation \cite{ramirez2023fastapi}. Uvicorn's \texttt{uvloop}-backed event loop handles large numbers of concurrent connections with low memory overhead.
 
-The stack strictly decouples network deserialization, Pydantic validation, OpenCV preprocessing, and PyTorch tensor execution. This isolation ensures computationally intensive deep learning operations execute in dedicated thread pools without blocking the ASGI web server event loop.
+The stack separates network deserialization, Pydantic validation, OpenCV preprocessing and PyTorch execution into distinct layers. Computationally expensive inference operations run in dedicated thread pools and do not block the ASGI event loop.
 
 \subsection{End-to-End Model Request Flow}
-As illustrated in Figure~\ref{fig:model_request_flow}, an inference request begins when the ASP.NET Core backend issues a multipart POST request containing a seed image. FastAPI validates the MIME constraints and payload boundaries. The validated byte stream is decoded in-memory into an OpenCV matrix. 
+As illustrated in Figure~\ref{fig:model_request_flow}, an inference request begins when the ASP.NET Core backend sends a multipart POST containing a seed image. FastAPI validates the MIME type and payload boundaries, then decodes the byte stream into an OpenCV matrix in memory.
 
-Parallel execution pathways process the matrix: a PyTorch inference engine (pre-loaded with frozen ResNet-50 weights to eliminate cold-start latency) computes classification logits \cite{paszke2019pytorch, he2016deep}, while OpenCV contour algorithms extract 17 Distinctness, Uniformity, and Stability (DUS) physical parameters \cite{bradski2000opencv}. The results are aggregated, scored against reference cultivars, serialized into JSON, and returned.
+From there, two operations run in parallel: a PyTorch inference engine --- with ResNet-50 weights pre-loaded to avoid cold-start delays --- computes classification logits \cite{paszke2019pytorch, he2016deep}, while OpenCV contour routines extract 17 DUS (Distinctness, Uniformity, and Stability) morphological parameters \cite{bradski2000opencv}. The results are aggregated, scored against reference cultivars, and returned as JSON.
 
 \begin{figure}[H]
   \centering
@@ -57,38 +57,38 @@ Parallel execution pathways process the matrix: a PyTorch inference engine (pre-
       \draw[arrow] (dus) -| (post);
     \end{tikzpicture}
   \end{adjustbox}
-  \caption{Asynchronous model request processing flow. Tensor classification and OpenCV feature extraction execute concurrently to minimize latency.}
+  \caption{Asynchronous model request processing flow.}
   \label{fig:model_request_flow}
 \end{figure}
 
-% ──────────────────────────────────────────────────────────────
-\section{Inference Execution and Preprocessing Pipeline}
-\label{sec:inference-pipeline}
+% % ──────────────────────────────────────────────────────────────
+% \section{Inference Execution and Preprocessing Pipeline}
+% \label{sec:inference-pipeline}
 
-\subsection{Tensor Normalization Mathematics}
-Deep neural networks are highly sensitive to input domain shifts. To guarantee alignment with the training domain, standard image transformations are applied. Incoming BGR byte buffers are converted to RGB, resized to $224 \times 224$ pixels via bicubic interpolation, and scaled to a $[0.0, 1.0]$ float interval. Channel-wise standardization is applied using ImageNet moments \cite{paszke2019pytorch}:
-\begin{equation}
-    \mathbf{X}_{\text{norm}} = \frac{\mathbf{X} - \boldsymbol{\mu}}{\boldsymbol{\sigma}}
-\end{equation}
-where $\boldsymbol{\mu} = [0.485, 0.456, 0.406]$ and $\boldsymbol{\sigma} = [0.229, 0.224, 0.225]$. The tensor is expanded to batch shape $(1, 3, 224, 224)$.
+% \subsection{Tensor Normalization Mathematics}
+% Deep neural networks are sensitive to distributional shifts in input data. To keep incoming images consistent with the training domain, a fixed preprocessing sequence is applied. BGR byte buffers are converted to RGB, resized to $224 \times 224$ pixels via bicubic interpolation, and scaled to the $[0.0, 1.0]$ float range. Channel-wise standardization then uses the ImageNet distribution moments \cite{paszke2019pytorch}:
+% \begin{equation}
+%     \mathbf{X}_{\text{norm}} = \frac{\mathbf{X} - \boldsymbol{\mu}}{\boldsymbol{\sigma}}
+% \end{equation}
+% where $\boldsymbol{\mu} = [0.485, 0.456, 0.406]$ and $\boldsymbol{\sigma} = [0.229, 0.224, 0.225]$. The resulting tensor is expanded to batch shape $(1, 3, 224, 224)$.
 
-\subsection{Confidence Scoring and Latency Telemetry}
-Following the forward pass, unnormalized logits $\mathbf{z} = [z_1, z_2, z_3]$ are mapped to class probabilities using a softmax activation:
-\begin{equation}
-    P(y = i \mid \mathbf{z}) = \frac{e^{z_i / T}}{\sum_{j=1}^{3} e^{z_j / T}}
-\end{equation}
-where $T=1.0$. To prevent overconfident misclassifications on out-of-distribution imagery, an uncertainty threshold is enforced: if the top-1 probability $P(y=i^*) < 0.75$, the sample is flagged as \texttt{Suspicious}. Furthermore, wall-clock execution latency is captured via monotonic timers (\texttt{time.perf\_counter()}) and embedded directly into the response payload as \texttt{inference\_ms} for upstream telemetry tracking.
+% \subsection{Confidence Scoring and Latency Telemetry}
+% After the forward pass, unnormalized logits $\mathbf{z} = [z_1, z_2, z_3]$ are converted to class probabilities via softmax:
+% \begin{equation}
+%     P(y = i \mid \mathbf{z}) = \frac{e^{z_i / T}}{\sum_{j=1}^{3} e^{z_j / T}}
+% \end{equation}
+% where $T=1.0$. To avoid overconfident predictions on out-of-distribution images, a threshold is applied: if the top-1 probability $P(y=i^*) < 0.75$, the sample is flagged as \texttt{Suspicious}. Wall-clock inference time is captured using \texttt{time.perf\_counter()} and returned in the response as \texttt{inference\_ms} for upstream telemetry.
 
 % ──────────────────────────────────────────────────────────────
 \section{API Specification and Endpoint Contracts}
 \label{sec:api-specification}
 
-The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_spec_predict} and \ref{tab:api_spec_health} outline the schema contracts, ensuring robust typed communication with the backend orchestrator.
+The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_spec_predict} and \ref{tab:api_spec_health} define the schema contracts for communication with the backend orchestrator.
 
 \begin{table}[H]
   \centering
   \footnotesize
-  \caption{Contractual Specification for the \texttt{POST /predict} Endpoint}
+  \caption{API Specification for the \texttt{POST /predict} Model Inference Endpoint}
   \label{tab:api_spec_predict}
   \renewcommand{\arraystretch}{1.2}
   \begin{tabularx}{\textwidth}{@{} l X @{}}
@@ -107,7 +107,7 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
 \begin{table}[H]
   \centering
   \footnotesize
-  \caption{Contractual Specification for the \texttt{GET /health} Operational Endpoint}
+  \caption{API Specification for the \texttt{GET /health} Model Inference Endpoint}
   \label{tab:api_spec_health}
   \renewcommand{\arraystretch}{1.2}
   \begin{tabularx}{\textwidth}{@{} l X @{}}
@@ -115,7 +115,7 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
     \midrule
     \textbf{Route} & \texttt{GET /health} (Unauthenticated liveness/readiness probe) \\
-    \textbf{Probing Logic} & Confirms Uvicorn ASGI event loop and verifies ResNet-50 weights memory load. \\
+    \textbf{Probing Logic} & Confirms Uvicorn ASGI event loop and verifies ResNet-50 weights are loaded in memory. \\
     \textbf{200 OK} & \texttt{\{"status": "online", "model\_loaded": true, "device": "cuda:0"\}} \\
     \textbf{503 Error} & Service unavailable (model weights corrupted or GPU allocation failure). \\
     \bottomrule
@@ -126,7 +126,7 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
 \section{Containerisation and Deployment Architecture}
 \label{sec:containerization}
 
-To ensure perfect reproducibility while maintaining a minimal footprint, the service utilizes a multi-stage Docker build pipeline \cite{merkel2014docker}. The \textbf{Builder Stage} compiles large Python binaries (\texttt{.whl}) utilizing \texttt{gcc}. The \textbf{Runtime Stage} pulls these pre-compiled binaries into an ultra-slim, security-hardened Debian image (\texttt{python:3.10-slim}), stripping compilation toolchains. This decouples build logic from execution, compressing the final image from $>3$GB to $\sim$850MB and reducing the vulnerability attack surface.
+The service uses a multi-stage Docker build to balance reproducibility against image size \cite{merkel2014docker}. The \textbf{Builder Stage} compiles Python binaries (\texttt{.whl}) with \texttt{gcc}. The \textbf{Runtime Stage} copies those pre-compiled binaries into a minimal, security-hardened Debian base (\texttt{python:3.10-slim}), discarding the build toolchain entirely. The final image is approximately 850MB --- down from over 3GB --- with a correspondingly smaller attack surface.
 
 \begin{figure}[H]
   \centering
@@ -150,18 +150,18 @@ To ensure perfect reproducibility while maintaining a minimal footprint, the ser
   \label{fig:container_deployment_workflow}
 \end{figure}
 
-The image is deployed to Google Cloud Platform (GCP) Cloud Run, a fully managed serverless environment \cite{biswas2022gcp}. Cloud Run natively handles HTTPS termination, dynamic load balancing, and scales to zero during idle periods to optimize infrastructure costs.
+The image is deployed to GCP Cloud Run \cite{biswas2022gcp}. Cloud Run manages HTTPS termination and load balancing, and scales to zero when idle, so infrastructure costs track actual query volume rather than reserved capacity.
 
-% ──────────────────────────────────────────────────────────────
-\section{Configuration and Defensive Security Hardening}
-\label{sec:configuration-management}
+% % ──────────────────────────────────────────────────────────────
+% \section{Configuration and Defensive Security Hardening}
+% \label{sec:configuration-management}
 
-Adhering to the 12-Factor application methodology \cite{wiggins2011twelve}, all configuration overrides (e.g., \texttt{ALLOWED\_CORS\_ORIGINS}, \texttt{MAX\_IMAGE\_SIZE\_MB}) and cryptographic secrets (\texttt{API\_KEY\_SECRET}) are injected securely at runtime via GCP Secret Manager, isolating credentials from version control.
+% Following the 12-Factor application methodology \cite{wiggins2011twelve}, all runtime configuration --- including \texttt{ALLOWED\_CORS\_ORIGINS}, \texttt{MAX\_IMAGE\_SIZE\_MB}, and the \texttt{API\_KEY\_SECRET} --- is injected via GCP Secret Manager rather than baked into the image or committed to version control.
 
-To defend against malicious payloads, input sanitization is executed at the ASGI middleware level. \texttt{Content-Length} anomalies trigger connection termination before memory allocation, preventing Denial of Service (DoS) attacks via payload bombs. Strict TLS~1.3 encryption prevents data-in-transit eavesdropping, while global exception handlers sanitize HTTP error responses to suppress internal Python stack traces from potential attackers.
+% Input sanitization runs at the ASGI middleware layer. Requests with anomalous \texttt{Content-Length} values are dropped before memory is allocated, which blocks payload-based denial-of-service attempts. TLS~1.3 is enforced for data in transit, and global exception handlers strip Python stack traces from error responses to avoid leaking implementation details to potential attackers.
 
-% ──────────────────────────────────────────────────────────────
-\section{Summary}
-\label{sec:chapter5-summary}
+% % ──────────────────────────────────────────────────────────────
+% \section{Summary}
+% \label{sec:chapter5-summary}
 
-This chapter detailed the engineering architecture of the AgriVerify Model Serving microservice. By synthesizing FastAPI, PyTorch, and OpenCV within an asynchronous execution loop, the service achieves high concurrent throughput for real-time seed classification. The implementation of strict Pydantic API contracts, multi-stage Docker containerisation, and serverless GCP deployment establishes a resilient, publication-ready AI inference engine capable of supporting large-scale agricultural verification operations.
+% This chapter described the engineering design of the AgriVerify Model Serving microservice. FastAPI, PyTorch, and OpenCV are composed within an asynchronous execution model to handle concurrent inference requests at low latency. Strict Pydantic API contracts, multi-stage Docker containerisation, and serverless GCP deployment address the practical requirements of a production inference service: reproducible builds, bounded resource usage, and predictable failure modes.

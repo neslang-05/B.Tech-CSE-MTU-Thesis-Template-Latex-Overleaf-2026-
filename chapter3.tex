@@ -26,40 +26,42 @@
 % \section{Overall System Architecture}
 % % ──────────────────────────────────────────────────────────────
 
-% The AgriVerify platform is engineered as a distributed, multi-tier web system
-% that integrates deep learning inference, cloud-based AI orchestration, and a
-% role-aware web application into a single coherent service. The architecture
-% adheres to the \textbf{Clean Architecture} principle (Onion Architecture
-% variant), which ensures that the core business logic remains entirely
-% independent of infrastructure concerns such as databases, cloud vendors, and UI
-% frameworks. Dependencies flow strictly inward: the outer layers (Infrastructure
-% and API) depend on abstractions exposed by the inner layers (Application and
-% Domain), never the reverse~\cite{martin2018clean}.
+% Building AgriVerify required us to carefully orchestrate three key layers: a
+% deep learning system for analyzing seed images, a robust backend API to manage
+% the workflow, and a user-friendly interface for farmers and officials. We chose
+% the \textbf{Clean Architecture} approach (specifically the Onion Architecture
+% variant) because it keeps the core business logic completely separate from
+% external concerns like databases and cloud platforms. Put simply, dependencies
+% always point inward—the outer layers depend on the inner ones, never the other
+% way around~\cite{martin2018clean}.
 
-% At the highest level, the platform comprises three major subsystems:
+% At the heart of our system are three main components working together:
 
 % \begin{enumerate}
-%   \item \textbf{Deep Learning Microservice} — A PyTorch/ResNet-50 model trained
-%         on a 1{,}563-image paddy seed corpus and served as a containerised
-%         FastAPI endpoint on Google Cloud Platform (GCP) Cloud Run~\cite{he2016deep}.
+%   \item \textbf{Deep Learning Microservice} — We trained a PyTorch-based
+%         ResNet-50 model on 1{,}563 paddy seed images and deployed it as a
+%         containerised FastAPI service on Google Cloud Platform's Cloud Run. This
+%         service handles the heavy lifting of image analysis~\cite{he2016deep}.
 
-%   \item \textbf{Backend API} — An ASP.NET Core 8 Web API acting as the primary
-%         orchestration layer. It authenticates users, mediates access to the ML
-%         microservice and Azure AI services (Custom Vision, AI Vision OCR, and
-%         Azure OpenAI), persists results to Microsoft SQL Server via Entity
-%         Framework Core, and exposes a versioned REST API consumed by the
-%         frontend~\cite{microsoft2023aspnet}.
+%   \item \textbf{Backend API} — We built an ASP.NET Core 8 Web API that acts as
+%         the central hub. It manages user authentication, communicates with the
+%         ML model and various Azure AI tools (for image classification, text
+%         extraction, and intelligent report generation), stores results in a SQL
+%         Server database, and provides a clean REST interface for the frontend to
+%         consume~\cite{microsoft2023aspnet}.
 
-%   \item \textbf{Frontend Web Application} — A Next.js 14 App Router application
-%         providing role-based dashboards for Farmers, Officers, and
-%         Administrators. All browser-to-backend traffic is forwarded through a
-%         server-side proxy route to centralise authentication token injection and
-%         prevent credential exposure in the browser~\cite{nextjs2023docs}.
+%   \item \textbf{Frontend Web Application} — A Next.js 14 application that
+%         delivers different dashboards for farmers, agricultural officers, and
+%         system administrators. To keep things secure, all communication between
+%         the browser and backend is routed through a server-side proxy, ensuring
+%         authentication tokens never leak to the client
+%         side~\cite{nextjs2023docs}.
 % \end{enumerate}
 
 % \subsection{Backend Architectural Layers}
 
-% The backend follows the four-layer Onion model, each layer encapsulating a distinct concern as outlined in Table~\ref{tab:backend_layers}.
+% Our backend follows a four-layer design pattern, with each layer handling a
+% specific set of responsibilities. Here's what each layer does:
 
 % \begin{table}[H]
 %   \centering
@@ -70,13 +72,13 @@
 %     \toprule
 %     \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
 %     \midrule
-%     \textbf{Domain Layer} & Contains core entities (\texttt{User}, \texttt{VerificationHistory}, \texttt{ProductComplaint}), value objects, enumerations (\texttt{UserRole}, \texttt{VerificationStatus}, \texttt{ComplaintStatus}), and domain exceptions. This layer carries no dependency on any external framework or service. \\
+%     \textbf{Domain Layer} & This is where we define the heart of our application: core entities like \texttt{User} and \texttt{VerificationHistory}, value objects, and error types. Importantly, this layer has zero dependencies on external frameworks or services—it's pure business logic. \\
 %     \addlinespace
-%     \textbf{Application Layer} & Orchestrates business workflows through application services (\texttt{VerificationService}, \texttt{UserService}, \texttt{ComplaintService}), defines Data Transfer Objects (DTOs), AutoMapper profiles, and FluentValidation rules. It depends only on the Domain layer. \\
+%     \textbf{Application Layer} & Think of this as the conductor of our application. It orchestrates how different business operations flow together using application services (\texttt{VerificationService}, \texttt{UserService}), data transfer objects (DTOs) for communication, mapping configurations, and validation rules. It depends only on the Domain layer. \\
 %     \addlinespace
-%     \textbf{Infrastructure Layer} & Provides concrete implementations for interfaces declared in the Application layer: Entity Framework Core repositories, the \texttt{ApplicationDbContext}, Azure service wrappers (\texttt{CustomVisionService}, \texttt{ComputerVisionService}, \texttt{OpenAIService}, \texttt{BlobStorageService}), and migration management. This layer bridges the application to external systems without surfacing implementation details to upper layers. \\
+%     \textbf{Infrastructure Layer} & This layer bridges our application to the outside world. It provides concrete implementations of interfaces, manages database interactions via Entity Framework Core, wraps Azure services (\texttt{CustomVisionService}, \texttt{ComputerVisionService}, \texttt{OpenAIService}), and handles file storage. The details here stay hidden from the upper layers. \\
 %     \addlinespace
-%     \textbf{API Layer} & Hosts ASP.NET Core controllers (\texttt{AuthController}, \texttt{VerificationController}, \texttt{ComplaintController}, \texttt{AdminController}), the JWT middleware pipeline, Swagger/OpenAPI documentation, and the global exception handling middleware. \\
+%     \textbf{API Layer} & This is the front door of our system. It hosts the ASP.NET Core controllers that handle HTTP requests, manages JWT authentication, exposes API documentation via Swagger, and handles errors consistently across all endpoints. \\
 %     \bottomrule
 %   \end{tabularx}
 % \end{table}
@@ -85,9 +87,10 @@
 % \section{Functional Requirements}
 % % ──────────────────────────────────────────────────────────────
 
-% The functional requirements presented below were derived from stakeholder
-% analysis involving farmers, agricultural officers, and domain experts. They
-% form the contractual basis for all implementation decisions across the platform.
+% We spent considerable time talking to farmers, agricultural officers, and
+% domain experts to understand exactly what AgriVerify needed to do. These
+% conversations shaped the following requirements, which became our roadmap for
+% what to build.
 
 % \begin{longtable}{@{} p{2.0cm} p{3.2cm} >{\raggedright\arraybackslash}p{8.2cm} @{}}
 % \caption{Comprehensive Functional Requirements Specification}
@@ -111,49 +114,50 @@
 % \bottomrule
 % \endlastfoot
 
-% \textbf{FR-01.1} & \textbf{Farmers (Auth)} & Must register using their name, email address, state, and district, and authenticate via an email--password credential pair. \\
+% \textbf{FR-01.1} & \textbf{Farmers (Auth)} & Farmers can sign up using their name, email, state, and district information. They log in with their email and password. \\
 % \addlinespace
-% \textbf{FR-01.2} & \textbf{Officers (Auth)} & Must authenticate using an officer ID and a time-based one-time password (TOTP) as a second authentication factor. \\
+% \textbf{FR-01.2} & \textbf{Officers (Auth)} & Agricultural officers authenticate using a unique officer ID and a time-based one-time password (TOTP) for added security. \\
 % \addlinespace
-% \textbf{FR-01.3} & \textbf{Administrators} & Accounts are provisioned through database seeding; credentials are managed directly by the platform. \\
+% \textbf{FR-01.3} & \textbf{Administrators} & Admin accounts are set up through initial database setup; their credentials are managed directly by the system. \\
 % \addlinespace
-% \textbf{FR-01.4} & \textbf{Session Control} & The system must issue JWT access tokens and refresh tokens upon successful login, and must invalidate both upon logout. \\
+% \textbf{FR-01.4} & \textbf{Session Control} & When users log in successfully, the system issues them access tokens and refresh tokens. These tokens become invalid when users log out. \\
 % \midrule
-% \textbf{FR-02.1} & \textbf{Image Submission} & Authenticated farmers must be able to upload front and back images of seed packaging for AI-powered authenticity analysis. \\
+% \textbf{FR-02.1} & \textbf{Image Submission} & Farmers can upload photos of the front and back of their seed packages so the system can analyze them. \\
 % \addlinespace
-% \textbf{FR-02.2} & \textbf{AI Inference} & The system must perform parallel inference using Azure Custom Vision for image classification, Azure AI Vision for OCR text extraction, and Azure OpenAI for contextual report synthesis. \\
+% \textbf{FR-02.2} & \textbf{AI Inference} & The system simultaneously uses three AI tools: one to identify the packaging genuineness, one to read text from the packaging, and one to extract physical seed characteristics. \\
 % \addlinespace
-% \textbf{FR-02.3} & \textbf{Result Output} & A confidence score, a verification status (Genuine / Counterfeit / Suspicious), extracted OCR text, and a natural-language summary must be returned to the caller and persisted to the database. \\
+% \textbf{FR-02.3} & \textbf{Result Output} & After analysis, the system provides a confidence score, a clear verdict (Genuine / Counterfeit / Suspicious), the extracted text from the packaging, and a summary report written in plain language. \\
 % \addlinespace
-% \textbf{FR-02.4} & \textbf{Public Access} & An anonymous public verification endpoint must be available to unauthenticated users. \\
+% \textbf{FR-02.4} & \textbf{Public Access} & Anyone—even without creating an account—can use the verification system to check if their seeds are genuine. \\
 % \midrule
-% \textbf{FR-03.1} & \textbf{Farmers (Complaints)} & Must be able to file complaints against seed batches, specifying issue type, affected district, severity level, and optional image evidence. \\
+% \textbf{FR-03.1} & \textbf{Farmers (Complaints)} & When farmers encounter a problem with seeds, they can file a complaint describing the issue, which district it affects, how serious it is, and can attach photos if needed. \\
 % \addlinespace
-% \textbf{FR-03.2} & \textbf{Officers (Complaints)} & Must be able to view assigned complaints, update their status (Open / Under Investigation / Resolved / Closed), and record investigation actions with timestamps. \\
+% \textbf{FR-03.2} & \textbf{Officers (Complaints)} & Officers assigned to a complaint can view its details, update its status as they investigate, and document what actions they've taken and when. \\
 % \addlinespace
-% \textbf{FR-03.3} & \textbf{Admin (Complaints)} & Must be able to view all complaints, filter by district and status, and assign unassigned complaints to available officers. \\
+% \textbf{FR-03.3} & \textbf{Admin (Complaints)} & Administrators can see all complaints across the system, filter them by location and status, and assign unhandled complaints to available officers. \\
 % \midrule
-% \textbf{FR-04.1} & \textbf{Farmer Dashboard} & Must have access to a personal dashboard displaying their verification history, complaint status, and summary metrics. \\
+% \textbf{FR-04.1} & \textbf{Farmer Dashboard} & Farmers have a personal dashboard showing their past verifications, the status of any complaints they filed, and quick summary numbers. \\
 % \addlinespace
-% \textbf{FR-04.2} & \textbf{Officer Dashboard} & Must be able to view a complaint queue, perform batch risk assessments, and access officer-level analytics. \\
+% \textbf{FR-04.2} & \textbf{Officer Dashboard} & Officers see a prioritised list of complaints, can quickly assess risk across batches of seeds, and have access to helpful analytics. \\
 % \addlinespace
-% \textbf{FR-04.3} & \textbf{Admin Dashboard} & Must have access to platform-wide analytics, user management controls, and reference data configuration. \\
+% \textbf{FR-04.3} & \textbf{Admin Dashboard} & Admins have a complete view of system performance across all users and locations, can manage user accounts, and can adjust reference data as needed. \\
 % \midrule
-% \textbf{FR-05.1} & \textbf{Data Aggregation} & The system must maintain a \texttt{BatchRiskRegistry} that aggregates complaint statistics per batch number. \\
+% \textbf{FR-05.1} & \textbf{Data Aggregation} & We maintain a registry (\texttt{BatchRiskRegistry}) that collects complaint data by batch number, making it easy to spot problematic seed batches at a glance. \\
 % \addlinespace
-% \textbf{FR-05.2} & \textbf{Risk Analytics} & Must track affected districts, compute average severity scores, and assign categorical risk levels. \\
+% \textbf{FR-05.2} & \textbf{Risk Analytics} & The system tracks which districts are affected, calculates average severity scores, and labels each batch with a risk category (Low, Medium, High). \\
 % \midrule
-% \textbf{FR-06.1} & \textbf{Feature Inference} & The ResNet-50 microservice must accept seed images, apply the 224\,×\,224 preprocessing pipeline, perform forward inference, and return class probabilities alongside 17 extracted DUS (Distinctness, Uniformity, and Stability) physical parameters such as length, width, colour, texture, and shape metrics. \\
+% \textbf{FR-06.1} & \textbf{Feature Inference} & When a seed image arrives at our ML microservice, it preprocesses the image, runs it through the ResNet-50 model, and extracts 17 physical measurements like seed length, width, color, and texture. \\
 % \addlinespace
-% \textbf{FR-06.2} & \textbf{Variety Matching} & The microservice must perform variety matching against a reference database of 12 registered paddy varieties and return the top-3 matches with their similarity percentages. \\
+% \textbf{FR-06.2} & \textbf{Variety Matching} & The microservice compares the seed against our database of 12 registered paddy varieties and returns the three best matches along with similarity scores. \\
 % \end{longtable}
 
 % % ──────────────────────────────────────────────────────────────
 % \section{Non-Functional Requirements}
 % % ──────────────────────────────────────────────────────────────
 
-% Non-functional requirements govern the quality attributes of the system and
-% are treated as first-class design constraints throughout the implementation.
+% Beyond what the system does, we also cared deeply about how well it does it.
+% These non-functional requirements shaped our architectural decisions at every
+% turn.
 
 % \begin{longtable}{@{} p{2.0cm} p{3.2cm} >{\raggedright\arraybackslash}p{8.2cm} @{}}
 % \caption{Comprehensive Non-Functional Requirements Specification}
@@ -177,19 +181,19 @@
 % \bottomrule
 % \endlastfoot
 
-% \textbf{NFR-01} & \textbf{Performance} & The end-to-end verification pipeline (image upload $\rightarrow$ AI orchestration $\rightarrow$ database write $\rightarrow$ response) must complete within a latency budget suitable for interactive web use. Parallel execution of OCR and Custom Vision calls via \texttt{Task.WhenAll} is mandated to reduce blocking latency. The FastAPI microservice must serve single-image inference in sub-second wall-clock time on GCP Cloud Run hardware. \\
+% \textbf{NFR-01} & \textbf{Performance} & When a farmer uploads seed images, we want an answer back quickly—ideally within a few seconds. To achieve this, we run image analysis and text extraction simultaneously rather than one after the other, and our ML model is optimized to deliver results in well under a second. \\
 % \addlinespace
-% \textbf{NFR-02} & \textbf{Scalability} & The backend must be stateless and deployable as a Dockerised container, enabling horizontal scaling without code changes~\cite{docker2023docs}. The Next.js frontend must support server-side rendering and edge caching to handle high concurrent client traffic efficiently. \\
+% \textbf{NFR-02} & \textbf{Scalability} & Our backend doesn't keep any state tied to individual servers, so we can easily run multiple copies of it to handle more users. The frontend uses server-side rendering and edge caching to handle traffic spikes gracefully, especially on mobile networks. \\
 % \addlinespace
-% \textbf{NFR-03} & \textbf{Security} & All HTTP traffic must be served strictly over TLS (HTTPS). JWT access tokens must carry minimal claims and expire within a configurable time-to-live (TTL). Passwords must be stored as cryptographic hashes using robust key derivation functions such as PBKDF2 or bcrypt. Sensitive credentials (Azure keys, database connection strings, and API keys) must reside in environment variables and must never be hard-coded. Role-based endpoint protection must be strictly enforced through ASP.NET Core \texttt{[Authorize]} policies~\cite{owasp2021top10}. \\
+% \textbf{NFR-03} & \textbf{Security} & All communication happens over secure HTTPS connections. Access tokens are short-lived and minimal. Passwords are securely hashed using industry-standard algorithms. Sensitive credentials like API keys and database passwords are kept in secure environment variables, never in code. Role-based access control ensures users can only do what they're authorized to do~\cite{owasp2021top10}. \\
 % \addlinespace
-% \textbf{NFR-04} & \textbf{Reliability \& Data Integrity} & All grouped repository operations must execute within a Unit of Work transaction with atomic commit-or-rollback semantics. Soft-delete functionality must be implemented for complaint and verification records to support future legal auditing. Health check endpoints (\texttt{/health} and \texttt{/api/health}) must expose the connectivity status of all critical dependencies. \\
+% \textbf{NFR-04} & \textbf{Reliability \& Data Integrity} & Database operations that involve multiple changes happen atomically—either all succeed or all fail, preserving data integrity. We use soft deletes so complaint and verification records can be preserved for future audits rather than permanently removed. The system includes health checks to monitor whether critical services are working properly. \\
 % \addlinespace
-% \textbf{NFR-05} & \textbf{Maintainability} & The codebase must adhere to Clean Architecture layering with clear separation of concerns. Infrastructure services must be registered through an \texttt{\seqsplit{InfrastructureServiceCollectionExtensions}} extension class rather than inline in \texttt{Program.cs}. All public API endpoints must be fully documented via the Swagger/OpenAPI~3.0 specification. \\
+% \textbf{NFR-05} & \textbf{Maintainability} & We've organized our code using Clean Architecture so it's easy for future developers to understand and modify. Infrastructure setup is handled cleanly through dedicated helper classes rather than scattered throughout startup code. All API endpoints are fully documented so other developers know how to use them. \\
 % \addlinespace
-% \textbf{NFR-06} & \textbf{Usability \& Accessibility} & The frontend must deliver a responsive layout usable on both desktop browsers and mobile devices, supporting farmers who access the platform via smartphones. The UI must provide immediate loading feedback through skeleton placeholders and toast notifications for asynchronous operations. \\
+% \textbf{NFR-06} & \textbf{Usability \& Accessibility} & The interface works smoothly on phones and desktop computers, since many farmers access AgriVerify via smartphones. Users get immediate visual feedback—loading indicators, success messages—so they know the system is working. \\
 % \addlinespace
-% \textbf{NFR-07} & \textbf{Portability} & The deep learning microservice must be exported in multiple formats (\texttt{.pth}, TorchScript \texttt{.pt}, and ONNX \texttt{.onnx}) to support deployment across heterogeneous runtime environments. The entire application stack must be fully containerisable via Docker. \\
+% \textbf{NFR-07} & \textbf{Portability} & We've exported our trained model in multiple formats so it can run in different environments and on different platforms. The entire system can be containerized and deployed anywhere that supports Docker. \\
 % \end{longtable}
 
 % % ──────────────────────────────────────────────────────────────
@@ -198,54 +202,55 @@
 
 % \subsection{Deep Learning Stack (PyTorch and ResNet-50)}
 
-% The classification model is implemented entirely in \textbf{Python~3.10} using
-% the following libraries~\cite{pytorch2019}:
+% We built our seed classification model in \textbf{Python~3.10} using these
+% core libraries~\cite{pytorch2019}:
 
 % \begin{itemize}
-%   \item \textbf{PyTorch} (\texttt{torch}, \texttt{torchvision}) — The primary
-%         deep learning framework used for model definition, training, and
-%         inference. PyTorch's dynamic computation graph simplifies debugging and
-%         permits flexible architecture modifications during transfer-learning
-%         fine-tuning phases.
+%   \item \textbf{PyTorch} (\texttt{torch}, \texttt{torchvision}) — This is our
+%         primary framework for building and training the neural network. We chose
+%         it because its dynamic architecture made debugging easier and allowed us
+%         to experiment with different model designs during development.
 
-%   \item \textbf{ResNet-50} — A 50-layer deep residual network pre-trained on
-%         ImageNet (1.2M images, 1{,}000 classes) sourced from
-%         \texttt{torchvision.models}~\cite{he2016deep}. The backbone contributes
-%         approximately 23.5M parameters; a custom three-layer classification head
-%         (2{,}048 $\rightarrow$ 512 $\rightarrow$ 128 $\rightarrow$ 3 units) adds
-%         a further 1.1M trainable parameters.
+%   \item \textbf{ResNet-50} — We started with a 50-layer deep neural network
+%         that was pre-trained on 1.2 million images across 1{,}000 different
+%         object categories. This pre-training gave us a head start; we then
+%         fine-tuned it specifically for seed classification using
+%         \texttt{torchvision.models}~\cite{he2016deep}. The base model contains
+%         23.5M parameters; we added a custom classification head with another
+%         1.1M trainable parameters tailored to our three output classes.
 
-%   \item \textbf{OpenCV} (\texttt{cv2}) — Used in the DUS parameter extraction
-%         pipeline for contour detection, pixel-to-millimetre calibration, and
-%         morphological analysis of seed images to compute the 17 physical
-%         parameters (colour mean/standard deviation, circularity, solidity, grain
-%         length/width, and related metrics)~\cite{opencv2015}.
+%   \item \textbf{OpenCV} (\texttt{cv2}) — We used this library to process seed
+%         images and extract 17 physical measurements. The process involves
+%         finding seed boundaries, measuring pixel dimensions relative to a known
+%         reference, and analyzing seed shape characteristics like how round or
+%         solid the seed is~\cite{opencv2015}.
 
-%   \item \textbf{NumPy / Pandas} — Employed for numerical array manipulation
-%         and dataset statistics management~\cite{harris2020numpy}.
+%   \item \textbf{NumPy / Pandas} — We used these for handling numerical arrays
+%         and organizing our dataset statistics~\cite{harris2020numpy}.
 
-%   \item \textbf{scikit-learn} — Provides stratified train/validation/test split
-%         utilities and evaluation metric helpers~\cite{pedregosa2011sklearn}.
+%   \item \textbf{scikit-learn} — This provided handy utilities for splitting
+%         data into training, validation, and test sets while maintaining data
+%         balance, plus functions for calculating evaluation metrics~\cite{pedregosa2011sklearn}.
 
-%   \item \textbf{Matplotlib / Seaborn} — Used for training curve visualisation
-%         and confusion matrix rendering.
+%   \item \textbf{Matplotlib / Seaborn} — We created visualizations to understand
+%         how well the model learned and to spot any patterns in its errors.
 % \end{itemize}
 
-% Training was conducted on a GPU-enabled environment using the \textbf{AdamW}
-% optimiser with weight decay $\lambda = 10^{-4}$, cross-entropy loss with label
-% smoothing $\varepsilon = 0.1$, and a two-phase transfer learning schedule.
-% Phase~1 (Epochs 1--8, backbone frozen, learning rate $= 10^{-3}$) allows the
-% classification head to converge quickly, while Phase~2 (Epochs 9--15, full
-% fine-tuning, learning rate $= 10^{-4}$) enables end-to-end weight adaptation.
-% The final ResNet-50 model achieved a test accuracy of \textbf{92.15\%} on the
-% combined 1{,}563-image dataset, with a train-to-validation accuracy gap of
-% 2.8\%.
+% We trained the model on a GPU using AdamW (an optimizer that also regularizes
+% weights with $\lambda = 10^{-4}$), cross-entropy loss with label smoothing
+% ($\varepsilon = 0.1$), and a two-stage training approach. In the first stage
+% (epochs 1–8, learning rate $= 10^{-3}$), we froze the pre-trained backbone and
+% only trained the new classification head so it could quickly learn what features
+% matter for seed classification. In the second stage (epochs 9–15, learning rate
+% $= 10^{-4}$), we unfroze the entire network and fine-tuned every layer end-to-end.
+% The final model achieved \textbf{92.15\%} accuracy on our test set of 1{,}563 seed
+% images, with the training accuracy only about 2.8\% higher than validation
+% accuracy—indicating the model generalizes well to new images.
 
 % \subsection{Backend Stack (ASP.NET Core 8, SQL Server, and Azure)}
 
-% The backend REST API is built on the \textbf{Microsoft .NET~8} ecosystem.
-% Table~\ref{tab:backend_stack} summarises the key technology components and
-% their roles within the system.
+% We built the backend REST API using the \textbf{Microsoft .NET~8} ecosystem.
+% Here's a quick summary of the key technologies and what each does:
 
 % \begin{table}[htbp]
 %   \centering
@@ -273,95 +278,92 @@
 %   \end{adjustbox}
 % \end{table}
 
-% Azure AI services are consumed through dedicated service wrappers
-% (\texttt{CustomVisionService}, \texttt{ComputerVisionService}, and
-% \texttt{OpenAIService}) registered in the dependency injection container as
-% singletons. The parallel orchestration pattern
-% (\texttt{await Task.WhenAll(ocrTask, classificationTask)}) ensures that OCR
-% extraction and image classification execute concurrently, minimising
-% per-request latency~\cite{microsoft2023aspnet}.
+% We wrapped each Azure AI service in a dedicated class (\texttt{CustomVisionService},
+% \texttt{ComputerVisionService}, \texttt{OpenAIService}) that handles the details
+% of communicating with Azure. These are registered once at startup and reused
+% throughout the application. The clever part is using parallel execution
+% (\texttt{await Task.WhenAll}) so that when a farmer submits images, we analyze
+% the packaging, extract text, and run the physical analysis all at the same
+% time—cutting down the total wait time~\cite{microsoft2023aspnet}.
 
 % \subsection{Model Serving (FastAPI and Docker)}
 
-% The trained PyTorch model is wrapped in a \textbf{FastAPI} microservice and
-% deployed as a Docker container on \textbf{GCP Cloud Run}~\cite{fastapi2023docs}.
-% The inference pipeline within the microservice follows five sequential stages:
+% Once we trained our PyTorch model, we wrapped it in a \textbf{FastAPI}
+% microservice and deployed it as a Docker container on \textbf{GCP Cloud Run}
+% so it can automatically scale based on demand~\cite{fastapi2023docs}. Here's
+% how the inference pipeline works step by step:
 
 % \begin{enumerate}
-%   \item \textbf{Request} — The FastAPI endpoint receives a multipart image
-%         payload from the ASP.NET backend.
+%   \item \textbf{Request} — The backend sends a seed image (as multipart file data)
+%         to the FastAPI endpoint.
 %   \item \textbf{Preprocessing} — The image is resized to 224\,×\,224 pixels
-%         and normalised using the ImageNet channel-wise mean
-%         $\boldsymbol{\mu} = [0.485,\,0.456,\,0.406]$ and standard deviation
-%         $\boldsymbol{\sigma} = [0.229,\,0.224,\,0.225]$.
-%   \item \textbf{Model Inference} — The ResNet-50 model processes the normalised
-%         tensor and produces class logits.
-%   \item \textbf{Post-processing} — Softmax converts logits to class
-%         probabilities; OpenCV routines extract the 17 DUS parameters; variety
-%         matching is performed against the 12-variety reference database.
-%   \item \textbf{Response} — A structured JSON payload containing the prediction
-%         label, confidence score, physical parameters, DUS classification, and
-%         top-3 variety matches is returned to the backend.
+%         and normalized using standard ImageNet values
+%         $\boldsymbol{\mu} = [0.485,\,0.456,\,0.406]$ and
+%         $\boldsymbol{\sigma} = [0.229,\,0.224,\,0.225]$ so the model sees
+%         consistent inputs.
+%   \item \textbf{Model Inference} — ResNet-50 processes the normalized image
+%         and produces raw classification scores (logits).
+%   \item \textbf{Post-processing} — We convert those scores to probabilities
+%         using softmax, extract the 17 physical seed measurements using OpenCV,
+%         and compare the seed against known varieties in our reference database.
+%   \item \textbf{Response} — A JSON payload is sent back containing the predicted
+%         class, confidence score, physical measurements, and the top-3 matching
+%         varieties with their similarity percentages.
 % \end{enumerate}
 
-% The model is exported in three formats to maximise deployment flexibility:
-% PyTorch native format (\texttt{.pth}, ${\approx}$98\,MB), TorchScript
-% (\texttt{.pt}, ${\approx}$97\,MB, for C++ runtimes), and ONNX
-% (\texttt{.onnx}, ${\approx}$98\,MB, for cross-platform inference). Continuous
-% delivery is automated via a \textbf{GitHub Actions} CI/CD pipeline that
-% triggers a Docker build-and-push to GCP Artifact Registry on every commit to
-% the \texttt{main} branch.
+% To maximize deployment flexibility, we export the model in three formats: native
+% PyTorch (\texttt{.pth}, ${\approx}$98\,MB), TorchScript for C++ environments
+% (\texttt{.pt}, ${\approx}$97\,MB), and ONNX for cross-platform inference
+% (\texttt{.onnx}, ${\approx}$98\,MB). We've set up automated deployment using
+% GitHub Actions—whenever we push new code to the main branch, the system
+% automatically builds a Docker image and deploys it to GCP.
 
 % \subsection{Frontend Stack (Next.js, TypeScript, and TanStack Query)}
 
-% The user-facing application is a \textbf{Next.js~14 App Router} single-page
-% application written in \textbf{TypeScript}. The key technology choices are
-% described below.
+% The user-facing interface is built with \textbf{Next.js~14 App Router} and
+% \textbf{TypeScript}. Here's what makes it tick:
 
 % \begin{itemize}
-%   \item \textbf{Next.js~14 App Router} — Provides file-system-based routing
-%         with route groups that cleanly separate the three role namespaces
-%         (\texttt{(farmer)}, \texttt{(officer)}, and \texttt{(admin)}). Server
-%         components handle initial data fetching; client components manage
-%         interactive UI behaviour.
+%   \item \textbf{Next.js~14 App Router} — This framework handles routing and
+%         rendering. We organized our routes into three separate sections
+%         (\texttt{(farmer)}, \texttt{(officer)}, \texttt{(admin)}) so each user
+%         type sees their own personalized interface. Some pages render on the
+%         server for better performance; interactive elements render in the browser.
 
-%   \item \textbf{TypeScript} — Enforces strict compile-time type safety across
-%         all layers, including shared DTO interfaces (\texttt{src/types/}),
-%         domain service modules (\texttt{src/services/}), and custom React hooks
-%         (\texttt{src/hooks/}).
+%   \item \textbf{TypeScript} — This adds type checking at development time,
+%         catching errors before code runs. We define shared data structures
+%         (\texttt{src/types/}), service modules (\texttt{src/services/}), and
+%         custom hooks (\texttt{src/hooks/}) all with full type safety.
 
-%   \item \textbf{TanStack Query (React Query v5)} — Manages all asynchronous
-%         server state, including cache invalidation, background refetch,
-%         pagination, and optimistic mutation rollback. Query hooks are
-%         co-located with domain modules; the global \texttt{QueryClient}
-%         disables refetch-on-window-focus to reduce incidental network
-%         requests~\cite{tanstack2023query}.
+%   \item \textbf{TanStack Query (React Query v5)} — Manages all the complex state
+%         around fetching data from the server: caching, refreshing, pagination,
+%         and rolling back failed changes. Query functions live alongside their
+%         domain logic; we've also configured it to not automatically refetch when
+%         the browser tab comes back into focus, reducing unnecessary requests~\cite{tanstack2023query}.
 
-%   \item \textbf{Zustand} — A lightweight client-side state store for
-%         authentication state (\texttt{user}, \texttt{token}, \texttt{role},
-%         \texttt{isAuthenticated}). The store is initialised from
-%         \texttt{localStorage} on the client side and exposes \texttt{setAuth}
-%         and \texttt{clearAuth} actions~\cite{zustand2023}.
+%   \item \textbf{Zustand} — A lightweight state store for authentication info
+%         (\texttt{user}, \texttt{token}, \texttt{role}, \texttt{isAuthenticated}).
+%         On page load, it reads from the browser's local storage; when users log
+%         out, it clears everything~\cite{zustand2023}.
 
-%   \item \textbf{Axios} — Centralised HTTP client configured with a base URL of
-%         \texttt{/api/proxy}. A request interceptor automatically injects the
-%         Bearer token from storage; a response interceptor handles 401 errors by
-%         transparently attempting a token refresh before replaying the failed
-%         request.
+%   \item \textbf{Axios} — Our HTTP client configured to talk to the backend via
+%         \texttt{/api/proxy}. It automatically adds authentication tokens to
+%         requests and handles the scenario where a token expires mid-request by
+%         getting a fresh token and retrying~\cite{axios2023}.
 
-%   \item \textbf{Next.js API Route Proxy} — A server-side proxy route at
-%         \texttt{\seqsplit{/api/proxy/[...path]}} forwards all browser requests to the
-%         ASP.NET backend using the URL stored in the \texttt{\seqsplit{BACKEND\_API\_URL}}
-%         environment variable, preventing credential exposure in the browser.
+%   \item \textbf{Next.js API Route Proxy} — For security, we added a server-side
+%         proxy at \texttt{\seqsplit{/api/proxy/[...path]}} that forwards requests from the
+%         browser to the actual backend API. This way, authentication tokens stay
+%         on the server and never appear in browser JavaScript.
 
-%   \item \textbf{Tailwind CSS} — Utility-first styling framework with extended
-%         design tokens (colours, border radii, and shadows) defined in
-%         \texttt{tailwind.config.ts}.
+%   \item \textbf{Tailwind CSS} — A utility-first CSS framework that lets us
+%         quickly style components. We extended the default design with custom
+%         colors, border styles, and shadows in \texttt{tailwind.config.ts}.
 
-%   \item \textbf{Shadcn/UI + Custom Primitives} — A compact local component
-%         library providing Button, Input, Select, Dialog, Sheet, Table, Badge,
-%         Tabs, Skeleton, and Progress components built on native HTML elements
-%         with minimal abstraction overhead.
+%   \item \textbf{Shadcn/UI + Custom Primitives} — We built a compact component
+%         library with frequently-used UI elements (buttons, input fields, dialogs,
+%         tables, badges) built on standard HTML and styled with Tailwind, keeping
+%         things lightweight.
 % \end{itemize}
 
 % ──────────────────────────────────────────────────────────────
@@ -370,13 +372,15 @@
 
 \subsection{High-Level Architecture}
 
-Figure~\ref{fig:high_level_arch} illustrates the end-to-end system topology.
-The user's browser communicates exclusively with the Next.js frontend server;
-no backend URLs are ever exposed to the client. All backend calls are proxied
-server-side to the ASP.NET Core API, which delegates to the ML microservice on
-GCP and to the suite of Azure AI services. Verification records are persisted
-in Microsoft SQL Server via Entity Framework Core, and seed images are stored
-in Azure Blob Storage.
+Figure~\ref{fig:high_level_arch} shows how the whole system fits together. When
+a farmer or officer uses AgriVerify through their browser, they never directly
+connect to the backend—everything goes through the Next.js frontend. The
+frontend acts as a trusted intermediary: it injects the secure authentication
+token into requests and forwards them to the ASP.NET backend. The backend then
+talks to three specialized services: the ML microservice on GCP for image
+analysis, Azure AI tools for text extraction and packaging verification, and
+finally stores everything in a SQL Server database. Any seed images are also
+safely stored in Azure's cloud storage.
 
 \begin{figure}[htbp]
   \centering
@@ -415,18 +419,20 @@ in Azure Blob Storage.
       \draw[-Stealth, thick, draw=teal!80!black] ([xshift=2.5cm]backend.south) -- (db.north) node[midway, right, font=\footnotesize] {EF Core / SQL};
     \end{tikzpicture}
   \end{adjustbox}
-  \caption{High-level system architecture of the AgriVerify platform. Solid arrows indicate request direction; dashed arrows indicate response direction.}
+  \caption{High-level system architecture of the AgriVerify platform.}
   \label{fig:high_level_arch}
 \end{figure}
 
 \subsection{Data Flow Diagram}
 
-Figure~\ref{fig:dfd} traces the data flow for the primary seed verification
-use case. When a farmer submits seed images, the request travels from the
-browser through the Next.js proxy, enters the ASP.NET verification pipeline,
-and is fanned out in parallel to the ML microservice and two Azure AI services.
-The combined results are synthesised by Azure OpenAI, persisted to the
-database, and returned as a structured JSON response.
+Figure~\ref{fig:dfd} walks through what happens when a farmer submits seed
+images for verification. The request travels from the browser through the
+Next.js security layer into the ASP.NET backend, where the system springs into
+action: it simultaneously asks the ML microservice to analyze the seed image,
+sends the image to Azure for packaging authenticity checks, and extracts any
+text visible on the package. Once all three analyses finish, Azure's AI
+synthesizes the results into a clear, easy-to-understand report. This report
+is saved to the database and sent back to the farmer's screen.
 
 \begin{figure}[htbp]
   \centering
@@ -436,7 +442,7 @@ database, and returned as a structured JSON response.
       subbox/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\footnotesize, inner sep=8pt}
     ]
       % Nodes
-      \node[box=green, text width=10cm] (farmer) {\textbf{1. Farmer / User Client}\\Captures \& Submits Seed Packaging Images (Front \& Back)};
+      \node[box=green, text width=10cm] (farmer) {\textbf{1. Farmer / User Client}\\Captures \& Submits Seed Images};
 
       \node[box=cyan, text width=10cm, below=1cm of farmer] (proxy) {\textbf{2. Next.js Proxy Route}\\Intercepts Request, Injects Secure JWT Bearer Token \& Forwards Payload};
 
@@ -444,7 +450,7 @@ database, and returned as a structured JSON response.
 
       \node[subbox=purple, text width=4cm, below=2cm of orch] (ocr) {\textbf{3b. Azure AI Vision}\\Extracts OCR Text \& Seed Batch Numbers};
       \node[subbox=blue, text width=4cm, left=0.5cm of ocr] (custom) {\textbf{3a. Azure Custom Vision}\\Classifies Packaging as Genuine / Counterfeit / Suspicious};
-      \node[subbox=orange, text width=4cm, right=0.5cm of ocr] (resnet) {\textbf{3c. GCP Cloud Run / ResNet-50}\\Extracts 17 DUS Parameters \& Performs Variety Matching};
+      \node[subbox=orange, text width=4cm, right=0.5cm of ocr] (resnet) {\textbf{GCP Cloud Run / ResNet-50}\\Extracts 17 DUS Parameters \& Performs Variety Matching};
 
       % Background box around parallel step
       \begin{scope}[on background layer]
@@ -475,15 +481,16 @@ database, and returned as a structured JSON response.
       \draw[-Stealth, thick] (db.south) -- (response.north) node[midway, right, font=\footnotesize] {JSON Response (DTO)};
     \end{tikzpicture}
   \end{adjustbox}
-  \caption{Data flow diagram for the seed verification pipeline. The three inference calls (Custom Vision, OCR, ResNet-50) execute in parallel; results are aggregated before OpenAI synthesis.}
+  \caption{Data flow diagram for the seed verification pipeline}
   \label{fig:dfd}
 \end{figure}
 
 \subsection{Entity-Relationship Diagram}
 
-Figure~\ref{fig:erd} presents the simplified entity-relationship (ER) diagram
-for the core domain model persisted in Microsoft SQL Server. The model captures
-the principal entities and the cardinality of their associations.
+Figure~\ref{fig:erd} shows the main database tables and how they connect to each
+other. Think of this as the backbone of AgriVerify's data storage—it captures
+users, their verification history, complaints filed against problematic seeds,
+and the actions officers take to investigate those complaints.
 
 \begin{figure}[htbp]
   \centering
@@ -589,25 +596,26 @@ the principal entities and the cardinality of their associations.
 \end{figure}
 
 \noindent
-Several design decisions embedded in the ER model merit explicit discussion:
+A few key design choices in this schema are worth mentioning:
 
 \begin{itemize}
-  \item \textbf{Soft delete} — \texttt{IsDeleted} and \texttt{DeletedAt} fields
-        on \texttt{VerificationHistory} and \texttt{ProductComplaint} preserve
-        audit trails and support future legal review without physically removing
-        records.
+  \item \textbf{Soft delete} — Rather than permanently removing verification
+        records or complaints from the database, we mark them as deleted. This way,
+        we preserve a complete audit trail that might be needed for legal
+        investigations or disputes down the road.
 
-  \item \textbf{Third Normal Form (3NF) normalisation} — Seed package
-        information, verification records, and complaint data are stored in
-        separate tables, eliminating data redundancy and update anomalies.
+  \item \textbf{Smart database design} — We split seed data, verification results,
+        and complaint information into separate tables. This eliminates redundancy
+        and makes sure that when we update information in one place, it's consistent
+        everywhere it appears.
 
-  \item \textbf{Indexed columns} — \texttt{User.Email},
-        \texttt{Verification\-History.UserId}, \texttt{ProductComplaint.Status},
-        and \texttt{ProductComplaint.District} carry non-clustered indices to
-        support efficient dashboard query execution.
+  \item \textbf{Fast lookups} — We've added database indices on frequently-queried
+        columns like email addresses, user IDs associated with verifications, and
+        complaint status filters. This keeps dashboard queries snappy even as the
+        system grows.
 
-  \item \textbf{BatchRiskRegistry} — Updated by a background aggregation job
-        triggered on every complaint state change, this denormalised table
-        provides fast, pre-computed risk summaries for officer-facing analytics
-        without requiring expensive real-time aggregation queries.
+  \item \textbf{BatchRiskRegistry} — This table pre-computes risk summaries for
+        each seed batch whenever a new complaint comes in. Rather than recalculating
+        these statistics every time an officer checks the dashboard, we just read
+        from this table. It's a smart tradeoff between performance and simplicity.
 \end{itemize}

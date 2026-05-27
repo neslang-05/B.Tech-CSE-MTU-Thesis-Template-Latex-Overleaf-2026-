@@ -5,29 +5,31 @@
 % ============================================================
 
 \section{Model Performance}
-The empirical performance of the proposed deep convolutional neural network framework was rigorously evaluated using standard classification metrics: Accuracy, Precision, Recall, and F1 Score~\cite{mohanty2016}. The quantitative evaluation was executed on an unseen validation test dataset following the completion of a two-phase transfer learning pipeline built upon the ResNet50 architecture~\cite{he2016deep, xu2021}.
 
-The fully converged model demonstrated exceptional discriminatory capability in categorising commercial seed samples into binary quality classifications: \texttt{Pure} (legitimate certified seed stock) and \texttt{Impure} (defective, damaged, or counterfeit seed stock). The resulting performance metrics confirm that the proposed visual inspection framework is highly reliable for real-world agricultural deployment in resource-constrained environments.
+After completing training, we rigorously tested our ResNet50 model on images it had never seen before. We measured its performance using standard metrics that the machine learning community relies on: Accuracy, Precision, Recall, and F1 Score~\cite{mohanty2016}. These metrics tell us from different angles how well the model distinguishes between genuine seeds and problematic ones (damaged or counterfeit)~\cite{he2016deep, xu2021}.
+
+The results were exceptional. Our model reliably sorted seed samples into two categories: \texttt{Pure} (legitimate, certified seeds) and \texttt{Impure} (defective, damaged, or counterfeit seeds). These numbers confirm that AgriVerify is genuinely ready to help farmers and agricultural officers in the real world, even in areas with limited resources.
 
 \subsection{Accuracy, Precision, Recall, and F1 Score}
-The aggregate performance metrics obtained from the final evaluation benchmark on the held-out test set are summarized in Table~\ref{tab:overallmetrics}, and the validation accuracy and loss trajectories across training epochs are illustrated in Figure~\ref{fig:model-performance}.
+
+Here's exactly how well our model performed on the test set:
 
 \begin{table}[htbp]
   \centering
-  \caption{Aggregate Deep Learning Model Evaluation Metrics}
+  \caption{Overall Model Evaluation Results}
   \label{tab:overallmetrics}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l c X @{}}
     \toprule
-    \textbf{Evaluation Metric} & \textbf{Achieved Score} & \textbf{Operational System Interpretation} \\
+    \textbf{Performance Metric} & \textbf{Result} & \textbf{What This Means} \\
     \midrule
-    Accuracy & 99.57\% & Flawless overall classification correctness across the held-out test distribution \\
+    Accuracy & 99.57\% & Out of every 100 seeds we tested, we correctly classified 99 or 100 of them \\
     \addlinespace
-    Precision & 99.57\% & Exceptional positive predictive value ensuring virtually zero false alarms \\
+    Precision & 99.57\% & When the system says a seed is problematic, it's right almost every time—virtually no false alarms \\
     \addlinespace
-    Recall & 99.57\% & High sensitivity guaranteeing consistent identification of defective seeds \\
+    Recall & 99.57\% & The system catches almost all problematic seeds—very few slip through undetected \\
     \addlinespace
-    F1 Score & 99.57\% & Perfect harmonic balance demonstrating robust precision-recall equilibrium \\
+    F1 Score & 99.57\% & Perfect balance between precision and recall—the system is equally good at both \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -37,54 +39,56 @@ The aggregate performance metrics obtained from the final evaluation benchmark o
   \begin{adjustbox}{max width=0.85\textwidth}
     \includegraphics[width=\textwidth]{{"thesis/model-performace.jpeg"}}
   \end{adjustbox}
-  \caption{Diagnostic performance curves illustrating validation accuracy and loss trajectories across training epochs.}
+  \caption{How the model improved over 15 training cycles. The top line shows accuracy getting better; the bottom line shows the error getting smaller.}
   \label{fig:model-performance}
 \end{figure}
 
-The achieved overall test accuracy of 99.57\% demonstrates that the model correctly categorized the vast majority of paddy seed samples across varying physical textures and lighting conditions. Precision and recall remained tightly coupled at 99.57\%, demonstrating that the transfer learning pipeline effectively suppresses both false positive alerts (classifying pure seeds as counterfeit) and false negative misses (approving defective batches). The resulting F1 Score of 99.57\% confirms the structural balance and mathematical robustness of the classifier.
+Let me explain why these numbers matter. When we achieved 99.57\% accuracy, it means the model correctly classified the vast majority of paddy seeds regardless of their texture or how the photo was lit. Precision and recall being equally high is particularly important: it means we're both good at avoiding false alarms (rejecting good seeds) and catching actual problems (approving bad seeds). A high F1 Score shows these two strengths are perfectly balanced~\cite{mohanty2016}.
 
-Importantly, these empirical outcomes significantly exceed the historical benchmark range of 85\% to 90\% commonly observed in automated agricultural grain sorting systems~\cite{dyrmann2016, ni2009}. This performance differential validates the efficacy of the proposed domain-specific fine-tuning and progressive image augmentation strategies.
+Most importantly, our 99.57\% result far exceeds the industry standard of 85--90\% for automated seed quality systems~\cite{dyrmann2016, ni2009}. This validates that our approach of combining transfer learning, careful data augmentation, and specialized regularization techniques really works.
 
-\section{Binary Quality Performance: Pure vs. Impure Seeds}
-To investigate the classification mechanics across distinct visual phenotypes, evaluation metrics were disaggregated and analyzed independently for the \texttt{Pure} and \texttt{Impure} seed categories across the 231 test samples.
+\section{Seed Quality Results: Pure vs. Impure Seeds}
+
+To understand exactly how the model performs on each type of seed, we analyzed its performance separately for genuine seeds and problematic seeds. We tested on 231 seed samples divided into these two categories.
 
 \begin{table}[htbp]
   \centering
-  \caption{Class-Wise Binary Diagnostic Performance Evaluation}
+  \caption{Performance on Each Seed Category}
   \label{tab:perclass}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l c c c X @{}}
     \toprule
-    \textbf{Seed Category} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Phenotypic Classification Analysis} \\
+    \textbf{Seed Type} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{What This Means} \\
     \midrule
-    Pure (\texttt{pure}) & 100.0\% & 99.19\% & 99.60\% & Flawless precision ensuring zero impure samples are falsely accepted as genuine \\
+    Pure (Genuine) & 100.0\% & 99.19\% & 99.60\% & Perfect at recognizing genuine seeds—never wrongly approves a fake one \\
     \addlinespace
-    Impure (\texttt{impure}) & 99.07\% & 100.0\% & 99.53\% & Perfect sensitivity (100\% recall) guaranteeing all defective/fake samples are flagged \\
+    Impure (Damaged/Fake) & 99.07\% & 100.0\% & 99.53\% & Perfect at detecting problems—catches every single defective seed \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-As detailed in Table~\ref{tab:perclass}, the \texttt{Pure} seed class achieved perfect precision (100.0\%) due to its highly uniform visual texture, standardized golden-brown coloration, and intact husk geometry. Conversely, the \texttt{Impure} class achieved perfect recall (100.0\%), meaning that every single defective, mechanically damaged, or substandard counterfeit sample in the test set was successfully identified and flagged by the neural network~\cite{liu2020}.
+The results show something remarkable: the model achieved 100\% precision on genuine seeds because they have very distinctive visual characteristics—a consistent golden-brown color, intact husks, and uniform texture. It also achieved 100\% recall on problematic seeds, meaning every damaged or counterfeit seed in our test set was flagged. This is exactly what we want: no genuine seeds are mistakenly rejected, and no fake seeds slip through~\cite{liu2020}.
 
-The systematic application of weighted random sampling and synthetic image transformations enabled the network to maintain equitable representation and high diagnostic accuracy across both target classes without forming majority-class bias.
+The combination of weighted sampling (giving equal importance to each category during training) and image augmentation (showing the network varied versions of seeds) prevented the model from developing a bias toward whichever category was more common in the data.
 
 \section{Confusion Matrix Analysis}
-A confusion matrix was constructed to map the exact distribution of model predictions against ground-truth labels across the 231 validation test instances. This diagnostic matrix provides deep visibility into true positive classifications alongside inter-class error distributions, as illustrated in Figure~\ref{fig:confusion-matrix} and detailed numerically in Table~\ref{tab:confusion}.
+
+To see the exact pattern of the model's decisions, we created a confusion matrix—a table showing which predictions were correct and which were wrong.
 
 \begin{table}[htbp]
   \centering
-  \caption{Binary Confusion Matrix Distribution on Test Set}
+  \caption{Detailed Look at Every Prediction}
   \label{tab:confusion}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{0.75\textwidth}{@{} l c c @{}}
     \toprule
-    \multirow{2}{*}{\textbf{Actual Ground Truth}} & \multicolumn{2}{c}{\textbf{Predicted Neural Classification}} \\
+    \multirow{2}{*}{\textbf{Actual Seed Type}} & \multicolumn{2}{c}{\textbf{What the Model Predicted}} \\
     \cmidrule{2-3}
-    & \textbf{Impure (\texttt{impure})} & \textbf{Pure (\texttt{pure})} \\
+    & \textbf{Impure} & \textbf{Pure} \\
     \midrule
-    \textbf{Impure (\texttt{impure})} & 107 & 0 \\
+    \textbf{Impure} & 107 & 0 \\
     \addlinespace
-    \textbf{Pure (\texttt{pure})} & 1 & 123 \\
+    \textbf{Pure} & 1 & 123 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -94,58 +98,64 @@ A confusion matrix was constructed to map the exact distribution of model predic
   \begin{adjustbox}{max width=0.75\textwidth}
     \includegraphics[width=\textwidth]{{"thesis/Confusion-Matrix.jpeg"}}
   \end{adjustbox}
-  \caption{Binary confusion matrix visualizing empirical classification performance and inter-class error distributions.}
+  \caption{Visual representation of how often the model got predictions right or wrong.}
   \label{fig:confusion-matrix}
 \end{figure}
 
-The empirical distribution rendered in Table~\ref{tab:confusion} confirms that 230 out of 231 test instances align exactly along the primary diagonal, signifying correct model predictions. 
+Out of 231 test seeds, 230 were classified correctly—that's almost perfect. Let's look at the two types of mistakes:
 
-The operational significance of these numbers is profound for agricultural quality control: out of 107 actual impure samples, all 107 were correctly classified as impure, resulting in zero false positives for pure seeds ($FP = 0$). This guarantees that no defective or counterfeit seed batch is ever mistakenly verified as legitimate. Out of 124 actual pure samples, 123 were correctly verified as pure, with only a single sample conservatively misclassified as impure ($FN = 1$). This conservative error boundary aligns perfectly with agronomic safety, as falsely rejecting a legitimate batch triggers a manual re-inspection, whereas falsely approving a counterfeit batch would lead to catastrophic crop failure for the farmer.
+**Out of 107 problematic seeds:** All 107 were correctly identified as impure. Zero problematic seeds were falsely approved. This is crucial—it means no farmer will unknowingly plant counterfeit or damaged seeds because the system missed them.
+
+**Out of 124 genuine seeds:** 123 were correctly approved, and only 1 was conservatively rejected (marked as impure when it was actually genuine). This conservative error is actually good for agricultural safety: if a genuine seed batch gets flagged, the farmer can request manual re-inspection. But if a fake batch gets approved and the farmer plants it, the entire harvest could fail. So falsely rejecting a good seed is a much safer mistake than falsely approving a bad one.
 
 \section{Regularization Effectiveness}
-Because the empirical training dataset was constrained to 1,563 field images, suppressing parameter overfitting was a paramount architectural priority during network optimization. A multi-layered regularization strategy was engineered to preserve generalization capacity across unseen test distributions.
 
-The relative effectiveness of these architectural interventions was quantified by tracking the divergence between training and validation loss trajectories, as summarized in Table~\ref{tab:regularization}.
+We only had 1,563 training images, which is relatively small for deep learning. This means the model could easily "memorize" the training data instead of learning general patterns. To prevent this overfitting, we used multiple protective techniques. Let's see how effective they were:
 
 \begin{table}[htbp]
   \centering
-  \caption{Impact of Architectural Regularization on Model Generalization}
+  \caption{How Our Anti-Overfitting Techniques Helped}
   \label{tab:regularization}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l c X @{}}
     \toprule
-    \textbf{Optimization Configuration} & \textbf{Train-Validation Gap} & \textbf{Empirical Generalization Outcome} \\
+    \textbf{Configuration} & \textbf{Training vs. Validation Difference} & \textbf{What Happened} \\
     \midrule
-    Unregularized Baseline & 25.0\% -- 30.0\% & Severe parameter memorization and high validation divergence \\
+    No Protection & 25--30\% & Bad—the model memorized training data and performed much worse on new seeds \\
     \addlinespace
-    Standard Dropout Only & 8.0\% -- 12.0\% & Moderate stabilization with residual overfitting on complex textures \\
+    Dropout Only & 8--12\% & Better, but still some overfitting on tricky seed textures \\
     \addlinespace
-    Final Combined Strategy & 2.8\% & Exceptional generalization with tight convergence across epochs ($<5\%$ gap) \\
+    All Techniques Combined & 2.8\% & Excellent—tight control with less than 5\% difference \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-The final train-validation accuracy gap of 2.8\% confirms that the regularized ResNet50 framework successfully avoids overfitting while maintaining stable convergence dynamics. This tight performance envelope was achieved through the simultaneous orchestration of the following techniques:
+The final gap of just 2.8\% between training and validation performance is excellent. It means the model learned general seed characteristics rather than memorizing specific training examples. We achieved this tight control using several coordinated techniques:
 
 \begin{itemize}
-    \item \textbf{Decoupled Weight Decay (\texttt{AdamW}):} Applied an L2 penalty of $1 \times 10^{-4}$ directly to weight parameters rather than gradients, preventing parameter inflation during adaptive optimization~\cite{loshchilov2019adamw}.
-    \item \textbf{Label Smoothing Regularization:} Set smoothing parameter $\alpha = 0.1$, discouraging the network from forming overconfident logits on noisy training labels~\cite{muller2019label}.
-    \item \textbf{Stochastic Dropout and Batch Normalization:} Integrated intermediate dropout layers ($p = 0.5$) before dense projection heads alongside batch-wise feature normalization~\cite{he2016deep}.
-    \item \textbf{Dynamic Learning Rate Scheduling:} Implemented cosine annealing with warm restarts, allowing the network to escape suboptimal local minima during fine-tuning.
-    \item \textbf{Aggressive Data Augmentation:} Enforced random affine rotations, horizontal flips, Gaussian blur, and color jitter to simulate real-world field capture variances.
+    \item \textbf{Smart Weight Decay (AdamW):} We gently penalized large weights, keeping the model simple and generalizable~\cite{loshchilov2019adamw}.
+    
+    \item \textbf{Label Smoothing:} Instead of forcing the model to be 100\% confident about labels, we softened the targets slightly, preventing overconfidence~\cite{muller2019label}.
+    
+    \item \textbf{Dropout and Batch Normalization:} During training, we randomly "turn off" 50\% of neurons and normalized values to stabilize learning~\cite{he2016deep}.
+    
+    \item \textbf{Adaptive Learning Rate Scheduling:} We adjusted the learning rate dynamically, allowing the network to escape local traps and find better solutions.
+    
+    \item \textbf{Aggressive Data Augmentation:} We artificially created new training examples by rotating, flipping, blurring, and color-shifting seed images to simulate real-world field photography variations.
 \end{itemize}
 
 \section{Model Comparison and Architecture Selection}
-To substantiate the selection of ResNet50 as the primary inference engine, a comprehensive benchmarking study was conducted against three alternative convolutional architectures trained under identical hardware constraints and hyperparameter schedules.
+
+Before settling on ResNet50, we tested four popular neural network designs on the same dataset with the same training approach to see which was best.
 
 \begin{table}[htbp]
   \centering
-  \caption{Comparative Architectural Benchmarking Across CNN Frameworks}
+  \caption{Comparing Four Different Neural Network Architectures}
   \label{tab:modelcomparison}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} X c c c c c @{}}
     \toprule
-    \textbf{Neural Architecture} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time} \\
+    \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time} \\
     \midrule
     \textbf{ResNet50} & \textbf{99.57\%} & \textbf{99.57\%} & \textbf{99.57\%} & \textbf{99.57\%} & 16.4 min \\
     \addlinespace
@@ -163,135 +173,142 @@ To substantiate the selection of ResNet50 as the primary inference engine, a com
   \begin{adjustbox}{max width=0.85\textwidth}
     \includegraphics[width=\textwidth]{{"thesis/model-comparison.jpeg"}}
   \end{adjustbox}
-  \caption{Visual comparative benchmarking of classification metrics and execution times across evaluated neural architectures.}
+  \caption{Visual comparison of how each model performed and how long training took.}
   \label{fig:model-comparison}
 \end{figure}
 
-As documented in Table~\ref{tab:modelcomparison} and illustrated in Figure~\ref{fig:model-comparison}, ResNet50 achieved the highest overall diagnostic performance across all key classification metrics. The network's identity shortcut connections allow gradients to flow unimpeded across 50 deep convolutional layers, overcoming vanishing gradient degradation during fine-tuning~\cite{he2016deep, xu2021}. 
+Three models tied for best accuracy—ResNet50, DenseNet121, and GoogleNet all achieved 99.57\%. MobileNetV2 was slightly lower at 99.13\% but trained much faster. So why did we choose ResNet50?
 
-While MobileNetV2 demonstrated rapid training convergence (8.5 minutes) and reduced memory footprint, its classification accuracy (99.13\%) was slightly lower. DenseNet121 and GoogleNet provided identical peak diagnostic capability (99.57\%), but ResNet50 exhibited superior numerical stability and seamless compatibility with production deployment tools such as ONNX Runtime and TensorRT~\cite{pytorch2019}. Consequently, ResNet50 was chosen as the optimal balance between diagnostic precision and computational efficiency for the AgriVerify backend microservice.
+ResNet50 has skip connections (shortcuts) that let training signals flow smoothly through all 50 layers, making it easier to fine-tune without losing information~\cite{he2016deep, xu2021}. More importantly, ResNet50 is the most widely supported across different deployment platforms—PyTorch, TorchScript, ONNX, and specialized inference engines. This flexibility means AgriVerify can run on cloud servers, edge devices, and even smartphones in the future. The extra 4.4 minutes of training time is negligible since training only happens once~\cite{pytorch2019}.
 
 \section{System Performance and Production Latency}
-Beyond isolated model accuracy, the complete end-to-end operational performance of the AgriVerify microservice architecture was evaluated to verify production deployment readiness. Key telemetry metrics including inference latency, API round-trip responsiveness, and concurrent server throughput were benchmarked across diverse hardware profiles.
 
-\subsection{API Inference Latency Benchmarks}
-Inference latency measures the execution duration required for the PyTorch runtime to ingest an incoming image tensor, execute forward pass tensor operations, and generate classification probability logits.
+Beyond just accuracy, we tested how fast the complete system responds to real requests—this is critical for farmers waiting for results in the field.
+
+\subsection{How Fast the AI Model Runs}
+
+Inference latency is the time it takes the model to receive an image, process it, and output a prediction.
 
 \begin{table}[htbp]
   \centering
-  \caption{Hardware-Specific Inference Latency Benchmarks}
+  \caption{Speed on Different Hardware}
   \label{tab:latency}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l c X @{}}
     \toprule
-    \textbf{Hardware Runtime Profile} & \textbf{Mean Latency} & \textbf{Operational Deployment Suitability} \\
+    \textbf{Hardware} & \textbf{Speed} & \textbf{Good For What?} \\
     \midrule
-    CPU Execution (\texttt{x86\_64}) & $\sim$165 ms & Ideal for lightweight containerized microservices and edge nodes \\
+    Regular CPU & $\sim$165 ms & Lightweight servers and edge devices; still plenty fast \\
     \addlinespace
-    GPU Acceleration (\texttt{NVIDIA CUDA}) & $\sim$20 ms & High-throughput cloud inference capable of handling peak market traffic \\
+    GPU (NVIDIA CUDA) & $\sim$20 ms & Cloud servers handling many requests; 8 times faster than CPU \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-GPU-accelerated tensor computation reduced forward pass execution latency to approximately 20 milliseconds, representing an $8.25\times$ speedup over unaccelerated CPU execution. Nevertheless, the CPU latency of 165 milliseconds remains highly performant, ensuring that edge servers and cost-optimized cloud containers can deliver real-time verification feedback to farmers in the field.
+Even on a regular CPU (without GPU acceleration), the model responds in 165 milliseconds—that's less than a quarter-second. On GPU hardware, it's 20 milliseconds. Both are fast enough for real-time farmer feedback in the field.
 
-\subsection{Backend API Responsiveness and Server Throughput}
-The ASP.NET Core backend was subjected to concurrent load testing to measure full round-trip HTTP response times and system stability under multi-user operational conditions~\cite{microsoft2023aspnet}.
+\subsection{Full System Response Time}
+
+We stress-tested the entire backend system (not just the model) to see how it performs when many farmers are using it simultaneously.
 
 \begin{table}[htbp]
   \centering
-  \caption{Production Backend API Responsiveness and Telemetry}
+  \caption{Real-World System Performance Under Load}
   \label{tab:backendperformance}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l c X @{}}
     \toprule
-    \textbf{System Telemetry Metric} & \textbf{Observed Benchmark} & \textbf{Architectural Execution Scope} \\
+    \textbf{Metric} & \textbf{Observation} & \textbf{Significance} \\
     \midrule
-    Mean API Round-Trip Time & 280 ms -- 420 ms & Encompasses multipart upload, proxy forwarding, inference, and DTO formatting \\
+    End-to-End Response & 280--420 ms & Includes uploading the image, sending it through the system, running AI, and formatting the response \\
     \addlinespace
-    Concurrent Request Throughput & 40 -- 60 req/sec & Highly stable execution under simulated agricultural market peak loads \\
+    Concurrent Requests & 40--60 per second & Very stable even when many farmers submit seeds simultaneously \\
     \addlinespace
-    Image Ingestion \& Preprocessing & 80 ms -- 120 ms & Network stream buffering, resolution normalization, and EXIF sanitization \\
+    Image Upload \& Prep & 80--120 ms & Network transfer and image preprocessing before AI runs \\
     \addlinespace
-    Relational Query Execution & $<$50 ms & Entity Framework Core optimized retrieval of complaint and user audits \\
+    Database Queries & $<$50 ms & Fast retrieval of complaint and user records \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-The integrated system maintained stable throughput and low latency across simultaneous verification uploads, grievance filings, and administrative queries. The proxy architecture successfully decoupled client connections from heavy asynchronous AI processing, preventing thread pool exhaustion during peak operational windows~\cite{martin2018clean}.
+The system remained stable and responsive even under peak load. The proxy architecture (where the frontend acts as an intermediary) was crucial—it prevented the backend from getting overwhelmed because it manages heavy workloads asynchronously instead of forcing everything to wait~\cite{martin2018clean}.
 
 \section{Functional Verification and Test Execution}
-Comprehensive functional testing was executed across the complete AgriVerify application stack to confirm the correctness, security, and state consistency of all primary modules. Test suites covered image verification pipelines, grievance redressal workflows, and role-based access control (RBAC) boundaries.
 
-\subsection{Seed Verification Test Execution}
-The image processing and AI classification subsystem was subjected to boundary and negative testing using diverse image inputs.
+We rigorously tested every major feature to confirm the system works correctly, is secure, and maintains data consistency.
+
+\subsection{Seed Verification Testing}
+
+We tested the image processing and classification system with many different scenarios:
 
 \begin{table}[htbp]
   \centering
-  \caption{Functional Test Suite for Seed Verification Workflows}
+  \caption{Seed Verification Test Cases}
   \label{tab:seedtestcases}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l X X c @{}}
     \toprule
-    \textbf{Test ID} & \textbf{Test Scenario} & \textbf{Expected System Behavior} & \textbf{Status} \\
+    \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
     \midrule
-    \textbf{SV-01} & Submit front/back images of legitimate certified paddy packaging & Correct classification as \texttt{Pure / Genuine} with DUS parameters extracted & \textbf{Pass} \\
+    \textbf{SV-01} & Upload clear photos of genuine seed packaging & Correctly classified as Pure with physical measurements extracted & \textbf{Pass} \\
     \addlinespace
-    \textbf{SV-02} & Upload images of mechanically fractured and discolored grains & Classification as \texttt{Impure (Damaged)} with degradation warnings rendered & \textbf{Pass} \\
+    \textbf{SV-02} & Upload photos of cracked or discolored seeds & Classified as Impure (Damaged) with warnings shown & \textbf{Pass} \\
     \addlinespace
-    \textbf{SV-03} & Upload uncertified packaging featuring counterfeit brand iconography & Classification as \texttt{Impure (Fake / Low Quality)} with high confidence & \textbf{Pass} \\
+    \textbf{SV-03} & Upload fake packaging with counterfeit branding & Classified as Impure (Fake) with high confidence & \textbf{Pass} \\
     \addlinespace
-    \textbf{SV-04} & Submit unsupported file formats (\texttt{.exe}, \texttt{.zip}, \texttt{.txt}) & HTTP 400 rejection and client-side validation toast rendered & \textbf{Pass} \\
+    \textbf{SV-04} & Try uploading wrong file types (.exe, .zip, .txt) & System rejects and shows helpful error message & \textbf{Pass} \\
     \addlinespace
-    \textbf{SV-05} & Upload highly blurred or extreme low-light seed photography & Warning notification advising recapture or low confidence score & \textbf{Pass} \\
+    \textbf{SV-05} & Upload blurry or very dark seed photos & System warns user to retake photo or shows low confidence & \textbf{Pass} \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\subsection{Grievance Management Test Execution}
-The complaint management subsystem was verified to ensure immutable auditing and seamless bidirectional synchronization between farmers and investigating officers.
+\subsection{Grievance Management Testing}
+
+We tested the complaint system to make sure complaints are recorded securely and can be tracked:
 
 \begin{table}[htbp]
   \centering
-  \caption{Functional Test Suite for Grievance Redressal Workflows}
+  \caption{Complaint System Test Cases}
   \label{tab:complainttestcases}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l X X c @{}}
     \toprule
-    \textbf{Test ID} & \textbf{Test Scenario} & \textbf{Expected System Behavior} & \textbf{Status} \\
+    \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
     \midrule
-    \textbf{CM-01} & Farmer submits complaint with narrative description and evidence & Record committed to SQL database and assigned \texttt{Open} status & \textbf{Pass} \\
+    \textbf{CM-01} & Farmer files a complaint with description and evidence & Complaint saved to database and marked as Open & \textbf{Pass} \\
     \addlinespace
-    \textbf{CM-02} & Submit complaint omitting mandatory batch ID or narrative fields & Client-side form validation prevents submission with inline error tags & \textbf{Pass} \\
+    \textbf{CM-02} & Try filing complaint with missing required information & Form validation prevents submission and shows error & \textbf{Pass} \\
     \addlinespace
-    \textbf{CM-03} & Farmer navigates to complaint history portal & Paginated list of active and historical grievances rendered accurately & \textbf{Pass} \\
+    \textbf{CM-03} & Farmer views their complaint history & All past and current complaints displayed with pagination & \textbf{Pass} \\
     \addlinespace
-    \textbf{CM-04} & Officer transitions complaint status from \texttt{Open} to \texttt{Resolved} & Optimistic UI mutation applied and persistent database state updated & \textbf{Pass} \\
+    \textbf{CM-04} & Officer changes complaint status from Open to Resolved & Update immediately visible in the system & \textbf{Pass} \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\subsection{Role-Based Access Control and Security Testing}
-Authentication boundaries and authorization guards were tested to ensure absolute isolation between user personas~\cite{owasp2021session}.
+\subsection{Security and Access Control Testing}
+
+We tested that only authorized users can access their roles' features:
 
 \begin{table}[htbp]
   \centering
-  \caption{Functional Test Suite for Role-Based Access Enforcement}
+  \caption{Security and Access Control Test Cases}
   \label{tab:rbactestcases}
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{@{} l X X c @{}}
     \toprule
-    \textbf{Test ID} & \textbf{Test Scenario} & \textbf{Expected System Behavior} & \textbf{Status} \\
+    \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
     \midrule
-    \textbf{RB-01} & Valid login submission via registered farmer credentials & Issuance of signed JWT pair and redirection to farmer dashboard & \textbf{Pass} \\
+    \textbf{RB-01} & Valid farmer login & Receives security token and goes to farmer dashboard & \textbf{Pass} \\
     \addlinespace
-    \textbf{RB-02} & Authenticated farmer attempts navigation to \texttt{/admin/dashboard} & \texttt{RoleGuard} intercepts request and redirects back to farmer portal & \textbf{Pass} \\
+    \textbf{RB-02} & Farmer tries accessing admin page & System blocks access and redirects to farmer area & \textbf{Pass} \\
     \addlinespace
-    \textbf{RB-03} & Administrator login with valid credentials and multi-factor TOTP & Full administrative privileges granted across user and telemetry views & \textbf{Pass} \\
+    \textbf{RB-03} & Admin login with multi-factor authentication & Full admin privileges granted & \textbf{Pass} \\
     \addlinespace
-    \textbf{RB-04} & JWT access token expiration during active user session & Axios interceptor automatically executes refresh token exchange & \textbf{Pass} \\
+    \textbf{RB-04} & Security token expires during session & System automatically gets new token without user noticing & \textbf{Pass} \\
     \addlinespace
-    \textbf{RB-05} & Login submission using invalid password or unregistered email & HTTP 401 error returned and descriptive rejection toast rendered & \textbf{Pass} \\
+    \textbf{RB-05} & Login with wrong password & System returns error and shows helpful message & \textbf{Pass} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -301,134 +318,134 @@ Authentication boundaries and authorization guards were tested to ensure absolut
 \label{sec:system-interfaces}
 % ──────────────────────────────────────────────────────────────
 
-The AgriVerify platform provides intuitive, role-partitioned web portals built using Next.js~15, React~19, and Tailwind CSS~\cite{nextjs2024, react2013, tailwind2024}. To evaluate the usability, responsiveness, and functional comprehensiveness of the platform, the complete user interface was verified across mobile and desktop environments. The following sections present detailed screenshots and operational analyses of the core user workflows across the public domain, farmer portal, grievance redressal system, and administrative governance dashboards.
+AgriVerify provides simple, intuitive interfaces tailored to three different user types: farmers, agricultural officers, and system administrators. We built these using modern web technologies: Next.js 15, React 19, and Tailwind CSS~\cite{nextjs2024, react2013, tailwind2024}. Let's walk through each interface and see how users interact with the system.
 
 \subsection{Public Portal, Onboarding, and Multilingual Support}
 
-The public-facing namespace introduces farmers and unauthenticated users to the AgriVerify ecosystem. The landing portal is optimized for immediate value communication and rapid mobile field scanning. To accommodate the linguistic diversity of rural agricultural districts, the user interface integrates robust internationalization support, allowing users to toggle between English and regional dialects seamlessly.
+When farmers first visit AgriVerify, they land on a public page explaining what the platform does and why they should use it. Since many rural farmers speak regional languages, the interface supports language selection—farmers can switch between English and their local dialect.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Public landing page showcasing platform value proposition and fake seed detection capabilities.]{\includegraphics[width=0.48\textwidth]{{"thesis/Landing.png"}}\label{fig:ui-landing}}
+  \subfloat[Main landing page showing AgriVerify's value and features.]{\includegraphics[width=0.48\textwidth]{{"thesis/Landing.png"}}\label{fig:ui-landing}}
   \hfill
-  \subfloat[Multilingual localization interface providing regional dialect selection for rural accessibility.]{\includegraphics[width=0.48\textwidth]{{"thesis/language.png"}}\label{fig:ui-language}}
-  \caption{Public portal interfaces designed for seamless onboarding and localized accessibility.}
+  \subfloat[Language selection interface so rural farmers can use their preferred language.]{\includegraphics[width=0.48\textwidth]{{"thesis/language.png"}}\label{fig:ui-language}}
+  \caption{Welcome pages for onboarding and language selection.}
   \label{fig:ui-public-portal}
 \end{figure}
 
-Secure onboarding is facilitated through dedicated role selection and registration interfaces. Farmers creating new accounts provide essential demographic data, contact coordinates, and agricultural district assignments, establishing the verifiable identity required for formal grievance redressal.
+New farmers can create accounts by providing their name, email, location, and agricultural district. This information is essential for the complaint system—it verifies that users are real people in the agricultural community.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Secure authentication landing portal for user role selection.]{\includegraphics[width=0.48\textwidth]{{"thesis/login landing.png"}}\label{fig:ui-login-landing}}
+  \subfloat[Login and role selection interface.]{\includegraphics[width=0.48\textwidth]{{"thesis/login landing.png"}}\label{fig:ui-login-landing}}
   \hfill
-  \subfloat[Farmer account registration interface capturing demographic and district metadata.]{\includegraphics[width=0.48\textwidth]{{"thesis/new account.png"}}\label{fig:ui-new-account}}
-  \caption{Authentication landing and farmer registration workflows.}
+  \subfloat[Farmer registration form collecting demographic and location information.]{\includegraphics[width=0.48\textwidth]{{"thesis/new account.png"}}\label{fig:ui-new-account}}
+  \caption{Login and farmer account registration.}
   \label{fig:ui-onboarding}
 \end{figure}
 
-For administrative personnel and nodal agricultural officers, access is protected via a specialized secure login portal requiring multi-factor authentication passcodes in addition to standard credentials.
+For agricultural officers and system administrators, there's a separate secure login page that requires both a password and a special time-based security code (multi-factor authentication) to prevent unauthorized access.
 
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.75\textwidth}
     \includegraphics[width=\textwidth]{{"thesis/admin login.png"}}
   \end{adjustbox}
-  \caption{Secure administrative login interface enforcing multi-factor authentication for privileged roles.}
+  \caption{Secure admin login requiring multi-factor authentication.}
   \label{fig:ui-admin-login}
 \end{figure}
 
 \subsection{Farmer Portal and AI Seed Quality Assessment Workflow}
 
-Upon successful authentication, farmers enter a centralized dashboard that aggregates personal verification metrics, historical submission archives, and real-time alerts. The portal is engineered to provide immediate operational feedback regarding seed batch quality before planting commences.
+Once logged in, farmers see a personalized dashboard showing their verification history, verification statistics, and any alerts. This is their command center for seed quality checking.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Main dashboard aggregating verification history, crop quality metrics, and recent activity logs.]{\includegraphics[width=0.48\textwidth]{{"thesis/dashboard.png"}}\label{fig:ui-dashboard}}
+  \subfloat[Main farmer dashboard showing verification history and activity summary.]{\includegraphics[width=0.48\textwidth]{{"thesis/dashboard.png"}}\label{fig:ui-dashboard}}
   \hfill
-  \subfloat[Farmer profile management interface displaying registered credentials and verification badges.]{\includegraphics[width=0.48\textwidth]{{"thesis/profile.png"}}\label{fig:ui-profile}}
-  \caption{Farmer portal overview and profile management interface.}
+  \subfloat[Farmer profile page showing account information and verification badges.]{\includegraphics[width=0.48\textwidth]{{"thesis/profile.png"}}\label{fig:ui-profile}}
+  \caption{Farmer dashboard and profile management.}
   \label{fig:ui-farmer-portal}
 \end{figure}
 
-Farmers can modify their demographic details and account preferences through the profile editing panel. The core functional capability of the portal is the field verification submission workflow, where farmers utilize mobile or desktop cameras to capture high-resolution front and back imagery of commercial seed packaging.
+Farmers can update their profile information at any time. The core feature is submitting seed photos—farmers take pictures of the front and back of seed packaging using their phone or computer camera.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Profile editing and account detail modification interface.]{\includegraphics[width=0.48\textwidth]{{"thesis/rename.png"}}\label{fig:ui-rename}}
+  \subfloat[Profile editing interface.]{\includegraphics[width=0.48\textwidth]{{"thesis/rename.png"}}\label{fig:ui-rename}}
   \hfill
-  \subfloat[Responsive camera capture and image upload workflow for front and back seed packet analysis.]{\includegraphics[width=0.48\textwidth]{{"thesis/adding seed image.png"}}\label{fig:ui-adding-seed}}
-  \caption{Account modification and dual-image seed packet verification submission workflow.}
+  \subfloat[Mobile-friendly camera interface for uploading front and back seed packaging photos.]{\includegraphics[width=0.48\textwidth]{{"thesis/adding seed image.png"}}\label{fig:ui-adding-seed}}
+  \caption{Account settings and seed photo submission.}
   \label{fig:ui-capture-workflow}
 \end{figure}
 
-Once imagery is submitted to the backend AI inference pipeline, the system returns a comprehensive diagnostic report. Verified genuine seed packets display extracted DUS (Distinctness, Uniformity, and Stability) physical parameters~\cite{upov2002dus}, whereas counterfeit or defective batches trigger high-visibility warning banners accompanied by direct reporting instructions.
+After submitting photos, the system analyzes them and returns a detailed report. If the seeds are genuine, the report shows the extracted physical measurements. If the system detects a problem, it displays a warning with clear instructions on what to do next.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Verification report indicating genuine seed packaging with extracted DUS physical parameters.]{\includegraphics[width=0.48\textwidth]{{"thesis/geniune.png"}}\label{fig:ui-genuine}}
+  \subfloat[Verification result for genuine seeds showing extracted physical parameters.]{\includegraphics[width=0.48\textwidth]{{"thesis/geniune.png"}}\label{fig:ui-genuine}}
   \hfill
-  \subfloat[High-risk counterfeit seed alert displaying confidence breakdowns and immediate reporting instructions.]{\includegraphics[width=0.48\textwidth]{{"thesis/counterfeit.png"}}\label{fig:ui-counterfeit}}
-  \caption{Automated AI seed quality assessment diagnostic reports.}
+  \subfloat[Alert for counterfeit seeds with confidence breakdown and reporting instructions.]{\includegraphics[width=0.48\textwidth]{{"thesis/counterfeit.png"}}\label{fig:ui-counterfeit}}
+  \caption{Seed quality assessment results.}
   \label{fig:ui-verification-results}
 \end{figure}
 
 \subsection{Grievance Redressal and Officer Investigation Interfaces}
 
-When farmers encounter counterfeit packaging or experience uncharacteristic crop failure from verified seed batches, they can file formal disputes through the grievance redressal module. The submission form captures narrative descriptions, batch identification numbers, and an adjustable severity rating.
+If a farmer encounters fake or damaged seeds, they can file a formal complaint. The complaint form asks for a description of the problem, the seed batch number, and a severity rating.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Interactive product quality complaint form with narrative description and adjustable severity slider.]{\includegraphics[width=0.48\textwidth]{{"thesis/complains.png"}}\label{fig:ui-complaints-form}}
+  \subfloat[Complaint form where farmers describe the problem and adjust severity.]{\includegraphics[width=0.48\textwidth]{{"thesis/complains.png"}}\label{fig:ui-complaints-form}}
   \hfill
-  \subfloat[User complaint tracking queue displaying real-time investigation statuses and historical resolutions.]{\includegraphics[width=0.48\textwidth]{{"thesis/complains queue.png"}}\label{fig:ui-complaints-queue}}
-  \caption{Farmer grievance submission form and active complaint tracking queue.}
+  \subfloat[Farmer's complaint tracking page showing status updates.]{\includegraphics[width=0.48\textwidth]{{"thesis/complains queue.png"}}\label{fig:ui-complaints-queue}}
+  \caption{Complaint filing and tracking for farmers.}
   \label{fig:ui-grievance}
 \end{figure}
 
-Agricultural Officers oversee assigned regional jurisdictions via dedicated investigative portals. The officer dashboard presents geographical dispute distributions and active workload metrics, allowing officers to filter and prioritize open cases within their district.
+Agricultural officers have a separate dashboard showing all complaints in their region. They can filter by severity and see which areas have the most problems. This helps them prioritize investigations.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Officer primary dashboard summarizing regional dispute distributions and active workload.]{\includegraphics[width=0.48\textwidth]{{"thesis/officer dashboard.png"}}\label{fig:ui-officer-dashboard}}
+  \subfloat[Officer dashboard showing regional complaint summary and workload metrics.]{\includegraphics[width=0.48\textwidth]{{"thesis/officer dashboard.png"}}\label{fig:ui-officer-dashboard}}
   \hfill
-  \subfloat[Regional investigation queue supporting multi-parameter filtering by severity and district.]{\includegraphics[width=0.48\textwidth]{{"thesis/investication queue.png"}}\label{fig:ui-investigation-queue}}
-  \caption{Agricultural Officer management portal and regional investigation queue.}
+  \subfloat[Investigation queue that officers can filter and sort by severity and location.]{\includegraphics[width=0.48\textwidth]{{"thesis/investication queue.png"}}\label{fig:ui-investigation-queue}}
+  \caption{Agricultural officer portal and complaint queue.}
   \label{fig:ui-officer-portal}
 \end{figure}
 
-Selecting a specific dispute record opens an in-depth audit view where officers inspect uploaded packaging evidence, verify extraction histories, and execute optimistic status transitions~\cite{tanstack2024query}.
+When officers click on a specific complaint, they can see the farmer's photos, read their description, and update the investigation status.
 
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.85\textwidth}
     \includegraphics[width=\textwidth]{{"thesis/complains officer.png"}}
   \end{adjustbox}
-  \caption{Detailed officer dispute inspection interface for reviewing farmer-submitted packaging evidence and updating investigation statuses.}
+  \caption{Officer view of a complaint with farmer evidence and status update options.}
   \label{fig:ui-complaint-officer}
 \end{figure}
 
 \subsection{Platform Administration, User Governance, and Telemetry}
 
-System Administrators manage the overarching technical health, security compliance, and user governance of the AgriVerify platform. The central telemetry dashboard provides real-time visibility into system latency, active sessions, and database performance.
+System administrators have a complete dashboard showing real-time system health: response times, active users, and database performance. This allows them to spot problems quickly.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[System Administrator central telemetry dashboard displaying real-time system latency, active sessions, and database health.]{\includegraphics[width=0.48\textwidth]{{"thesis/Admin Dashboard.png"}}\label{fig:ui-admin-dashboard}}
+  \subfloat[Admin telemetry dashboard showing system performance metrics in real time.]{\includegraphics[width=0.48\textwidth]{{"thesis/Admin Dashboard.png"}}\label{fig:ui-admin-dashboard}}
   \hfill
-  \subfloat[Administrative user management interface for provisioning agricultural officers and overseeing farmer account statuses.]{\includegraphics[width=0.48\textwidth]{{"thesis/user management.png"}}\label{fig:ui-user-mgmt}}
-  \caption{Executive system administration and user governance dashboard.}
+  \subfloat[User management interface for creating officers and monitoring farmer accounts.]{\includegraphics[width=0.48\textwidth]{{"thesis/user management.png"}}\label{fig:ui-user-mgmt}}
+  \caption{Administrator dashboard and user management.}
   \label{fig:ui-admin-governance}
 \end{figure}
 
-To support longitudinal policy making and agricultural oversight, the platform provides comprehensive reporting and analytics dashboards that visualize system-wide verification trends and counterfeit geographical distributions over time.
+The platform also provides detailed analytics showing verification trends over time and which regions have the most fake seed problems. This information helps agricultural policymakers identify where counterfeit operations are concentrated.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Primary analytics dashboard aggregating system-wide verification trends and fake seed detection rates over time.]{\includegraphics[width=0.48\textwidth]{{"thesis/reports and analytics.png"}}\label{fig:ui-reports-1}}
+  \subfloat[Analytics dashboard showing verification trends and fake seed detection rates over time.]{\includegraphics[width=0.48\textwidth]{{"thesis/reports and analytics.png"}}\label{fig:ui-reports-1}}
   \hfill
-  \subfloat[Detailed secondary analytics view visualizing district-level dispute patterns and counterfeit geographical distributions.]{\includegraphics[width=0.48\textwidth]{{"thesis/reports and analytics 2nd.png"}}\label{fig:ui-reports-2}}
-  \caption{Longitudinal reporting and platform analytics dashboards.}
+  \subfloat[Regional analysis showing which districts have the most counterfeit seed problems.]{\includegraphics[width=0.48\textwidth]{{"thesis/reports and analytics 2nd.png"}}\label{fig:ui-reports-2}}
+  \caption{System analytics and reporting dashboards.}
   \label{fig:ui-analytics}
 \end{figure}
 
@@ -437,13 +454,16 @@ To support longitudinal policy making and agricultural oversight, the platform p
 \label{sec:challenges}
 % ──────────────────────────────────────────────────────────────
 
-Several technical, computational, and operational challenges were encountered during the engineering and deployment of the AgriVerify architecture. 
+Building AgriVerify wasn't without obstacles. Here are the main challenges we faced and how we solved them:
 
 \begin{itemize}
-    \item \textbf{Constrained Empirical Dataset Size:} The primary dataset comprised 1,563 field images, posing a substantial risk of over-parameterization during deep learning optimization. This challenge was resolved by adopting a two-phase transfer learning schedule on pre-trained ImageNet weights~\cite{krizhevsky2012imagenet}, coupled with heavy stochastic data augmentation and weight decay regularization~\cite{loshchilov2019adamw}.
-    \item \textbf{High Visual Similarity Across Defective Classes:} Discriminating between mechanically damaged grains and sophisticated counterfeit seed stock proved highly complex due to overlapping morphological features. Incorporating multi-modal OCR text extraction alongside visual feature maps significantly improved classification accuracy on ambiguous packaging~\cite{mohanty2016}.
-    \item \textbf{High Field Lighting Variability:} Rural image capture via low-end mobile camera sensors introduced severe illumination variances, lens distortion, and motion blur. Client-side EXIF orientation normalization and automated contrast adjustments within the Next.js proxy layer stabilized input tensor distributions before inference execution.
-    \item \textbf{Computational Model Weight Footprint:} The 50-layer ResNet architecture introduced significant model parameter storage requirements ($\sim$100 MB checkpoint size), complicating lightweight serverless container deployment. Utilizing PyTorch JIT compilation and half-precision (\texttt{FP16}) quantization reduced memory overhead and accelerated inference throughput without degrading diagnostic accuracy~\cite{pytorch2019}.
+    \item \textbf{Limited Training Data:} We only had 1,563 seed images, which is small for deep learning. The risk was that the model would memorize training examples instead of learning general patterns. Solution: We used pre-trained ImageNet weights as a starting point, applied heavy data augmentation (creating artificial variations of existing images), and used weight decay to keep the model simple~\cite{krizhevsky2012imagenet, loshchilov2019adamw}.
+    
+    \item \textbf{Similar-Looking Defects:} Mechanically damaged seeds and sophisticated counterfeits can look similar in photographs. Solution: We combined visual analysis with text extraction from packaging (OCR), giving the model multiple sources of information to distinguish between damage types~\cite{mohanty2016}.
+    
+    \item \textbf{Varying Lighting in the Field:} Farmers use basic mobile phone cameras in unpredictable sunlight, causing images to be bright, dim, or unevenly lit. The model could struggle with these variations. Solution: We added automatic image adjustment in our frontend system (correcting orientation and contrast) and trained with color shifting augmentation to prepare the model for lighting variations.
+    
+    \item \textbf{Large Model File Size:} ResNet50 with all its parameters takes about 100 MB of storage. For a lightweight cloud service, this is significant. Solution: We used PyTorch's compression techniques and half-precision floating-point numbers (FP16), which reduced file size without noticeably hurting accuracy~\cite{pytorch2019}.
 \end{itemize}
 
 % ──────────────────────────────────────────────────────────────
@@ -451,13 +471,16 @@ Several technical, computational, and operational challenges were encountered du
 \label{sec:limitations}
 % ──────────────────────────────────────────────────────────────
 
-This chapter presented a comprehensive empirical evaluation of the AgriVerify platform, verifying the deep learning model, backend microservice responsiveness, and end-to-end user workflows. The regularized ResNet50 classifier achieved an exceptional overall test accuracy of 99.57\% and an F1 Score of 99.57\%, demonstrating robust discriminatory performance across pure (genuine) and impure (defective/counterfeit) seed categories. Concurrent load testing confirmed that the ASP.NET Core backend and Next.js proxy layer maintain stable, low-latency execution under simulated agricultural peak traffic conditions. Furthermore, rigorous functional testing validated the complete suite of user interfaces, confirming intuitive operation across the farmer verification portals, grievance tracking queues, and administrative oversight dashboards.
+In this chapter, we comprehensively evaluated AgriVerify across every dimension: model accuracy, system responsiveness, and user workflows. Our ResNet50 model achieved 99.57\% accuracy and an F1 Score of 99.57\%, demonstrating exceptional performance in distinguishing genuine seeds from damaged or counterfeit ones. The backend system proved stable and responsive even under simulated peak traffic. All functional tests passed, confirming that farmers, officers, and administrators can reliably use the platform.
 
-Despite these strong empirical outcomes, certain limitations remain within the current implementation:
+However, several limitations remain that represent opportunities for future work:
+
 \begin{itemize}
-    \item The model is currently trained exclusively on paddy seed imagery; extending support to other staple crops (e.g., wheat, maize, soybean) requires expanded multi-crop dataset curation~\cite{xu2021}.
-    \item Automated mobile edge inference (offline classification on smartphones via ONNX Runtime Mobile) has not yet been implemented, requiring active cellular connectivity for cloud inference.
-    \item Finer-grained phytopathological disease detection beyond broad physical quality grading is not currently supported by the classification ontology~\cite{mohanty2016}.
+    \item \textbf{Single Crop Focus:} The model is trained only on paddy seeds. Supporting other crops like wheat, maize, or soybeans would require collecting and training on images of those crops~\cite{xu2021}.
+    
+    \item \textbf{Cloud Dependency:} The system currently requires internet connectivity to reach the cloud AI service. Offline classification on smartphones using quantized models would make AgriVerify accessible to farmers in areas with poor connectivity.
+    
+    \item \textbf{Disease Detection Not Included:} The current system grades overall seed quality but doesn't detect specific plant diseases. Adding phytopathological disease detection would provide even richer agricultural insights~\cite{mohanty2016}.
 \end{itemize}
 
-Addressing these limitations through mobile quantization, multi-crop dataset expansion, and explainable AI heatmaps represents highly promising avenues for future agricultural research and platform development.
+These limitations open promising directions for future research: deploying quantized models on mobile devices for offline use, expanding to multiple crops, and integrating explainable AI visualizations (heatmaps showing what the model "sees") to build farmer trust.
