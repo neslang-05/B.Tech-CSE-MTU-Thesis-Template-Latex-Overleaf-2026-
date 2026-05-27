@@ -45,8 +45,8 @@
 /build/
 /dist/
 
-# Document PDFs (Uncomment if you want all PDFs ignored)
-# *.pdf
+# Document PDFs
+main.pdf
 
 # ==========================================
 # OS & IDE / Editor Temporary Files
