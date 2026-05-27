@@ -1,3 +1,7 @@
+% ============================================================
+% OVERLEAF USERS: Go to Menu → Compiler → select "pdfLaTeX"
+%                 Go to Menu → Bibliography tool → select "Biber"
+% ============================================================
 \documentclass[a4paper, 12pt]{report}
 \usepackage[T1]{fontenc}
 \usepackage{mathptmx}
@@ -21,9 +25,7 @@
 % -------------------------------------------------
 \usepackage{graphicx}
 \DeclareGraphicsExtensions{.eps,.png,.jpg,.pdf}
-\usepackage{subfig}
 \usepackage{float}
-\usepackage{morefloats}
 \usepackage{tikz}
 \usetikzlibrary{positioning, shapes.geometric, shapes.multipart, arrows.meta, calc, fit, backgrounds}
 
@@ -39,6 +41,7 @@
 \usepackage{makecell}
 \usepackage{cellspace}
 \usepackage{caption}
+\usepackage{subfig}  % loaded AFTER caption to avoid conflict; provides \subfloat
 \usepackage{adjustbox}
 \usepackage{varwidth}
 \usepackage{multicol}
