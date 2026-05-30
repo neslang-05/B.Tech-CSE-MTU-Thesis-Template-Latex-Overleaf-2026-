@@ -16,19 +16,19 @@ The backend API follows Onion Architecture principles, dividing responsibilities
   \centering
   \caption{Backend Architectural Layers and Responsibilities}
   \label{tab:backend_layers}
-  \renewcommand{\arraystretch}{1.3}
-  \begin{tabularx}{\textwidth}{@{} l X @{}}
-    \toprule
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{|p{3.8cm}|X|}
+    \hline
     \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
-    \midrule
+    \hline
     \textbf{Domain Layer} & Core domain entities (\texttt{User}, \texttt{VerificationHistory}), value objects, and domain exceptions. Completely independent of external frameworks. \\
-    \addlinespace
+    \hline
     \textbf{Application Layer} & Orchestration logic (\texttt{VerificationService}, \texttt{UserService}), Data Transfer Objects (DTOs), mapping configurations and request validation rules. \\
-    \addlinespace`'
+    \hline
     \textbf{Infrastructure Layer} & External integration implementations, including database persistence via Entity Framework Core, Azure Cognitive Services and Blob storage managers. \\
-    \addlinespace
+    \hline
     \textbf{API Layer} & REST API controllers, request-response handling, JWT authentication middleware and unified exception filters. \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -38,29 +38,38 @@ Table~\ref{tab:technology_stack} details the software development kits (SDKs), f
   \centering
   \caption{Consolidated Technology Stack of AgriVerify}
   \label{tab:technology_stack}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{Component} & \textbf{Framework/Library} & \textbf{Functionality / Purpose} \\
-    \midrule
-    \textbf{Frontend} 
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\textwidth}{|p{2.8cm}|p{4.2cm}|X|}
+    \hline
+    \textbf{Component} & \textbf{Framework / Library} & \textbf{Functionality / Purpose} \\
+    \hline
+    \multirow{4}{*}{\textbf{Frontend}}
       & Next.js 14 (TS) & Client interface, server-side rendering, and API proxy routing~\cite{nextjs2023docs}. \\
+      \cline{2-3}
       & TanStack Query & Server state synchronization and asynchronous data caching~\cite{tanstack2023query}. \\
+      \cline{2-3}
       & Zustand & Client-side authentication state management~\cite{zustand2023}. \\
+      \cline{2-3}
       & Tailwind CSS & Styling system and component customization~\cite{tailwind2024}. \\
-    \midrule
-    \textbf{Backend} 
+    \hline
+    \multirow{4}{*}{\textbf{Backend}}
       & ASP.NET Core 8 & Orchestration Web API, routing, and controller layer~\cite{microsoft2023aspnet}. \\
+      \cline{2-3}
       & Entity Framework Core & Object-Relational Mapping (ORM) for SQL Server database access. \\
+      \cline{2-3}
       & Azure Cognitive Services & Optical Character Recognition (OCR) and Custom Vision packaging verification. \\
+      \cline{2-3}
       & Azure OpenAI Service & Natural language synthesis for seed verification reports. \\
-    \midrule
-    \textbf{Machine Learning} 
-      & PyTorch 2.1 & Deep learning framework for neural network training and validation~\cite{pytorch2019}. \\
-      & ResNet-50 & Pre-trained CNN backbone utilized for seed variety classification~\cite{he2016deep}. \\
-      & OpenCV & Preprocessing and morphometric analysis for DUS parameters~\cite{opencv2015}. \\
-      & FastAPI & Serverless microservice API hosting the model on GCP Cloud Run~\cite{fastapi2023docs}. \\
-    \bottomrule
+    \hline
+    \multirow{4}{*}{\textbf{ML}}
+      & PyTorch 2.1 & Deep learning framework for neural network training~\cite{pytorch2019}. \\
+      \cline{2-3}
+      & ResNet-50 & Pre-trained CNN backbone for seed variety classification~\cite{he2016deep}. \\
+      \cline{2-3}
+      & OpenCV & Preprocessing and morphometric DUS parameter analysis~\cite{opencv2015}. \\
+      \cline{2-3}
+      & FastAPI & Serverless microservice API on GCP Cloud Run~\cite{fastapi2023docs}. \\
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -78,18 +87,23 @@ The functional requirements (Table~\ref{tab:functional_requirements}) define the
   \centering
   \caption{System Functional Requirements}
   \label{tab:functional_requirements}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{|p{1.5cm}|p{3.5cm}|X|}
+    \hline
     \textbf{ID} & \textbf{Module / Role} & \textbf{Functional Specification} \\
-    \midrule
-    \textbf{FR-01} & Authentication & User registration and authentication via JWT for farmers, officers, and administrators. \\
-    \textbf{FR-02} & Image Submission & Multi-modal submission (packaging and seed image) for real-time verification. \\
-    \textbf{FR-03} & AI Inference & Execution of Custom Vision, OCR text extraction, and ResNet-50 DUS profiling. \\
-    \textbf{FR-04} & Feedback System & Reporting mechanism allowing farmers to submit grievances on counterfeit seed batches. \\
-    \textbf{FR-05} & Case Management & Dashboards for officers to track, update, and resolve seed complaints. \\
-    \textbf{FR-06} & Risk Analytics & Automated aggregation of regional complaints in a Batch Risk Registry for analytics. \\
-    \bottomrule
+    \hline
+    FR-01 & Authentication & User registration and authentication via JWT for farmers, officers, and administrators. \\
+    \hline
+    FR-02 & Image Submission & Multi-modal submission (packaging and seed image) for real-time verification. \\
+    \hline
+    FR-03 & AI Inference & Execution of Custom Vision, OCR text extraction, and ResNet-50 DUS profiling. \\
+    \hline
+    FR-04 & Feedback System & Reporting mechanism allowing farmers to submit grievances on counterfeit seed batches. \\
+    \hline
+    FR-05 & Case Management & Dashboards for officers to track, update, and resolve seed complaints. \\
+    \hline
+    FR-06 & Risk Analytics & Automated aggregation of regional complaints in a Batch Risk Registry for analytics. \\
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -97,17 +111,21 @@ The functional requirements (Table~\ref{tab:functional_requirements}) define the
   \centering
   \caption{System Non-Functional Requirements}
   \label{tab:non_functional_requirements}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
-    \textbf{ID} & \textbf{Quality Attribute} & \textbf{Architectural Constraint \& Target Specification} \\
-    \midrule
-    \textbf{NFR-01} & Performance & Target end-to-end inference latency under 3.0 seconds through parallel service calls. \\
-    \textbf{NFR-02} & Scalability & Stateless API design facilitating horizontal scaling and microservice containment. \\
-    \textbf{NFR-03} & Security & HTTPS communication, JWT session control, role-based authorization (RBAC), and hashed secrets~\cite{owasp2021top10}. \\
-    \textbf{NFR-04} & Reliability & Atomic database operations and soft-delete implementation for data auditability. \\
-    \textbf{NFR-05} & Usability & Responsive UI designed for mobile and desktop screens, optimized for low-bandwidth environments. \\
-    \bottomrule
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{|p{1.7cm}|p{3.2cm}|X|}
+    \hline
+    \textbf{ID} & \textbf{Quality Attribute} & \textbf{Specification} \\
+    \hline
+    NFR-01 & Performance & Target end-to-end inference latency under 3.0 seconds through parallel service calls. \\
+    \hline
+    NFR-02 & Scalability & Stateless API design facilitating horizontal scaling and microservice containment. \\
+    \hline
+    NFR-03 & Security & HTTPS communication, JWT session control, role-based authorization (RBAC), and hashed secrets~\cite{owasp2021top10}. \\
+    \hline
+    NFR-04 & Reliability & Atomic database operations and soft-delete implementation for data auditability. \\
+    \hline
+    NFR-05 & Usability & Responsive UI designed for mobile and desktop screens, optimized for low-bandwidth environments. \\
+    \hline
   \end{tabularx}
 \end{table}
 

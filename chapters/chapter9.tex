@@ -19,18 +19,18 @@ Here's exactly how well our model performed on the test set, with the overall pe
   \caption{Overall Model Evaluation Results}
   \label{tab:overallmetrics}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{4.5cm}|c|X|}
+    \hline
     \textbf{Performance Metric} & \textbf{Result} & \textbf{What This Means} \\
-    \midrule
+    \hline
     Accuracy & 99.57\% & Out of every 100 seeds we tested, we correctly classified 99 or 100 of them \\
-    \addlinespace
+
     Precision & 99.57\% & When the system says a seed is problematic, it's right almost every time---virtually no false alarms \\
-    \addlinespace
+
     Recall & 99.57\% & The system catches almost all problematic seeds---very few slip through undetected \\
-    \addlinespace
+
     F1 Score & 99.57\% & Perfect balance between precision and recall---the system is equally good at both \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -56,14 +56,14 @@ To understand exactly how the model performs on each type of seed, we analyzed i
   \caption{Performance on Each Seed Category}
   \label{tab:perclass}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l c c c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{3.8cm}|c|c|c|X|}
+    \hline
     \textbf{Seed Type} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{What This Means} \\
-    \midrule
+    \hline
     Pure (Genuine) & 100.0\% & 99.19\% & 99.60\% & Perfect at recognizing genuine seeds---never wrongly approves a fake one \\
-    \addlinespace
+
     Impure (Damaged/Fake) & 99.07\% & 100.0\% & 99.53\% & Perfect at detecting problems---catches every single defective seed \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -80,16 +80,16 @@ To see the exact pattern of the model's decisions, we created a confusion matrix
   \caption{Detailed Look at Every Prediction}
   \label{tab:confusion}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{0.75\textwidth}{@{} l c c @{}}
-    \toprule
+  \begin{tabularx}{0.75\textwidth}{|l|c|c|}
+    \hline
     \multirow{2}{*}{\textbf{Actual Seed Type}} & \multicolumn{2}{c}{\textbf{What the Model Predicted}} \\
-    \cmidrule{2-3}
+    \hline
     & \textbf{Impure} & \textbf{Pure} \\
-    \midrule
+    \hline
     \textbf{Impure} & 107 & 0 \\
-    \addlinespace
+
     \textbf{Pure} & 1 & 123 \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -117,16 +117,16 @@ We only had 1,563 training images, which is relatively small for deep learning. 
   \caption{How Our Anti-Overfitting Techniques Helped}
   \label{tab:regularization}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l c X @{}}
-    \toprule
-    \textbf{Configuration} & \textbf{Training vs. Validation Difference} & \textbf{What Happened} \\
-    \midrule
+  \begin{tabularx}{\textwidth}{|p{4.2cm}|p{4.8cm}|X|}
+    \hline
+    \textbf{Configuration} & \textbf{Train vs. Validation Gap} & \textbf{What Happened} \\
+    \hline
     No Protection & 25--30\% & Bad---the model memorized training data and performed much worse on new seeds \\
-    \addlinespace
+    \hline
     Dropout Only & 8--12\% & Better, but still some overfitting on tricky seed textures \\
-    \addlinespace
+    \hline
     All Techniques Combined & 2.8\% & Excellent---tight control with less than 5\% difference \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -153,18 +153,18 @@ Before settling on ResNet50, we tested four popular neural network designs on th
   \caption{Comparing Four Different Neural Network Architectures}
   \label{tab:modelcomparison}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} p{3.2cm} c c c c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{3.2cm}|c|c|c|c|X|}
+    \hline
     \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time} \\
-    \midrule
+    \hline
     \textbf{ResNet50} & \textbf{99.57\%} & \textbf{99.57\%} & \textbf{99.57\%} & \textbf{99.57\%} & 16.4 min \\
-    \addlinespace
+
     \textbf{DenseNet121} & 99.57\% & 99.57\% & 99.57\% & \textbf{99.57\%} & 15.0 min \\
-    \addlinespace
+
     \textbf{GoogleNet} & 99.57\% & 99.57\% & 99.57\% & \textbf{99.57\%} & 12.2 min \\
-    \addlinespace
+
     \textbf{MobileNetV2} & 99.13\% & 99.15\% & 99.13\% & 99.13\% & \textbf{8.5 min} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -194,14 +194,14 @@ Inference latency is the time it takes the model to receive an image, process it
   \caption{Speed on Different Hardware}
   \label{tab:latency}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{4.5cm}|c|X|}
+    \hline
     \textbf{Hardware} & \textbf{Speed} & \textbf{Good For What?} \\
-    \midrule
+    \hline
     Regular CPU & $\sim$165 ms & Lightweight servers and edge devices; still plenty fast \\
-    \addlinespace
+
     GPU (NVIDIA CUDA) & $\sim$20 ms & Cloud servers handling many requests; 8 times faster than CPU \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -216,18 +216,18 @@ We stress-tested the entire backend system (not just the model) to see how it pe
   \caption{Real-World System Performance Under Load}
   \label{tab:backendperformance}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{4.5cm}|c|X|}
+    \hline
     \textbf{Metric} & \textbf{Observation} & \textbf{Significance} \\
-    \midrule
+    \hline
     End-to-End Response & 280--420 ms & Includes uploading the image, sending it through the system, running AI, and formatting the response \\
-    \addlinespace
+
     Concurrent Requests & 40--60 per second & Very stable even when many farmers submit seeds simultaneously \\
-    \addlinespace
+
     Image Upload \& Prep & 80--120 ms & Network transfer and image preprocessing before AI runs \\
-    \addlinespace
+
     Database Queries & $<$50 ms & Fast retrieval of complaint and user records \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -246,20 +246,20 @@ We tested the image processing and classification system with many different sce
   \caption{Seed Verification Test Cases}
   \label{tab:seedtestcases}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l X X c @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{1.6cm}|X|X|c|}
+    \hline
     \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
-    \midrule
+    \hline
     \textbf{SV-01} & Upload clear photos of genuine seed packaging & Correctly classified as Pure with physical measurements extracted & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{SV-02} & Upload photos of cracked or discolored seeds & Classified as Impure (Damaged) with warnings shown & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{SV-03} & Upload fake packaging with counterfeit branding & Classified as Impure (Fake) with high confidence & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{SV-04} & Try uploading wrong file types (.exe, .zip, .txt) & System rejects and shows helpful error message & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{SV-05} & Upload blurry or very dark seed photos & System warns user to retake photo or shows low confidence & \textbf{Pass} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -272,18 +272,18 @@ We tested the complaint system to make sure complaints are recorded securely and
   \caption{Complaint System Test Cases}
   \label{tab:complainttestcases}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l X X c @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{1.6cm}|X|X|c|}
+    \hline
     \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
-    \midrule
+    \hline
     \textbf{CM-01} & Farmer files a complaint with description and evidence & Complaint saved to database and marked as Open & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{CM-02} & Try filing complaint with missing required information & Form validation prevents submission and shows error & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{CM-03} & Farmer views their complaint history & All past and current complaints displayed with pagination & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{CM-04} & Officer changes complaint status from Open to Resolved & Update immediately visible in the system & \textbf{Pass} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -296,20 +296,20 @@ We tested that only authorized users can access their roles' features, as detail
   \caption{Security and Access Control Test Cases}
   \label{tab:rbactestcases}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l X X c @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|p{1.6cm}|X|X|c|}
+    \hline
     \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
-    \midrule
+    \hline
     \textbf{RB-01} & Valid farmer login & Receives security token and goes to farmer dashboard & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{RB-02} & Farmer tries accessing admin page & System blocks access and redirects to farmer area & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{RB-03} & Admin login with multi-factor authentication & Full admin privileges granted & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{RB-04} & Security token expires during session & System automatically gets new token without user noticing & \textbf{Pass} \\
-    \addlinespace
+
     \textbf{RB-05} & Login with wrong password & System returns error and shows helpful message & \textbf{Pass} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 

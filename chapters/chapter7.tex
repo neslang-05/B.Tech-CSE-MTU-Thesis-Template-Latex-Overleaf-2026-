@@ -2,7 +2,7 @@
 % CHAPTER 9: FRONTEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
 % ============================================================
 
-The AgriVerify frontend connects the inference engine and backend services to a browser interface that has to work for two quite different users: farmers on mid-range Android handsets with variable connectivity, and state administrators managing supply chain dashboards. The stack --- Next.js~16, React~19`', TypeScript~5, and Tailwind CSS --- was chosen to handle that range without the interface becoming slow or hard to maintain \cite{salim2024microservices, singh2026impact}.
+The AgriVerify frontend connects the inference engine and backend services to a browser interface that has to work for two quite different users: farmers on mid-range Android handsets with variable connectivity, and state administrators managing supply chain dashboards. The stack --- Next.js~16, React~19, TypeScript~5, and Tailwind CSS --- was chosen to handle that range without the interface becoming slow or hard to maintain \cite{salim2024microservices, singh2026impact}.
 
 % ============================================================
 \section{Frontend Architecture and Design Patterns}
@@ -59,20 +59,25 @@ Table~\ref{tab:frontend-stack} summarises the stack and the reasoning behind eac
 
 \begin{table}[H]
 \centering
-\footnotesize
 \caption{Frontend Technology Stack}
 \label{tab:frontend-stack}
-\begin{tabularx}{\textwidth}{@{}l X@{}}
-\toprule
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{|p{3.8cm}|X|}
+\hline
 \textbf{Technology} & \textbf{Architectural Reasoning} \\
-\midrule
-Next.js 14 & Provides Server-Side Rendering and built-in API proxy routing \cite{nextjs2024}. \\
+\hline
+Next.js 14 & Provides Server-Side Rendering and built-in API proxy routing~\cite{nextjs2024}. \\
+\hline
 React 18 & Declarative UI rendering with efficient Virtual DOM reconciliation. \\
+\hline
 TypeScript 5 & Compile-time type checking with backend DTO parity. \\
-Tailwind CSS & Utility-first styling with minimal production bundle output \cite{tailwind2024}. \\
-Axios \& TanStack & HTTP pipeline management, token injection, and cache synchronization \cite{tanstack2024}. \\
+\hline
+Tailwind CSS & Utility-first styling with minimal production bundle output~\cite{tailwind2024}. \\
+\hline
+Axios \& TanStack & HTTP pipeline management, token injection, and cache synchronization~\cite{tanstack2024}. \\
+\hline
 Zustand 4.5 & Lightweight atomic state slices for session persistence. \\
-\bottomrule
+\hline
 \end{tabularx}
 \end{table}
 
@@ -185,18 +190,21 @@ The interface is built from a set of reusable primitives (Table~\ref{tab:ui-comp
 
 \begin{table}[H]
 \centering
-\footnotesize
 \caption{Standardized UI Components}
 \label{tab:ui-components}
-\begin{tabularx}{\textwidth}{@{}l X@{}}
-\toprule
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{|p{3.8cm}|X|}
+\hline
 \textbf{Component} & \textbf{Role} \\
-\midrule
+\hline
 \textbf{Data Table} & Scrollable grids with sticky headers and dynamic pagination for inspection data. \\
+\hline
 \textbf{Status Badge} & Colour-coded indicators (e.g., Green/Genuine) for fast visual parsing. \\
+\hline
 \textbf{Loading Skeleton} & Animated placeholders that prevent layout shifts during network delays. \\
+\hline
 \textbf{Input Modal} & Focused overlays that trap keyboard navigation for accessible data entry. \\
-\bottomrule
+\hline
 \end{tabularx}
 \end{table}
 

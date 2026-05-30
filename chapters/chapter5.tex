@@ -87,38 +87,41 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
 
 \begin{table}[H]
   \centering
-  \footnotesize
   \caption{API Specification for the \texttt{POST /predict} Model Inference Endpoint}
   \label{tab:api_spec_predict}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabularx}{\textwidth}{@{} l X @{}}
-    \toprule
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{|p{3.2cm}|X|}
+    \hline
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
-    \midrule
-    \textbf{Route \& Auth} & \texttt{POST /predict} \textbar{} Requires \texttt{Authorization: Bearer <token>} \\
-    \textbf{Payload} & \texttt{multipart/form-data} (File: \texttt{image}). Types: JPEG/PNG. Max size: 10MB. \\
-    \textbf{200 OK} & \texttt{\textbraceleft"predicted\_label": "Genuine", "confidence": 0.98, "inference\_ms": 42.8,}\\
-    \textbf{(Response)} & \texttt{ "dus\_parameters": \textbraceleft"length\_mm": 8.4, "aspect\_ratio": 3.1\textbraceright\textbraceright} \\
-    \textbf{Error Codes} & \textbf{400}: Malformed payload \textbar{} \textbf{413}: File too large \textbar{} \textbf{415}: Invalid MIME type \\
-    \bottomrule
+    \hline
+    Route \& Auth & \texttt{POST /predict} | Requires \texttt{Authorization: Bearer <token>} \\
+    \hline
+    Payload & \texttt{multipart/form-data} (File: \texttt{image}). Types: JPEG/PNG. Max size: 10MB. \\
+    \hline
+    200 OK Response & \texttt{\{"predicted\_label": "Genuine", "confidence": 0.98, "inference\_ms": 42.8, "dus\_parameters": \{"length\_mm": 8.4, "aspect\_ratio": 3.1\}\}} \\
+    \hline
+    Error Codes & \textbf{400}: Malformed payload | \textbf{413}: File too large | \textbf{415}: Invalid MIME type \\
+    \hline
   \end{tabularx}
 \end{table}
 
 \begin{table}[H]
   \centering
-  \footnotesize
-  \caption{API Specification for the \texttt{GET /health} Model Inference Endpoint}
+  \caption{API Specification for the \texttt{GET /health} Liveness Endpoint}
   \label{tab:api_spec_health}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabularx}{\textwidth}{@{} l X @{}}
-    \toprule
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\textwidth}{|p{3.2cm}|X|}
+    \hline
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
-    \midrule
-    \textbf{Route} & \texttt{GET /health} (Unauthenticated liveness/readiness probe) \\
-    \textbf{Probing Logic} & Confirms Uvicorn ASGI event loop and verifies ResNet-50 weights are loaded in memory. \\
-    \textbf{200 OK} & \texttt{\textbraceleft"status": "online", "model\_loaded": true, "device": "cuda:0"\textbraceright} \\
-    \textbf{503 Error} & Service unavailable (model weights corrupted or GPU allocation failure). \\
-    \bottomrule
+    \hline
+    Route & \texttt{GET /health} (Unauthenticated liveness/readiness probe) \\
+    \hline
+    Probing Logic & Confirms Uvicorn ASGI event loop and verifies ResNet-50 weights are loaded in memory. \\
+    \hline
+    200 OK & \texttt{\{"status": "online", "model\_loaded": true, "device": "cuda:0"\}} \\
+    \hline
+    503 Error & Service unavailable (model weights corrupted or GPU allocation failure). \\
+    \hline
   \end{tabularx}
 \end{table}
 

@@ -8,21 +8,21 @@ AgriVerify communicates across four main boundaries. To keep everything secure, 
 \centering
 \caption{How Different Parts of AgriVerify Communicate}
 \label{tab:integration_matrix}
-\small
-\begin{tabularx}{\linewidth}{@{} p{3.8cm} p{3.2cm} c X @{}}
-\toprule
-\textbf{Communication Path} & \textbf{What's Talking} & \textbf{How} & \textbf{What Happens \& Security} \\
-\midrule
-\textbf{Browser to Proxy} & User's browser $\rightarrow$ Next.js Proxy & HTTPS, with file uploads & Axios automatically adds JWT security tokens and handles token refresh if they expire \\
-\addlinespace
-\textbf{Proxy to Backend} & Next.js Proxy $\rightarrow$ ASP.NET API & REST over HTTPS & The proxy forwards all requests, checks data is valid, and hides the real backend addresses from browsers \\
-\addlinespace
-\textbf{Backend to AI} & ASP.NET API $\rightarrow$ AI Models & HTTPS or gRPC & Backend sends images, checks for blurriness/lighting issues, extracts text, and runs the ResNet50 model \\
-\addlinespace
-\textbf{Cloud Services} & ASP.NET API $\rightarrow$ Azure AI & Azure's official libraries & Uses Azure Custom Vision to check packaging, Azure OpenAI to write reports, and Azure Blob Storage to save images \\
-\addlinespace
-\textbf{Deployment} & Docker $\rightarrow$ Registry $\rightarrow$ Live & Container systems & Multi-stage Docker builds prepare the code, store it securely, and automatically deploy with scaling \\
-\bottomrule
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{|p{3.5cm}|p{3.5cm}|X|}
+\hline
+\textbf{Communication Path} & \textbf{Protocol} & \textbf{What Happens \& Security} \\
+\hline
+\textbf{Browser to Proxy} & HTTPS with file uploads & Axios automatically adds JWT security tokens and handles token refresh if they expire. \\
+\hline
+\textbf{Proxy to Backend} & REST over HTTPS & The proxy forwards all requests, checks data is valid, and hides real backend addresses from browsers. \\
+\hline
+\textbf{Backend to AI} & HTTPS or gRPC & Backend sends images, checks for blurriness/lighting issues, extracts text, and runs the ResNet50 model. \\
+\hline
+\textbf{Cloud Services} & Azure official libraries & Uses Azure Custom Vision for packaging, Azure OpenAI to write reports, and Azure Blob Storage to save images. \\
+\hline
+\textbf{Deployment} & Container systems & Multi-stage Docker builds prepare the code, store it securely, and deploy with automatic scaling. \\
+\hline
 \end{tabularx}
 \end{table}
 
