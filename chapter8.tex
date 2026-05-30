@@ -87,14 +87,16 @@ When a farmer submits a seed image, it travels through several stages: from the 
 
 Let's walk through what happens at each stage:
 
-**1. Browser to Proxy (HTTPS with file uploads):** A farmer opens AgriVerify on their phone or computer and takes a photo of their seed packet. They hit "upload" and the image travels over encrypted HTTPS. The Next.js proxy receives it and automatically adds their security token (so the backend knows who they are). If the security token has expired, the proxy handles getting a fresh one without bothering the farmer.
+\begin{enumerate}
+    \item \textbf{Browser to Proxy (HTTPS with file uploads):} A farmer opens AgriVerify on their phone or computer and takes a photo of their seed packet. They hit ``upload'' and the image travels over encrypted HTTPS. The Next.js proxy receives it and automatically adds their security token (so the backend knows who they are). If the security token has expired, the proxy handles getting a fresh one without bothering the farmer.
+    
+    \item \textbf{Proxy to Backend (REST API over HTTPS):} The proxy forwards the farmer's request to the ASP.NET backend, but hides the real backend address from the browser. The backend receives the image and validation data, checks that everything looks correct, and is ready to process it.
+    
+    \item \textbf{Backend to AI Services (HTTPS / gRPC):} The backend doesn't try to analyze the image itself---it's too complex. Instead, it sends the image to specialized AI services. First, it checks if the image is blurry or too dark (if so, it warns the farmer). Then it runs three analyses in parallel: Azure's text extraction pulls batch numbers from the packaging, Azure's packaging classifier checks if it looks genuine, and our custom ResNet50 model extracts the 17 physical seed measurements. All three work simultaneously to save time.
+    
+    \item \textbf{Cloud Storage (Azure Blob \& SQL Database):} As results come back from the AI services, they're immediately saved to the cloud: the image goes to Azure Blob Storage, and the results go into SQL Server. This ensures data is safely stored and the farmer's verification history is preserved for future reference.
+    
+    \item \textbf{Response Back to Browser:} The backend synthesizes all the AI results into a clear report using Azure OpenAI to write explanations in plain language. This report travels back through the proxy to the farmer's browser, where they see the results within seconds.
+\end{enumerate}
 
-**2. Proxy to Backend (REST API over HTTPS):** The proxy forwards the farmer's request to the ASP.NET backend, but hides the real backend address from the browser. The backend receives the image and validation data, checks that everything looks correct, and is ready to process it.
-
-**3. Backend to AI Services (HTTPS / gRPC):** The backend doesn't try to analyze the image itself—it's too complex. Instead, it sends the image to specialized AI services. First, it checks if the image is blurry or too dark (if so, it warns the farmer). Then it runs three analyses in parallel: Azure's text extraction pulls batch numbers from the packaging, Azure's packaging classifier checks if it looks genuine, and our custom ResNet50 model extracts the 17 physical seed measurements. All three work simultaneously to save time.
-
-**4. Cloud Storage (Azure Blob \& SQL Database):** As results come back from the AI services, they're immediately saved to the cloud: the image goes to Azure Blob Storage, and the results go into SQL Server. This ensures data is safely stored and the farmer's verification history is preserved for future reference.
-
-**5. Response Back to Browser:** The backend synthesizes all the AI results into a clear report using Azure OpenAI to write explanations in plain language. This report travels back through the proxy to the farmer's browser, where they see the results within seconds.
-
-Meanwhile, the **deployment pipeline** (shown in dashed lines) works independently in the background. Whenever our development team pushes new code to GitHub, Docker automatically builds a containerized version, stores it in Azure's secure registry, and deploys it to Azure Container Apps—which automatically scales up or down based on how many farmers are using AgriVerify at any given time.
+Meanwhile, the \textbf{deployment pipeline} (shown in dashed lines) works independently in the background. Whenever our development team pushes new code to GitHub, Docker automatically builds a containerized version, stores it in Azure's secure registry, and deploys it to Azure Container Apps---which automatically scales up or down based on how many farmers are using AgriVerify at any given time.

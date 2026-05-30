@@ -12,7 +12,7 @@ The results were exceptional. Our model reliably sorted seed samples into two ca
 
 \subsection{Accuracy, Precision, Recall, and F1 Score}
 
-Here's exactly how well our model performed on the test set:
+Here's exactly how well our model performed on the test set, with the overall performance metrics compiled in Table~\ref{tab:overallmetrics} and the model's accuracy improvement and loss reduction over 15 training cycles illustrated in Figure~\ref{fig:model-performance}:
 
 \begin{table}[htbp]
   \centering
@@ -49,7 +49,7 @@ Most importantly, our 99.57\% result far exceeds the industry standard of 85--90
 
 \section{Seed Quality Results: Pure vs. Impure Seeds}
 
-To understand exactly how the model performs on each type of seed, we analyzed its performance separately for genuine seeds and problematic seeds. We tested on 231 seed samples divided into these two categories.
+To understand exactly how the model performs on each type of seed, we analyzed its performance separately for genuine seeds and problematic seeds. We tested on 231 seed samples divided into these two categories, as summarized in Table~\ref{tab:perclass}.
 
 \begin{table}[htbp]
   \centering
@@ -73,7 +73,7 @@ The combination of weighted sampling (giving equal importance to each category d
 
 \section{Confusion Matrix Analysis}
 
-To see the exact pattern of the model's decisions, we created a confusion matrix—a table showing which predictions were correct and which were wrong.
+To see the exact pattern of the model's decisions, we created a confusion matrix. The numerical prediction outcomes are summarized in Table~\ref{tab:confusion}, while the visual representation of correct and incorrect predictions is illustrated in Figure~\ref{fig:confusion-matrix}.
 
 \begin{table}[htbp]
   \centering
@@ -102,15 +102,15 @@ To see the exact pattern of the model's decisions, we created a confusion matrix
   \label{fig:confusion-matrix}
 \end{figure}
 
-Out of 231 test seeds, 230 were classified correctly—that's almost perfect. Let's look at the two types of mistakes:
+Out of 231 test seeds, 230 were classified correctly---that's almost perfect. Let's look at the two types of mistakes:
 
-**Out of 107 problematic seeds:** All 107 were correctly identified as impure. Zero problematic seeds were falsely approved. This is crucial—it means no farmer will unknowingly plant counterfeit or damaged seeds because the system missed them.
+\textbf{Out of 107 problematic seeds:} All 107 were correctly identified as impure. Zero problematic seeds were falsely approved. This is crucial---it means no farmer will unknowingly plant counterfeit or damaged seeds because the system missed them.
 
-**Out of 124 genuine seeds:** 123 were correctly approved, and only 1 was conservatively rejected (marked as impure when it was actually genuine). This conservative error is actually good for agricultural safety: if a genuine seed batch gets flagged, the farmer can request manual re-inspection. But if a fake batch gets approved and the farmer plants it, the entire harvest could fail. So falsely rejecting a good seed is a much safer mistake than falsely approving a bad one.
+\textbf{Out of 124 genuine seeds:} 123 were correctly approved, and only 1 was conservatively rejected (marked as impure when it was actually genuine). This conservative error is actually good for agricultural safety: if a genuine seed batch gets flagged, the farmer can request manual re-inspection. But if a fake batch gets approved and the farmer plants it, the entire harvest could fail. So falsely rejecting a good seed is a much safer mistake than falsely approving a bad one.
 
 \section{Regularization Effectiveness}
 
-We only had 1,563 training images, which is relatively small for deep learning. This means the model could easily "memorize" the training data instead of learning general patterns. To prevent this overfitting, we used multiple protective techniques. Let's see how effective they were:
+We only had 1,563 training images, which is relatively small for deep learning. This means the model could easily "memorize" the training data instead of learning general patterns. To prevent this overfitting, we used multiple protective techniques, with their relative effectiveness compared in Table~\ref{tab:regularization}:
 
 \begin{table}[htbp]
   \centering
@@ -146,7 +146,7 @@ The final gap of just 2.8\% between training and validation performance is excel
 
 \section{Model Comparison and Architecture Selection}
 
-Before settling on ResNet50, we tested four popular neural network designs on the same dataset with the same training approach to see which was best.
+Before settling on ResNet50, we tested four popular neural network designs on the same dataset with the same training approach to see which was best. The detailed evaluation metrics for each model are compiled in Table~\ref{tab:modelcomparison}, and a visual comparison of their accuracy and training times is illustrated in Figure~\ref{fig:model-comparison}.
 
 \begin{table}[htbp]
   \centering
@@ -187,7 +187,7 @@ Beyond just accuracy, we tested how fast the complete system responds to real re
 
 \subsection{How Fast the AI Model Runs}
 
-Inference latency is the time it takes the model to receive an image, process it, and output a prediction.
+Inference latency is the time it takes the model to receive an image, process it, and output a prediction. The inference speed obtained across different hardware setups is summarized in Table~\ref{tab:latency}.
 
 \begin{table}[htbp]
   \centering
@@ -209,7 +209,7 @@ Even on a regular CPU (without GPU acceleration), the model responds in 165 mill
 
 \subsection{Full System Response Time}
 
-We stress-tested the entire backend system (not just the model) to see how it performs when many farmers are using it simultaneously.
+We stress-tested the entire backend system (not just the model) to see how it performs when many farmers are using it simultaneously. The real-world system performance under load is summarized in Table~\ref{tab:backendperformance}.
 
 \begin{table}[htbp]
   \centering
@@ -239,7 +239,7 @@ We rigorously tested every major feature to confirm the system works correctly, 
 
 \subsection{Seed Verification Testing}
 
-We tested the image processing and classification system with many different scenarios:
+We tested the image processing and classification system with many different scenarios, as detailed in Table~\ref{tab:seedtestcases}:
 
 \begin{table}[htbp]
   \centering
@@ -265,7 +265,7 @@ We tested the image processing and classification system with many different sce
 
 \subsection{Grievance Management Testing}
 
-We tested the complaint system to make sure complaints are recorded securely and can be tracked:
+We tested the complaint system to make sure complaints are recorded securely and can be tracked, with the test scenarios and outcomes outlined in Table~\ref{tab:complainttestcases}:
 
 \begin{table}[htbp]
   \centering
@@ -289,7 +289,7 @@ We tested the complaint system to make sure complaints are recorded securely and
 
 \subsection{Security and Access Control Testing}
 
-We tested that only authorized users can access their roles' features:
+We tested that only authorized users can access their roles' features, as detailed in Table~\ref{tab:rbactestcases}:
 
 \begin{table}[htbp]
   \centering
@@ -322,7 +322,7 @@ AgriVerify provides simple, intuitive interfaces tailored to three different use
 
 \subsection{Public Portal, Onboarding, and Multilingual Support}
 
-When farmers first visit AgriVerify, they land on a public page explaining what the platform does and why they should use it. Since many rural farmers speak regional languages, the interface supports language selection—farmers can switch between English and their local dialect.
+When farmers first visit AgriVerify, they land on a public page explaining what the platform does and why they should use it, as shown in Figure~\ref{fig:ui-landing}. Since many rural farmers speak regional languages, the interface supports language selection—farmers can switch between English and their local dialect (see Figure~\ref{fig:ui-language}). The combined public portal and language interface are shown in Figure~\ref{fig:ui-public-portal}.
 
 \begin{figure}[htbp]
   \centering
@@ -333,7 +333,7 @@ When farmers first visit AgriVerify, they land on a public page explaining what 
   \label{fig:ui-public-portal}
 \end{figure}
 
-New farmers can create accounts by providing their name, email, location, and agricultural district. This information is essential for the complaint system—it verifies that users are real people in the agricultural community.
+New farmers can create accounts by providing their name, email, location, and agricultural district, as shown in Figure~\ref{fig:ui-onboarding}. Figure~\ref{fig:ui-login-landing} shows the role selection page, and Figure~\ref{fig:ui-new-account} displays the registration form. This information is essential for the complaint system—it verifies that users are real people in the agricultural community.
 
 \begin{figure}[htbp]
   \centering
@@ -344,7 +344,7 @@ New farmers can create accounts by providing their name, email, location, and ag
   \label{fig:ui-onboarding}
 \end{figure}
 
-For agricultural officers and system administrators, there's a separate secure login page that requires both a password and a special time-based security code (multi-factor authentication) to prevent unauthorized access.
+For agricultural officers and system administrators, there's a separate secure login page that requires both a password and a special time-based security code (multi-factor authentication) to prevent unauthorized access, as shown in Figure~\ref{fig:ui-admin-login}.
 
 \begin{figure}[htbp]
   \centering
@@ -357,7 +357,7 @@ For agricultural officers and system administrators, there's a separate secure l
 
 \subsection{Farmer Portal and AI Seed Quality Assessment Workflow}
 
-Once logged in, farmers see a personalized dashboard showing their verification history, verification statistics, and any alerts. This is their command center for seed quality checking.
+Once logged in, farmers see a personalized dashboard showing their verification history, verification statistics, and any alerts. The main dashboard layout is shown in Figure~\ref{fig:ui-dashboard}, and the profile settings are in Figure~\ref{fig:ui-profile}. The combined farmer portal interfaces are displayed in Figure~\ref{fig:ui-farmer-portal}.
 
 \begin{figure}[htbp]
   \centering
@@ -368,7 +368,7 @@ Once logged in, farmers see a personalized dashboard showing their verification 
   \label{fig:ui-farmer-portal}
 \end{figure}
 
-Farmers can update their profile information at any time. The core feature is submitting seed photos—farmers take pictures of the front and back of seed packaging using their phone or computer camera.
+Farmers can update their profile information at any time, using the edit interface shown in Figure~\ref{fig:ui-rename}. The core feature is submitting seed photos—farmers take pictures of the front and back of seed packaging using their phone or computer camera, as shown in Figure~\ref{fig:ui-adding-seed} (with the full upload flow compiled in Figure~\ref{fig:ui-capture-workflow}).
 
 \begin{figure}[htbp]
   \centering
@@ -379,7 +379,7 @@ Farmers can update their profile information at any time. The core feature is su
   \label{fig:ui-capture-workflow}
 \end{figure}
 
-After submitting photos, the system analyzes them and returns a detailed report. If the seeds are genuine, the report shows the extracted physical measurements. If the system detects a problem, it displays a warning with clear instructions on what to do next.
+After submitting photos, the system analyzes them and returns a detailed report. If the seeds are genuine, the report shows the extracted physical measurements, as shown in Figure~\ref{fig:ui-genuine}. If the system detects a problem, it displays a warning with clear instructions on what to do next (see Figure~\ref{fig:ui-counterfeit}). The result pages are compiled in Figure~\ref{fig:ui-verification-results}.
 
 \begin{figure}[htbp]
   \centering
@@ -392,7 +392,7 @@ After submitting photos, the system analyzes them and returns a detailed report.
 
 \subsection{Grievance Redressal and Officer Investigation Interfaces}
 
-If a farmer encounters fake or damaged seeds, they can file a formal complaint. The complaint form asks for a description of the problem, the seed batch number, and a severity rating.
+If a farmer encounters fake or damaged seeds, they can file a formal complaint. The complaint form is illustrated in Figure~\ref{fig:ui-complaints-form}, and the tracking screen is shown in Figure~\ref{fig:ui-complaints-queue}. The combined grievance interface is displayed in Figure~\ref{fig:ui-grievance}.
 
 \begin{figure}[htbp]
   \centering
@@ -403,7 +403,7 @@ If a farmer encounters fake or damaged seeds, they can file a formal complaint. 
   \label{fig:ui-grievance}
 \end{figure}
 
-Agricultural officers have a separate dashboard showing all complaints in their region. They can filter by severity and see which areas have the most problems. This helps them prioritize investigations.
+Agricultural officers have a separate dashboard showing all complaints in their region. They can filter by severity and see which areas have the most problems, as shown in Figure~\ref{fig:ui-officer-dashboard}. The officer portal is shown in Figure~\ref{fig:ui-officer-portal}, with the filtering investigation queue illustrated in Figure~\ref{fig:ui-investigation-queue}.
 
 \begin{figure}[htbp]
   \centering
@@ -414,7 +414,7 @@ Agricultural officers have a separate dashboard showing all complaints in their 
   \label{fig:ui-officer-portal}
 \end{figure}
 
-When officers click on a specific complaint, they can see the farmer's photos, read their description, and update the investigation status.
+When officers click on a specific complaint, they can see the farmer's photos, read their description, and update the investigation status, as shown in Figure~\ref{fig:ui-complaint-officer}.
 
 \begin{figure}[htbp]
   \centering
@@ -427,7 +427,7 @@ When officers click on a specific complaint, they can see the farmer's photos, r
 
 \subsection{Platform Administration, User Governance, and Telemetry}
 
-System administrators have a complete dashboard showing real-time system health: response times, active users, and database performance. This allows them to spot problems quickly.
+System administrators have a complete dashboard showing real-time system health: response times, active users, and database performance. This dashboard is shown in Figure~\ref{fig:ui-admin-dashboard}, and user management in Figure~\ref{fig:ui-user-mgmt} (with both admin views grouped in Figure~\ref{fig:ui-admin-governance}).
 
 \begin{figure}[htbp]
   \centering
@@ -438,7 +438,7 @@ System administrators have a complete dashboard showing real-time system health:
   \label{fig:ui-admin-governance}
 \end{figure}
 
-The platform also provides detailed analytics showing verification trends over time and which regions have the most fake seed problems. This information helps agricultural policymakers identify where counterfeit operations are concentrated.
+The platform also provides detailed analytics showing verification trends over time and which regions have the most fake seed problems, as shown in Figure~\ref{fig:ui-reports-1} and Figure~\ref{fig:ui-reports-2} (under the unified analytics view in Figure~\ref{fig:ui-analytics}). This information helps agricultural policymakers identify where counterfeit operations are concentrated.
 
 \begin{figure}[htbp]
   \centering

@@ -1,6 +1,5 @@
 \documentclass[a4paper, 12pt]{report}
 \usepackage[T1]{fontenc}
-\usepackage{mathptmx}
 \usepackage{courier}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{geometry}
@@ -13,8 +12,27 @@
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
-\usepackage{indentfirst}
 \usepackage{microtype}
+
+\makeatletter
+\newif\if@indentfirst
+\@indentfirsttrue
+
+\def\@afterheading{%
+  \global\@nobreaktrue
+  \everypar{%
+    \if@nobreak
+      \global\@nobreakfalse
+      \clubpenalty \@M
+      \if@noskipsec \gdef\@nobreaktrue \fi
+      \if@indentfirst
+        \hspace*{1.5em}% Indent only the first paragraph by 1.5em
+      \fi
+    \else
+      \clubpenalty \@clubpenalty
+      \global\everypar{}% Clear globally to handle grouped environments like TOC
+    \fi}}
+\makeatother
 
 % -------------------------------------------------
 % Graphics & Figures
@@ -175,6 +193,24 @@
 % -------------------------------------------------
 \usepackage{xurl}
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref}
+
+\makeatletter
+% Wrap list and bibliography commands to disable first-paragraph indentation inside them
+\let\oldtableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{{\@indentfirstfalse\oldtableofcontents}}
+
+\let\oldlistoftables\listoftables
+\renewcommand{\listoftables}{{\@indentfirstfalse\oldlistoftables}}
+
+\let\oldlistoffigures\listoffigures
+\renewcommand{\listoffigures}{{\@indentfirstfalse\oldlistoffigures}}
+
+\let\oldprintnomenclature\printnomenclature
+\renewcommand{\printnomenclature}{{\@indentfirstfalse\oldprintnomenclature}}
+
+\let\oldprintbibliography\printbibliography
+\renewcommand{\printbibliography}{{\@indentfirstfalse\oldprintbibliography}}
+\makeatother
 
 \begin{document}
 

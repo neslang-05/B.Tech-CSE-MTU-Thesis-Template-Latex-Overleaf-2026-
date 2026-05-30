@@ -14,7 +14,7 @@ The backend integrates multiple services including SQL Server, Azure AI services
 \label{sec:backend-architecture}
 % ============================================================
 
-The backend follows a layered architecture based on Clean Architecture principles. Each layer performs a dedicated responsibility while maintaining loose coupling between components.
+The backend follows a layered architecture based on Clean Architecture principles, with the relationship and dependency flow between these layers illustrated in Figure~\ref{fig:backend-clean-architecture}. Each layer performs a dedicated responsibility while maintaining loose coupling between components.
 
 \begin{figure}[H]
 \centering
@@ -66,7 +66,7 @@ The layered architecture improves:
 \label{sec:backend-tech-stack}
 % ============================================================
 
-The backend uses modern technologies for API development, authentication, AI integration, and database management.
+The backend uses modern technologies for API development, authentication, AI integration, and database management. The core technologies and libraries comprising this stack are summarized in Table~\ref{tab:backend-tech-stack}.
 
 \begin{table}[H]
 \centering
@@ -144,7 +144,7 @@ Serilog & Request logging and monitoring \\
 \label{sec:backend-project-structure}
 % ============================================================
 
-The backend source code is divided into multiple layers and modules to maintain clear responsibility boundaries.
+The backend source code is divided into multiple layers and modules to maintain clear responsibility boundaries, as outlined in Table~\ref{tab:backend-project-structure}.
 
 \begin{table}[H]
 \centering
@@ -254,7 +254,7 @@ These services manage AI processing, validation, database interaction, and respo
 
 \subsection{DTOs}
 
-Data Transfer Objects (DTOs) are used for request and response communication between layers.
+Data Transfer Objects (DTOs) are used for request and response communication between layers. The primary DTOs utilized in the system and their respective purposes are listed in Table~\ref{tab:important-dtos}.
 
 \begin{table}[H]
 \centering
@@ -345,7 +345,7 @@ The repository pattern abstracts database operations from business logic.
 
 \subsection{AI and Cloud Integrations}
 
-The system integrates multiple Azure services for AI processing and storage.
+The system integrates multiple Azure services for AI processing and storage, as detailed in Table~\ref{tab:external-services}.
 
 \begin{table}[H]
 \centering
@@ -387,7 +387,7 @@ ResNet Classifier & Paddy seed classification \\
 \label{sec:database-schema}
 % ============================================================
 
-The backend database maintains relationships between users, seed batches, verification results, complaints, and audit records.
+The backend database maintains relationships between users, seed batches, verification results, complaints, and audit records. The database schema and its corresponding primary/foreign key mappings are represented in the Entity-Relationship Diagram in Figure~\ref{fig:er-diagram}.
 
 \begin{figure}[H]
 \centering
@@ -554,7 +554,7 @@ The Presentation Layer exposes RESTful APIs for frontend communication.
 
 \subsection{API Controllers}
 
-The backend contains multiple API controllers responsible for different system modules.
+The backend contains multiple API controllers responsible for different system modules. These controllers and their design objectives are summarized in Table~\ref{tab:api-controllers}.
 
 \begin{table}[H]
 \centering
@@ -612,7 +612,7 @@ These middleware components improve system security and monitoring.
 \label{sec:backend-security}
 % ============================================================
 
-The backend uses JWT-based authentication with role-based authorization.
+The backend uses JWT-based authentication with role-based authorization, following the flow depicted in Figure~\ref{fig:jwt-backend-flow}.
 
 \begin{figure}[H]
 \centering
@@ -675,7 +675,7 @@ The system supports multiple user roles:
 \label{sec:verification-workflow}
 % ============================================================
 
-The seed verification workflow integrates AI classification, OCR analysis, and database persistence.
+The seed verification workflow integrates AI classification, OCR analysis, and database persistence, as shown in Figure~\ref{fig:verification-workflow}.
 
 \begin{figure}[H]
 \centering

@@ -126,7 +126,7 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
 \section{Containerisation and Deployment Architecture}
 \label{sec:containerization}
 
-The service uses a multi-stage Docker build to balance reproducibility against image size \cite{merkel2014docker}. The \textbf{Builder Stage} compiles Python binaries (\texttt{.whl}) with \texttt{gcc}. The \textbf{Runtime Stage} copies those pre-compiled binaries into a minimal, security-hardened Debian base (\texttt{python:3.10-slim}), discarding the build toolchain entirely. The final image is approximately 850MB --- down from over 3GB --- with a correspondingly smaller attack surface.
+The service uses a multi-stage Docker build to balance reproducibility against image size \cite{merkel2014docker}. The \textbf{Builder Stage} compiles Python binaries (\texttt{.whl}) with \texttt{gcc}. The \textbf{Runtime Stage} copies those pre-compiled binaries into a minimal, security-hardened Debian base (\texttt{python:3.10-slim}), discarding the build toolchain entirely. The final image is approximately 850MB --- down from over 3GB --- with a correspondingly smaller attack surface. The automated containerization, versioning, and deployment pipeline is illustrated in Figure~\ref{fig:container_deployment_workflow}.
 
 \begin{figure}[H]
   \centering

@@ -24,7 +24,7 @@ When we combined both datasets, we ended up with 1,563 images that represent a w
 
 \subsection{Dataset Statistics and Class Distribution}
 
-After merging the two datasets, we had a total of 1,563 paddy seed images divided into three quality categories. Let's look at where these images came from and how they're distributed:
+After merging the two datasets, we had a total of 1,563 paddy seed images divided into three quality categories. A detailed breakdown of the datasets, their image counts, storage sizes, and public Kaggle repositories is summarized in Table~\ref{tab:dataset_source_summary}, while the class-wise distribution of these images is provided in Table~\ref{tab:class_distribution}.
 
 \begin{table}[htbp]
 \centering
@@ -72,7 +72,7 @@ As you can see, we have more healthy seed images than damaged or fake ones—whi
 
 \subsection{Train/Validation/Test Split Strategy}
 
-We divided the 1,563 images into three separate groups: one for training, one for validation, and one for testing. A key principle we followed was stratified splitting, which means we made sure each group had roughly the same mix of healthy, damaged, and fake seeds as the overall dataset. This prevents any group from accidentally having too many of one type, which could give us misleading results.
+We divided the 1,563 images into three separate groups: one for training, one for validation, and one for testing. A key principle we followed was stratified splitting, which means we made sure each group had roughly the same mix of healthy, damaged, and fake seeds as the overall dataset. The proportions, approximate image counts, and primary objectives of each split are summarized in Table~\ref{tab:dataset_split}. This partitioning prevents any group from accidentally having too many of one type, which could give us misleading results.
 
 \begin{table}[htbp]
 \centering
@@ -212,7 +212,7 @@ We monitored validation performance carefully and stopped training at epoch 15 w
 
 \subsection{Hyperparameter Configuration and Optimiser}
 
-Here's a summary of all the settings we used during training:
+A comprehensive summary of the optimizer, learning rates, regularizers, and general training configurations is provided in Table~\ref{tab:hyperparameters}:
 
 \begin{table}[htbp]
 \centering
@@ -253,7 +253,7 @@ We chose the AdamW optimiser because it's smart about adjusting the learning rat
 
 \subsection{Model Export Formats}
 
-After training finished, we saved the model in multiple formats so it can run in different environments:
+After training finished, we saved the model in multiple formats to ensure compatibility with different environments. The exported files, including their sizes and target use cases, are listed in Table~\ref{tab:export_formats}.
 
 \begin{table}[htbp]
 \centering
@@ -307,7 +307,7 @@ The live API is publicly accessible at:
 
 \section{Model Comparison and Selection}
 
-Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared ResNet50, MobileNetV2, DenseNet121, and GoogleNet. Here are the results:
+Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared ResNet50, MobileNetV2, DenseNet121, and GoogleNet, with the comparative results detailed in Table~\ref{tab:architecture_comparison}.
 
 \begin{table}[htbp]
 \centering
@@ -346,7 +346,7 @@ The extra 4.4 minutes of training time is a small price to pay for these advanta
 
 \section{Final Model Performance Summary}
 
-After completing both training phases, we evaluated our final ResNet50 model on the test set—the images we'd held back and never shown the model during training. Here's how well it performed:
+After completing both training phases, we evaluated our final ResNet50 model on the test set—the images we'd held back and never shown the model during training. The final evaluation metrics are compiled in Table~\ref{tab:final_test_performance}, and a detailed summary of the training trajectory and learning stability is provided in Table~\ref{tab:training_behaviour}.
 
 \begin{table}[htbp]
 \centering
