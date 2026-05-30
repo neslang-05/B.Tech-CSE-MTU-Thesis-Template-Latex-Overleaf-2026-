@@ -1,0 +1,346 @@
+% ============================================================
+%  CHAPTER 3: SYSTEM DESIGN AND ARCHITECTURE
+%  AgriVerify --- AI-Powered Fake Seed Detection System
+%  Manipur Technical University, Final Year Project Report
+% ============================================================
+
+% ──────────────────────────────────────────────────────────────
+\section{Overall System Architecture and Technology Stack}
+% ──────────────────────────────────────────────────────────────
+
+The AgriVerify platform is designed using a multi-tiered architecture based on the Clean Architecture model to ensure strict separation of concerns, decoupling of business logic from external frameworks and high maintainability~\cite{martin2018clean}. The system comprises three primary layers: a Next.js frontend client web application, an ASP.NET Core backend Web API and a FastAPI deep learning inference microservice. These tiers interact to process seed validation requests, manage user authentication and persist data.
+
+The backend API follows Onion Architecture principles, dividing responsibilities into four distinct concentric layers as detailed in Table~\ref{tab:backend_layers}.
+
+\begin{table}[H]
+  \centering
+  \caption{Backend Architectural Layers and Responsibilities}
+  \label{tab:backend_layers}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\textwidth}{@{} l X @{}}
+    \toprule
+    \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
+    \midrule
+    \textbf{Domain Layer} & Core domain entities (\texttt{User}, \texttt{VerificationHistory}), value objects, and domain exceptions. Completely independent of external frameworks. \\
+    \addlinespace
+    \textbf{Application Layer} & Orchestration logic (\texttt{VerificationService}, \texttt{UserService}), Data Transfer Objects (DTOs), mapping configurations and request validation rules. \\
+    \addlinespace`'
+    \textbf{Infrastructure Layer} & External integration implementations, including database persistence via Entity Framework Core, Azure Cognitive Services and Blob storage managers. \\
+    \addlinespace
+    \textbf{API Layer} & REST API controllers, request-response handling, JWT authentication middleware and unified exception filters. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Table~\ref{tab:technology_stack} details the software development kits (SDKs), frameworks, libraries, and cloud platforms employed across the frontend, backend, and machine learning components.
+
+\begin{table}[H]
+  \centering
+  \caption{Consolidated Technology Stack of AgriVerify}
+  \label{tab:technology_stack}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{Component} & \textbf{Framework/Library} & \textbf{Functionality / Purpose} \\
+    \midrule
+    \textbf{Frontend} 
+      & Next.js 14 (TS) & Client interface, server-side rendering, and API proxy routing~\cite{nextjs2023docs}. \\
+      & TanStack Query & Server state synchronization and asynchronous data caching~\cite{tanstack2023query}. \\
+      & Zustand & Client-side authentication state management~\cite{zustand2023}. \\
+      & Tailwind CSS & Styling system and component customization~\cite{tailwind2024}. \\
+    \midrule
+    \textbf{Backend} 
+      & ASP.NET Core 8 & Orchestration Web API, routing, and controller layer~\cite{microsoft2023aspnet}. \\
+      & Entity Framework Core & Object-Relational Mapping (ORM) for SQL Server database access. \\
+      & Azure Cognitive Services & Optical Character Recognition (OCR) and Custom Vision packaging verification. \\
+      & Azure OpenAI Service & Natural language synthesis for seed verification reports. \\
+    \midrule
+    \textbf{Machine Learning} 
+      & PyTorch 2.1 & Deep learning framework for neural network training and validation~\cite{pytorch2019}. \\
+      & ResNet-50 & Pre-trained CNN backbone utilized for seed variety classification~\cite{he2016deep}. \\
+      & OpenCV & Preprocessing and morphometric analysis for DUS parameters~\cite{opencv2015}. \\
+      & FastAPI & Serverless microservice API hosting the model on GCP Cloud Run~\cite{fastapi2023docs}. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The PyTorch ResNet-50 model is containerized and deployed as a FastAPI microservice on Google Cloud Platform (GCP) Cloud Run to enable automatic, serverless scaling~\cite{fastapi2023docs}. During inference, input images undergo size standardization to $224 \times 224$ pixels and normalization using ImageNet statistics ($\boldsymbol{\mu} = [0.485, 0.456, 0.406]$, $\boldsymbol{\sigma} = [0.229, 0.224, 0.225]$). OpenCV extracts 17 Distinctness, Uniformity, and Stability (DUS) morphometric parameters, which are compared against reference variety profiles to compute similarity scores~\cite{upov2002dus}.
+
+% ──────────────────────────────────────────────────────────────
+\section{Functional and Non-Functional Requirements}
+% ──────────────────────────────────────────────────────────────
+
+System requirements are categorized into functional specifications, defining the core operations and roles within the application, and non-functional specifications, outlining quality attributes and system constraints. These requirements ensure that the platform meets both agricultural user needs and architectural standards.
+
+The functional requirements (Table~\ref{tab:functional_requirements}) define the core capabilities across different system actors (farmers, agricultural officers, and administrators). Concurrently, the non-functional requirements (Table~\ref{tab:non_functional_requirements}) dictate operational performance, security, and portability parameters, ensuring standard enterprise scalability and reliability.
+
+\begin{table}[H]
+  \centering
+  \caption{System Functional Requirements}
+  \label{tab:functional_requirements}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{ID} & \textbf{Module / Role} & \textbf{Functional Specification} \\
+    \midrule
+    \textbf{FR-01} & Authentication & User registration and authentication via JWT for farmers, officers, and administrators. \\
+    \textbf{FR-02} & Image Submission & Multi-modal submission (packaging and seed image) for real-time verification. \\
+    \textbf{FR-03} & AI Inference & Execution of Custom Vision, OCR text extraction, and ResNet-50 DUS profiling. \\
+    \textbf{FR-04} & Feedback System & Reporting mechanism allowing farmers to submit grievances on counterfeit seed batches. \\
+    \textbf{FR-05} & Case Management & Dashboards for officers to track, update, and resolve seed complaints. \\
+    \textbf{FR-06} & Risk Analytics & Automated aggregation of regional complaints in a Batch Risk Registry for analytics. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{System Non-Functional Requirements}
+  \label{tab:non_functional_requirements}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\textwidth}{@{} l l X @{}}
+    \toprule
+    \textbf{ID} & \textbf{Quality Attribute} & \textbf{Architectural Constraint \& Target Specification} \\
+    \midrule
+    \textbf{NFR-01} & Performance & Target end-to-end inference latency under 3.0 seconds through parallel service calls. \\
+    \textbf{NFR-02} & Scalability & Stateless API design facilitating horizontal scaling and microservice containment. \\
+    \textbf{NFR-03} & Security & HTTPS communication, JWT session control, role-based authorization (RBAC), and hashed secrets~\cite{owasp2021top10}. \\
+    \textbf{NFR-04} & Reliability & Atomic database operations and soft-delete implementation for data auditability. \\
+    \textbf{NFR-05} & Usability & Responsive UI designed for mobile and desktop screens, optimized for low-bandwidth environments. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% ──────────────────────────────────────────────────────────────
+\section{High-Level System Architecture}
+% ──────────────────────────────────────────────────────────────
+
+The system architecture is structured as a three-tier model: the Client Layer, the Backend Orchestration Tier, and the Cloud AI and Data Infrastructure Tier. As illustrated in Figure~\ref{fig:high_level_arch}, client applications do not interact directly with the backend API; rather, all requests are routed through a server-side proxy in the Next.js frontend web tier. This proxy injects JSON Web Tokens (JWT) for authentication and forwards requests to the ASP.NET Core 8 Web API. The API layer orchestrates calls to the persistent data store (SQL Server), cloud storage, and AI inference services.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{adjustbox}{max width=\textwidth}
+    \begin{tikzpicture}[
+      box/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\small, inner sep=10pt},
+      subbox/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\footnotesize, inner sep=8pt}
+    ]
+      % Nodes
+      \node[box=blue, text width=12cm] (client) {\textbf{Client Layer}\\Browser \& Mobile Applications (Farmers, Officers, System Administrators)};
+
+      \node[box=cyan, text width=12cm, below=1.5cm of client] (frontend) {\textbf{Frontend Web Tier}\\Next.js 14 App Router \& Server-Side API Proxy Route};
+
+      \node[box=teal, text width=12cm, below=1.5cm of frontend] (backend) {\textbf{Backend Orchestration Tier}\\ASP.NET Core 8 Web API (Clean Architecture: API, Application, Domain, Infrastructure)};
+
+      \node[subbox=purple, text width=3.8cm, below=2.2cm of backend] (azure) {\textbf{Azure AI Services}\\Custom Vision, OCR \&\\Azure OpenAI Synthesis};
+      \node[subbox=orange, text width=3.8cm, left=0.6cm of azure.north west, anchor=north east] (ml) {\textbf{AI Microservice}\\GCP Cloud Run\\FastAPI \& ResNet-50\\(DUS \& Variety Match)};
+      \node[subbox=green, text width=3.8cm, right=0.6cm of azure.north east, anchor=north west] (db) {\textbf{Data Persistence}\\SQL Server (EF Core) \&\\Azure Blob Storage};
+
+      % Background Box
+      \begin{scope}[on background layer]
+        \coordinate (bg_top) at ([yshift=1.0cm]azure.north);
+        \coordinate (bg_left) at ([xshift=-0.5cm]ml.west);
+        \node[draw=gray!50, fill=gray!5, dashed, rounded corners=8pt, inner sep=12pt, fit=(ml) (db) (azure) (bg_top) (bg_left)] (cloud_bg) {};
+        \node[anchor=north west, font=\scriptsize\bfseries\color{gray!70!black}, xshift=10pt, yshift=-8pt, text width=2.8cm, align=left] at (cloud_bg.north west) {Cloud AI \& Data\\Infrastructure\\Tier};
+      \end{scope}
+
+      % Arrows
+      \draw[-Stealth, thick, draw=blue!80!black] ([xshift=-2.5cm]client.south) -- ([xshift=-2.5cm]frontend.north) node[midway, left, font=\footnotesize] {HTTPS / REST Requests};
+      \draw[Stealth-, dashed, thick, draw=blue!80!black] ([xshift=2.5cm]client.south) -- ([xshift=2.5cm]frontend.north) node[midway, right, font=\footnotesize] {Rendered UI \& JSON Responses};
+
+      \draw[-Stealth, thick, draw=cyan!80!black] ([xshift=-2.5cm]frontend.south) -- ([xshift=-2.5cm]backend.north) node[midway, left, font=\footnotesize] {Proxied Token-Injected Calls};
+      \draw[Stealth-, dashed, thick, draw=cyan!80!black] ([xshift=2.5cm]frontend.south) -- ([xshift=2.5cm]backend.north) node[midway, right, font=\footnotesize] {JSON API Payloads};
+
+      \draw[-Stealth, thick, draw=teal!80!black] (backend.south) -- (azure.north) node[pos=0.25, right, font=\footnotesize] {SDK Call};
+      \draw[-Stealth, thick, draw=teal!80!black] ([xshift=-2.5cm]backend.south) -- (ml.north) node[pos=0.25, left, font=\footnotesize] {FastAPI / JSON};
+      \draw[-Stealth, thick, draw=teal!80!black] ([xshift=2.5cm]backend.south) -- (db.north) node[pos=0.25, right, font=\footnotesize] {EF Core / SQL};
+    \end{tikzpicture}
+  \end{adjustbox}
+  \caption{High-level system architecture of the AgriVerify platform.}
+  \label{fig:high_level_arch}
+\end{figure}
+
+% ──────────────────────────────────────────────────────────────
+\section{System Data Flow Pipeline}
+% ──────────────────────────────────────────────────────────────
+
+The step-by-step verification pipeline and data transmission flow are depicted in Figure~\ref{fig:dfd}. The execution sequence is structured as follows:
+
+\begin{enumerate}
+  \item \textbf{Submission:} The client uploads multi-part image data representing seed packaging and physical seeds.
+  \item \textbf{Routing and Proxying:} The Next.js API proxy interceptor validates user sessions, appends a secure bearer token, and executes an HTTP POST request to the backend.
+  \item \textbf{Parallel Execution:} The ASP.NET Core orchestration engine coordinates concurrent asynchronous requests using asynchronous task-based execution.
+  \item \textbf{Feature Extraction:}
+        \begin{itemize}
+          \item Custom Vision classifies the packaging (Genuine, Counterfeit, Suspicious).
+          \item Azure AI Vision extracts text strings via OCR to identify seed batch codes.
+          \item The GCP Cloud Run ResNet-50 service determines 17 morphological parameters.
+        \end{itemize}
+  \item \textbf{Synthesis and Persistence:} The OpenAI integration consolidates these individual model predictions into a coherent diagnostic summary, which is stored in the relational database via Entity Framework Core before the final JSON payload is returned to the user interface.
+\end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{adjustbox}{max width=\textwidth}
+    \begin{tikzpicture}[
+      box/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\small, inner sep=10pt},
+      subbox/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\footnotesize, inner sep=8pt}
+    ]
+      % Nodes
+      \node[box=green, text width=10cm] (farmer) {\textbf{1. Farmer / User Client}\\Captures \& Submits Seed Images};
+
+      \node[box=cyan, text width=10cm, below=1cm of farmer] (proxy) {\textbf{2. Next.js Proxy Route}\\Intercepts Request, Injects Secure JWT Bearer Token \& Forwards Payload};
+
+      \node[box=teal, text width=10cm, below=1cm of proxy] (orch) {\textbf{3. ASP.NET Core VerificationService}\\Orchestrates Verification Pipeline \& Triggers Parallel Asynchronous Tasks (\texttt{Task.WhenAll})};
+
+      \node[subbox=purple, text width=4.2cm, below=2cm of orch] (ocr) {\textbf{3b. Azure AI Vision}\\Extracts OCR Text \&\\Seed Batch Numbers};
+      \node[subbox=blue, text width=4.2cm, left=0.5cm of ocr.north west, anchor=north east] (custom) {\textbf{3a. Azure Custom}\\Vision\\Classifies Packaging as\\Genuine, Counterfeit\\or Suspicious};
+      \node[subbox=orange, text width=4.2cm, right=0.5cm of ocr.north east, anchor=north west] (resnet) {\textbf{3c. GCP Cloud Run}\\(ResNet-50)\\Extracts 17 DUS\\Parameters \& Performs\\Variety Matching};
+
+      % Background box around parallel step
+      \begin{scope}[on background layer]
+        \coordinate (parallel_top) at ([yshift=1.2cm]ocr.north);
+        \node[draw=purple!40, fill=purple!5, dashed, rounded corners=8pt, inner sep=12pt, fit=(custom) (resnet) (ocr) (parallel_top)] (parallel_bg) {};
+        \node[anchor=north west, font=\scriptsize\bfseries\color{purple!80!black}, xshift=6pt, yshift=-8pt, text width=2.4cm, align=left] at (parallel_bg.north west) {Parallel AI\\Inference\\Execution};
+      \end{scope}
+
+      \node[box=teal, text width=10cm, below=2cm of ocr] (openai) {\textbf{4. Azure OpenAI Service}\\Aggregates Parallel AI Inference Outputs \& Synthesises Natural Language Report};
+
+      \node[box=blue, text width=10cm, below=1cm of openai] (db) {\textbf{5. Entity Framework Core \& SQL Server}\\Persists Verification Record to \texttt{VerificationHistory} Table (with Soft Delete)};
+
+      \node[box=green, text width=10cm, below=1cm of db] (response) {\textbf{6. Client Interface}\\Displays Structured Verification Status, Confidence Score \& Summary Report};
+
+      % Arrows
+      \draw[-Stealth, thick] (farmer.south) -- (proxy.north) node[midway, right, font=\footnotesize] {Multipart Image Payload};
+      \draw[-Stealth, thick] (proxy.south) -- (orch.north) node[midway, right, font=\footnotesize] {Authenticated HTTP POST};
+
+      \draw[-Stealth, thick] (orch.south) -- (ocr.north);
+      \draw[-Stealth, thick] (orch.south) -- (custom.north);
+      \draw[-Stealth, thick] (orch.south) -- (resnet.north);
+
+      \draw[-Stealth, thick] (ocr.south) -- (openai.north);
+      \draw[-Stealth, thick] (custom.south) -- (openai.north);
+      \draw[-Stealth, thick] (resnet.south) -- (openai.north);
+
+      \draw[-Stealth, thick] (openai.south) -- (db.north) node[midway, right, font=\footnotesize] {Domain Entity Record};
+      \draw[-Stealth, thick] (db.south) -- (response.north) node[midway, right, font=\footnotesize] {JSON Response (DTO)};
+    \end{tikzpicture}
+  \end{adjustbox}
+  \caption{Data flow diagram for the seed verification pipeline}
+  \label{fig:dfd}
+\end{figure}
+
+% ──────────────────────────────────────────────────────────────
+\section{Database Entity-Relationship Model}
+% ──────────────────────────────────────────────────────────────
+
+The relational database schema is modeled to ensure data consistency, minimize redundancy, and support real-time querying. Figure~\ref{fig:erd} defines the entity relations, key fields, and cardinalities within the AgriVerify database. The core architectural design decisions are detailed as follows:
+
+\begin{itemize}
+  \item \textbf{User and Security Tracking:} The \texttt{User} entity supports role-based access control and maintains a 1-to-many relationship with \texttt{RefreshToken} to secure active sessions.
+  \item \textbf{Verification History:} The \texttt{VerificationHistory} table preserves all client evaluations and maintains a soft-delete status (\texttt{IsDeleted}) to enforce an immutable audit trail.
+  \item \textbf{Feedback and Case Resolution:} When a seed dispute is identified, a \texttt{ProductComplaint} record is initiated. This entity links to the executing officer, records ongoing investigations via \texttt{ComplaintAction}, and syncs batch metrics with the \texttt{BatchRiskRegistry}.
+  \item \textbf{Batch Analytics:} The \texttt{BatchRiskRegistry} dynamically compiles aggregation data (complaint counts, severity indices, and regional distributions) to optimize query performance for system dashboards.
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{adjustbox}{max width=\textwidth}
+    \begin{tikzpicture}[
+      entity/.style={draw=#1!80!black, fill=#1!5, thick, rounded corners=6pt, inner sep=8pt, font=\small},
+      rel/.style={-Stealth, thick, draw=black!70},
+      label/.style={font=\footnotesize, fill=white, inner sep=2pt}
+    ]
+      % Entities
+      \node[entity=blue] (user) {
+        \begin{tabular}{@{}ll@{}}
+          \multicolumn{2}{@{}c@{}}{\textbf{User}} \\ \midrule
+          \textbf{PK} & UserId \\
+          & Username \\
+          & Email \\
+          & PasswordHash \\
+          & Role \\
+          & State, District \\
+        \end{tabular}
+      };
+
+      \node[entity=cyan, left=1.8cm of user] (token) {
+        \begin{tabular}{@{}ll@{}}
+          \multicolumn{2}{@{}c@{}}{\textbf{RefreshToken}} \\ \midrule
+          \textbf{PK} & TokenId \\
+          \textbf{FK} & UserId \\
+          & TokenString \\
+          & ExpiryDate \\
+          & IsRevoked \\
+        \end{tabular}
+      };
+
+      \node[entity=teal, right=1.8cm of user] (verif) {
+        \begin{tabular}{@{}ll@{}}
+          \multicolumn{2}{@{}c@{}}{\textbf{VerificationHistory}} \\ \midrule
+          \textbf{PK} & VerificationHistoryId \\
+          \textbf{FK} & UserId \\
+          & ImageUrl, OCRText \\
+          & ClassificationResult \\
+          & ConfidenceScore \\
+          & CreatedAt, IsDeleted \\
+        \end{tabular}
+      };
+
+      \node[entity=purple, below=2.5cm of user] (complaint) {
+        \begin{tabular}{@{}ll@{}}
+          \multicolumn{2}{@{}c@{}}{\textbf{ProductComplaint}} \\ \midrule
+          \textbf{PK} & ProductComplaintId \\
+          \textbf{FK} & UserId \\
+          \textbf{FK} & OfficerId \\
+          & IssueType, BatchNumber \\
+          & District, Severity \\
+          & Status, CreatedAt \\
+        \end{tabular}
+      };
+
+      \node[entity=orange, right=1.8cm of complaint] (action) {
+        \begin{tabular}{@{}ll@{}}
+          \multicolumn{2}{@{}c@{}}{\textbf{ComplaintAction}} \\ \midrule
+          \textbf{PK} & ActionId \\
+          \textbf{FK} & ComplaintId \\
+          & Description \\
+          & ActionDate \\
+        \end{tabular}
+      };
+
+      \node[entity=green, left=1.8cm of complaint] (registry) {
+        \begin{tabular}{@{}ll@{}}
+          \multicolumn{2}{@{}c@{}}{\textbf{BatchRiskRegistry}} \\ \midrule
+          \textbf{PK} & BatchNumber \\
+          & TotalComplaints \\
+          & AffectedDistricts \\
+          & AvgSeverityScore \\
+          & RiskLevel \\
+        \end{tabular}
+      };
+
+      % Relationships
+      \draw[rel] (user.west) -- (token.east) 
+        node[pos=0.15, above, label] {1} node[pos=0.85, above, label] {*};
+
+      \draw[rel] (user.east) -- (verif.west) 
+        node[pos=0.15, above, label] {1} node[pos=0.85, above, label] {*};
+
+      \draw[rel] (user.south) -- (complaint.north) 
+        node[pos=0.15, right, label] {1} node[pos=0.85, right, label] {*};
+
+      \draw[rel] (complaint.east) -- (action.west) 
+        node[pos=0.15, above, label] {1} node[pos=0.85, above, label] {*};
+
+      \draw[Stealth-, thick, dashed, draw=black!70] (registry.east) -- (complaint.west) 
+        node[pos=0.15, above, label] {1} node[pos=0.85, above, label] {*} 
+        node[midway, below, label] {batch sync};
+
+      \draw[-Stealth, thick, dotted, draw=black!70] (verif.south) -- (complaint.north east) 
+        node[pos=0.15, left, label] {0..1} node[pos=0.85, above, label] {*} 
+        node[midway, right, label] {disputes};
+    \end{tikzpicture}
+  \end{adjustbox}
+  \caption{Simplified entity-relationship diagram for the AgriVerify domain model. Cardinality notation follows UML conventions.}
+  \label{fig:erd}
+\end{figure}

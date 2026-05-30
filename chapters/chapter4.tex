@@ -4,7 +4,7 @@
 
 \subsection{Data Sources and Collection (Kaggle)}
 
-We built our training dataset by combining two sources from Kaggle. The first is a publicly available dataset, and the second is a custom collection we put together in partnership with India's Council of Agricultural Research (ICAR) facility in Manipur. By bringing these two sources together, we got a larger and more realistic dataset—one that includes seed images captured in different ways and from different parts of India. This diversity is crucial because it helps the model learn to recognize seeds regardless of lighting conditions or camera setup.
+We built our training dataset by combining two sources from Kaggle. The first is a publicly available dataset, and the second is a custom collection we put together in partnership with India's Council of Agricultural Research (ICAR) facility in Manipur. By bringing these two sources together, we got a larger and more realistic dataset---one that includes seed images captured in different ways and from different parts of India. This diversity is crucial because it helps the model learn to recognize seeds regardless of lighting conditions or camera setup.
 
 \subsubsection{Public Source}
 The first source is the Paddy Seeds Quality Classification dataset published on Kaggle by Ayyan Arkadalkani:
@@ -68,7 +68,7 @@ Fake/Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
 }
 \end{table}
 
-As you can see, we have more healthy seed images than damaged or fake ones—which makes sense because in real life, most seeds are healthy. However, this imbalance could cause the model to become biased toward recognizing healthy seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
+As you can see, we have more healthy seed images than damaged or fake ones---which makes sense because in real life, most seeds are healthy. However, this imbalance could cause the model to become biased toward recognizing healthy seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
 
 \subsection{Train/Validation/Test Split Strategy}
 
@@ -93,12 +93,12 @@ Test Set & 10\% & $\sim$156 & Held completely separate to give a final, unbiased
 }
 \end{table}
 
-Here's how we used each group: The training set is where the model learns—we show it images and let it adjust its internal parameters to get better at classification. The validation set is our quality control checkpoint—after each training cycle, we test on these images to see if the model is still improving or starting to overfit (basically, memorizing the training data instead of learning general patterns). The test set is completely hidden until the very end. We only use it once to get a fair, final assessment of the model's performance on images it has never seen before.
+Here's how we used each group: The training set is where the model learns---we show it images and let it adjust its internal parameters to get better at classification. The validation set is our quality control checkpoint---after each training cycle, we test on these images to see if the model is still improving or starting to overfit (basically, memorizing the training data instead of learning general patterns). The test set is completely hidden until the very end. We only use it once to get a fair, final assessment of the model's performance on images it has never seen before.
 
 \subsection{Data Preprocessing and Augmentation}
 \label{subsec:augmentation}
 
-Before showing images to the neural network, we prepared them using a standard pipeline. All images were resized to $224 \times 224$ pixels—this is the standard size that ResNet50 (our neural network architecture) expects. We then adjusted the color values using ImageNet statistics (numbers from a large, well-known image dataset):
+Before showing images to the neural network, we prepared them using a standard pipeline. All images were resized to $224 \times 224$ pixels---this is the standard size that ResNet50 (our neural network architecture) expects. We then adjusted the color values using ImageNet statistics (numbers from a large, well-known image dataset):
 \begin{equation}
 \mu = [0.485, 0.456, 0.406], \quad \sigma = [0.229, 0.224, 0.225]
 \end{equation}
@@ -125,7 +125,7 @@ To make the model more robust and help it learn from our limited training data, 
 
 \subsection{ResNet50 Backbone (25.6M Parameters)}
 
-We chose ResNet50 as the foundation of our classification model. This neural network has 50 layers and about 25.6 million parameters (adjustable settings inside the network). What makes ResNet special is its use of "skip connections"—shortcuts that let information flow directly around groups of layers. This design makes it much easier to train very deep networks because it prevents the gradient (the training signal) from fading as it travels backward through the network.
+We chose ResNet50 as the foundation of our classification model. This neural network has 50 layers and about 25.6 million parameters (adjustable settings inside the network). What makes ResNet special is its use of "skip connections"---shortcuts that let information flow directly around groups of layers. This design makes it much easier to train very deep networks because it prevents the gradient (the training signal) from fading as it travels backward through the network.
 
 Rather than training from scratch, we started with weights that were pre-trained on ImageNet, a massive dataset of millions of everyday images. This pre-trained starting point is like giving the model a head start: it already knows how to recognize edges, textures, and shapes, so we only need to teach it the specific patterns that distinguish different seed qualities.
 
@@ -144,10 +144,10 @@ On top of the ResNet50 backbone, we added a custom section designed specifically
 
 \subsection{Anti-Overfitting Techniques}
 
-Overfitting is the enemy of machine learning—it's when a model memorizes the training data instead of learning generalizable patterns. We used several techniques to prevent this:
+Overfitting is the enemy of machine learning---it's when a model memorizes the training data instead of learning generalizable patterns. We used several techniques to prevent this:
 
 \begin{itemize}
-    \item \textbf{Dropout}---During training, we randomly "turn off" 50\% of neurons in the classification head. This forces the network to learn redundant representations, so it can't rely on a few specific neurons. Think of it like training a team where you randomly swap out players—the team learns to work together, not depend on one star player.
+    \item \textbf{Dropout}---During training, we randomly "turn off" 50\% of neurons in the classification head. This forces the network to learn redundant representations, so it can't rely on a few specific neurons. Think of it like training a team where you randomly swap out players---the team learns to work together, not depend on one star player.
     
     \item \textbf{Batch Normalisation}---After each layer, we normalize the values to keep them in a healthy range. This stabilizes training and acts as a natural regularizer.
     
@@ -164,7 +164,7 @@ Overfitting is the enemy of machine learning—it's when a model memorizes the t
 
 \subsection{Feature Extraction---17 Physical Parameters}
 
-Beyond just classifying seeds as Healthy, Damaged, or Fake, we wanted our model to extract physical measurements that agriculture experts understand. The standard set of measurements in agriculture is called DUS—Distinctiveness, Uniformity, and Stability. We programmed our model to extract 17 of these physical parameters from each seed image:
+Beyond just classifying seeds as Healthy, Damaged, or Fake, we wanted our model to extract physical measurements that agriculture experts understand. The standard set of measurements in agriculture is called DUS---Distinctiveness, Uniformity, and Stability. We programmed our model to extract 17 of these physical parameters from each seed image:
 
 \begin{itemize}
     \item How long and how wide each seed is
@@ -173,7 +173,7 @@ Beyond just classifying seeds as Healthy, Damaged, or Fake, we wanted our model 
     \item How circular the seed is (circularity) and how solid it is (solidity)
     \item How elongated the seed is (eccentricity)
     \item Mathematical descriptions of how the seed's mass is distributed
-    \item Hu moments—a special mathematical descriptor of seed shape that works the same way whether the seed is rotated, scaled, or shifted in the image
+    \item Hu moments---a special mathematical descriptor of seed shape that works the same way whether the seed is rotated, scaled, or shifted in the image
 \end{itemize}
 
 These 17 parameters bridge the gap between what the neural network learns (visual patterns) and what agricultural experts care about (standard physical measurements). This makes our system more transparent and trustworthy to end users.
@@ -185,7 +185,7 @@ When we measure seeds in a photograph, the measurements are in pixels, which dep
 \text{scale} = \frac{\text{reference\_length\_mm}}{\text{reference\_length\_pixels}}
 \end{equation}
 
-This scale factor is applied to all measurements, so when we report that a seed is 6.2 mm long, it's truly 6.2 millimetres—not dependent on camera distance or image resolution.
+This scale factor is applied to all measurements, so when we report that a seed is 6.2 mm long, it's truly 6.2 millimetres---not dependent on camera distance or image resolution.
 
 \subsection{Variety Matching (12 Reference Varieties)}
 
@@ -194,21 +194,21 @@ We created a reference database of 12 standard paddy seed varieties used in Indi
 d_i = \sqrt{\sum_{j=1}^{17} (p_j - r_{i,j})^2}
 \end{equation}
 
-Here, $p_j$ is one of the 17 measurements from the new seed, $r_{i,j}$ is the standard value for variety $i$, and $d_i$ tells us how different the new seed is from variety $i$. The variety with the smallest distance is the best match—this is the variety the seed most closely resembles. We report the top 3 matches so users can see alternatives if needed.
+Here, $p_j$ is one of the 17 measurements from the new seed, $r_{i,j}$ is the standard value for variety $i$, and $d_i$ tells us how different the new seed is from variety $i$. The variety with the smallest distance is the best match---this is the variety the seed most closely resembles. We report the top 3 matches so users can see alternatives if needed.
 
 \section{Training Pipeline}
 
 \subsection{Phase 1---Classification Head Training (Epochs 1--8)}
 
-We trained the model in two phases. In Phase 1 (the first 8 training cycles), we froze the ResNet50 backbone—meaning its weights didn't change—and only trained the custom classification head we added on top. Think of this like keeping a well-established expert's knowledge fixed and just training a new student to interpret their findings. We used a learning rate of 0.001, which controls how big the weight updates are. A learning rate that's too high causes instability; too low and training is slow. The batch size (number of images processed before updating weights) was set to 32.
+We trained the model in two phases. In Phase 1 (the first 8 training cycles), we froze the ResNet50 backbone---meaning its weights didn't change---and only trained the custom classification head we added on top. Think of this like keeping a well-established expert's knowledge fixed and just training a new student to interpret their findings. We used a learning rate of 0.001, which controls how big the weight updates are. A learning rate that's too high causes instability; too low and training is slow. The batch size (number of images processed before updating weights) was set to 32.
 
 At the end of each of these 8 epochs, we checked performance on the validation set to make sure the head was learning properly and not starting to overfit.
 
 \subsection{Phase 2---Full Fine-Tuning (Epochs 9--15)}
 
-In Phase 2 (epochs 9–15), we unfroze the entire network and trained everything end-to-end. We reduced the learning rate by 10 times to 0.0001—a smaller rate because we're now adjusting a fully-trained backbone and don't want to destroy what it's already learned. This phase refined the backbone's features to specialize better for seed classification.
+In Phase 2 (epochs 9--15), we unfroze the entire network and trained everything end-to-end. We reduced the learning rate by 10 times to 0.0001---a smaller rate because we're now adjusting a fully-trained backbone and don't want to destroy what it's already learned. This phase refined the backbone's features to specialize better for seed classification.
 
-We monitored validation performance carefully and stopped training at epoch 15 when we noticed the validation loss starting to increase (a sign the model was beginning to overfit). We then loaded the best weights we'd found during the entire training run—these became our final model.
+We monitored validation performance carefully and stopped training at epoch 15 when we noticed the validation loss starting to increase (a sign the model was beginning to overfit). We then loaded the best weights we'd found during the entire training run---these became our final model.
 
 \subsection{Hyperparameter Configuration and Optimiser}
 
@@ -296,7 +296,7 @@ We wrapped the trained model in FastAPI, a fast and modern Python web framework.
 
 \subsection{Containerisation and CI/CD Pipeline}
 
-We packaged everything—the model weights, the FastAPI server, and all required libraries—into a Docker container. Docker is like a lightweight virtual machine that ensures the model works the same way on any computer or cloud platform.
+We packaged everything---the model weights, the FastAPI server, and all required libraries---into a Docker container. Docker is like a lightweight virtual machine that ensures the model works the same way on any computer or cloud platform.
 
 Deployment happens automatically: whenever we push new code to our GitHub repository's main branch, a GitHub Actions workflow automatically builds a fresh Docker image, uploads it to Google Cloud's storage service (Artifact Registry), and deploys it to Google Cloud Run. Cloud Run is perfect for this because it automatically scales up when there are many requests and scales down when there's little traffic, so we don't pay for idle servers.
 
@@ -330,14 +330,14 @@ MobileNetV2 & 99.13\% & 99.15\% & 99.13\% & 99.13\% & 8.5 \\
 }
 \end{table}
 
-The results show that ResNet50, DenseNet121, and GoogleNet all achieved the same 99.57\% accuracy, demonstrating that our dataset is rich enough that all three architectures can learn to classify seeds nearly perfectly. MobileNetV2 achieved slightly lower accuracy at 99.13\% but trained much faster—in just 8.5 minutes compared to 16.4 minutes for ResNet50.
+The results show that ResNet50, DenseNet121, and GoogleNet all achieved the same 99.57\% accuracy, demonstrating that our dataset is rich enough that all three architectures can learn to classify seeds nearly perfectly. MobileNetV2 achieved slightly lower accuracy at 99.13\% but trained much faster---in just 8.5 minutes compared to 16.4 minutes for ResNet50.
 
 We chose ResNet50 for three practical reasons:
 
 \begin{enumerate}
     \item Its design with skip connections is well-understood in the research community, making it easier to diagnose training issues and fine-tune behavior.
     
-    \item It has excellent support across different deployment platforms—PyTorch, TorchScript, ONNX, and more—giving us flexibility in where and how we deploy it.
+    \item It has excellent support across different deployment platforms---PyTorch, TorchScript, ONNX, and more---giving us flexibility in where and how we deploy it.
     
     \item Most published agricultural image classification research uses ResNet50, so our results are directly comparable to other teams' work, helping the scientific community benchmark progress.
 \end{enumerate}
@@ -346,7 +346,7 @@ The extra 4.4 minutes of training time is a small price to pay for these advanta
 
 \section{Final Model Performance Summary}
 
-After completing both training phases, we evaluated our final ResNet50 model on the test set—the images we'd held back and never shown the model during training. The final evaluation metrics are compiled in Table~\ref{tab:final_test_performance}, and a detailed summary of the training trajectory and learning stability is provided in Table~\ref{tab:training_behaviour}.
+After completing both training phases, we evaluated our final ResNet50 model on the test set---the images we'd held back and never shown the model during training. The final evaluation metrics are compiled in Table~\ref{tab:final_test_performance}, and a detailed summary of the training trajectory and learning stability is provided in Table~\ref{tab:training_behaviour}.
 
 \begin{table}[htbp]
 \centering
@@ -359,13 +359,13 @@ After completing both training phases, we evaluated our final ResNet50 model on 
 \hline
 Test Accuracy & 99.57\% & Far exceeds industry standard (85--90\%) \\
 \hline
-Precision & $\sim$0.99 & Outstanding—almost no false positives \\
+Precision & $\sim$0.99 & Outstanding---almost no false positives \\
 \hline
-Recall & $\sim$0.99 & Outstanding—catches almost all cases \\
+Recall & $\sim$0.99 & Outstanding---catches almost all cases \\
 \hline
-F1 Score & $\sim$0.99 & Excellent—perfectly balanced performance \\
+F1 Score & $\sim$0.99 & Excellent---perfectly balanced performance \\
 \hline
-Train-Validation Gap & $<$5\% & Great generalization—model isn't overfitting \\
+Train-Validation Gap & $<$5\% & Great generalization---model isn't overfitting \\
 \hline
 \end{tabular}%
 }
@@ -388,10 +388,10 @@ Mid-training Stability & After the initial improvement phase, training was smoot
 \hline
 Overfitting Control & The gap between training accuracy and validation accuracy never exceeded 5\%, indicating the model learned general patterns rather than memorizing training data \\
 \hline
-Training Stopped at & Epoch 15—we detected the first signs of overfitting and stopped immediately, preserving the best weights we'd found \\
+Training Stopped at & Epoch 15---we detected the first signs of overfitting and stopped immediately, preserving the best weights we'd found \\
 \hline
 \end{tabular}%
 }
 \end{table}
 
-The final accuracy of 99.57\% is significantly better than the typical industry standard of 85--90\% for automated seed quality classification. The near-perfect precision (very few false alarms) and recall (catches nearly all problems) across all three seed quality categories mean our model is reliable and trustworthy for real agricultural use. This is exactly what we needed—a system that farmers and agricultural officers at ICAR Manipur can depend on to accurately identify problematic seeds before they're planted.
+The final accuracy of 99.57\% is significantly better than the typical industry standard of 85--90\% for automated seed quality classification. The near-perfect precision (very few false alarms) and recall (catches nearly all problems) across all three seed quality categories mean our model is reliable and trustworthy for real agricultural use. This is exactly what we needed---a system that farmers and agricultural officers at ICAR Manipur can depend on to accurately identify problematic seeds before they're planted.

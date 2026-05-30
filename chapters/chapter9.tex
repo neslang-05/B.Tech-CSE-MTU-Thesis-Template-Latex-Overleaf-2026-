@@ -1,6 +1,6 @@
 % ============================================================
 %  CHAPTER 9: RESULTS AND EVALUATION
-%  AgriVerify — AI-Powered Fake Seed Detection System
+%  AgriVerify --- AI-Powered Fake Seed Detection System
 %  Manipur Technical University, Final Year Project Report
 % ============================================================
 
@@ -25,11 +25,11 @@ Here's exactly how well our model performed on the test set, with the overall pe
     \midrule
     Accuracy & 99.57\% & Out of every 100 seeds we tested, we correctly classified 99 or 100 of them \\
     \addlinespace
-    Precision & 99.57\% & When the system says a seed is problematic, it's right almost every time—virtually no false alarms \\
+    Precision & 99.57\% & When the system says a seed is problematic, it's right almost every time---virtually no false alarms \\
     \addlinespace
-    Recall & 99.57\% & The system catches almost all problematic seeds—very few slip through undetected \\
+    Recall & 99.57\% & The system catches almost all problematic seeds---very few slip through undetected \\
     \addlinespace
-    F1 Score & 99.57\% & Perfect balance between precision and recall—the system is equally good at both \\
+    F1 Score & 99.57\% & Perfect balance between precision and recall---the system is equally good at both \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -37,7 +37,7 @@ Here's exactly how well our model performed on the test set, with the overall pe
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.85\textwidth}
-    \includegraphics[width=\textwidth]{{"thesis/model-performace.jpeg"}}
+    \includegraphics[width=\textwidth]{images/model-performance.jpeg}
   \end{adjustbox}
   \caption{How the model improved over 15 training cycles. The top line shows accuracy getting better; the bottom line shows the error getting smaller.}
   \label{fig:model-performance}
@@ -60,14 +60,14 @@ To understand exactly how the model performs on each type of seed, we analyzed i
     \toprule
     \textbf{Seed Type} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{What This Means} \\
     \midrule
-    Pure (Genuine) & 100.0\% & 99.19\% & 99.60\% & Perfect at recognizing genuine seeds—never wrongly approves a fake one \\
+    Pure (Genuine) & 100.0\% & 99.19\% & 99.60\% & Perfect at recognizing genuine seeds---never wrongly approves a fake one \\
     \addlinespace
-    Impure (Damaged/Fake) & 99.07\% & 100.0\% & 99.53\% & Perfect at detecting problems—catches every single defective seed \\
+    Impure (Damaged/Fake) & 99.07\% & 100.0\% & 99.53\% & Perfect at detecting problems---catches every single defective seed \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-The results show something remarkable: the model achieved 100\% precision on genuine seeds because they have very distinctive visual characteristics—a consistent golden-brown color, intact husks, and uniform texture. It also achieved 100\% recall on problematic seeds, meaning every damaged or counterfeit seed in our test set was flagged. This is exactly what we want: no genuine seeds are mistakenly rejected, and no fake seeds slip through~\cite{liu2020}.
+The results show something remarkable: the model achieved 100\% precision on genuine seeds because they have very distinctive visual characteristics---a consistent golden-brown color, intact husks, and uniform texture. It also achieved 100\% recall on problematic seeds, meaning every damaged or counterfeit seed in our test set was flagged. This is exactly what we want: no genuine seeds are mistakenly rejected, and no fake seeds slip through~\cite{liu2020}.
 
 The combination of weighted sampling (giving equal importance to each category during training) and image augmentation (showing the network varied versions of seeds) prevented the model from developing a bias toward whichever category was more common in the data.
 
@@ -96,7 +96,7 @@ To see the exact pattern of the model's decisions, we created a confusion matrix
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.75\textwidth}
-    \includegraphics[width=\textwidth]{{"thesis/Confusion-Matrix.jpeg"}}
+    \includegraphics[width=\textwidth]{images/confusion-matrix.jpeg}
   \end{adjustbox}
   \caption{Visual representation of how often the model got predictions right or wrong.}
   \label{fig:confusion-matrix}
@@ -121,11 +121,11 @@ We only had 1,563 training images, which is relatively small for deep learning. 
     \toprule
     \textbf{Configuration} & \textbf{Training vs. Validation Difference} & \textbf{What Happened} \\
     \midrule
-    No Protection & 25--30\% & Bad—the model memorized training data and performed much worse on new seeds \\
+    No Protection & 25--30\% & Bad---the model memorized training data and performed much worse on new seeds \\
     \addlinespace
     Dropout Only & 8--12\% & Better, but still some overfitting on tricky seed textures \\
     \addlinespace
-    All Techniques Combined & 2.8\% & Excellent—tight control with less than 5\% difference \\
+    All Techniques Combined & 2.8\% & Excellent---tight control with less than 5\% difference \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -153,7 +153,7 @@ Before settling on ResNet50, we tested four popular neural network designs on th
   \caption{Comparing Four Different Neural Network Architectures}
   \label{tab:modelcomparison}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} X c c c c c @{}}
+  \begin{tabularx}{\textwidth}{@{} p{3.2cm} c c c c X @{}}
     \toprule
     \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time} \\
     \midrule
@@ -171,19 +171,19 @@ Before settling on ResNet50, we tested four popular neural network designs on th
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.85\textwidth}
-    \includegraphics[width=\textwidth]{{"thesis/model-comparison.jpeg"}}
+    \includegraphics[width=\textwidth]{images/model-comparison.jpeg}
   \end{adjustbox}
   \caption{Visual comparison of how each model performed and how long training took.}
   \label{fig:model-comparison}
 \end{figure}
 
-Three models tied for best accuracy—ResNet50, DenseNet121, and GoogleNet all achieved 99.57\%. MobileNetV2 was slightly lower at 99.13\% but trained much faster. So why did we choose ResNet50?
+Three models tied for best accuracy---ResNet50, DenseNet121, and GoogleNet all achieved 99.57\%. MobileNetV2 was slightly lower at 99.13\% but trained much faster. So why did we choose ResNet50?
 
-ResNet50 has skip connections (shortcuts) that let training signals flow smoothly through all 50 layers, making it easier to fine-tune without losing information~\cite{he2016deep, xu2021}. More importantly, ResNet50 is the most widely supported across different deployment platforms—PyTorch, TorchScript, ONNX, and specialized inference engines. This flexibility means AgriVerify can run on cloud servers, edge devices, and even smartphones in the future. The extra 4.4 minutes of training time is negligible since training only happens once~\cite{pytorch2019}.
+ResNet50 has skip connections (shortcuts) that let training signals flow smoothly through all 50 layers, making it easier to fine-tune without losing information~\cite{he2016deep, xu2021}. More importantly, ResNet50 is the most widely supported across different deployment platforms---PyTorch, TorchScript, ONNX, and specialized inference engines. This flexibility means AgriVerify can run on cloud servers, edge devices, and even smartphones in the future. The extra 4.4 minutes of training time is negligible since training only happens once~\cite{pytorch2019}.
 
 \section{System Performance and Production Latency}
 
-Beyond just accuracy, we tested how fast the complete system responds to real requests—this is critical for farmers waiting for results in the field.
+Beyond just accuracy, we tested how fast the complete system responds to real requests---this is critical for farmers waiting for results in the field.
 
 \subsection{How Fast the AI Model Runs}
 
@@ -205,7 +205,7 @@ Inference latency is the time it takes the model to receive an image, process it
   \end{tabularx}
 \end{table}
 
-Even on a regular CPU (without GPU acceleration), the model responds in 165 milliseconds—that's less than a quarter-second. On GPU hardware, it's 20 milliseconds. Both are fast enough for real-time farmer feedback in the field.
+Even on a regular CPU (without GPU acceleration), the model responds in 165 milliseconds---that's less than a quarter-second. On GPU hardware, it's 20 milliseconds. Both are fast enough for real-time farmer feedback in the field.
 
 \subsection{Full System Response Time}
 
@@ -231,7 +231,7 @@ We stress-tested the entire backend system (not just the model) to see how it pe
   \end{tabularx}
 \end{table}
 
-The system remained stable and responsive even under peak load. The proxy architecture (where the frontend acts as an intermediary) was crucial—it prevented the backend from getting overwhelmed because it manages heavy workloads asynchronously instead of forcing everything to wait~\cite{martin2018clean}.
+The system remained stable and responsive even under peak load. The proxy architecture (where the frontend acts as an intermediary) was crucial---it prevented the backend from getting overwhelmed because it manages heavy workloads asynchronously instead of forcing everything to wait~\cite{martin2018clean}.
 
 \section{Functional Verification and Test Execution}
 
@@ -322,24 +322,24 @@ AgriVerify provides simple, intuitive interfaces tailored to three different use
 
 \subsection{Public Portal, Onboarding, and Multilingual Support}
 
-When farmers first visit AgriVerify, they land on a public page explaining what the platform does and why they should use it, as shown in Figure~\ref{fig:ui-landing}. Since many rural farmers speak regional languages, the interface supports language selection—farmers can switch between English and their local dialect (see Figure~\ref{fig:ui-language}). The combined public portal and language interface are shown in Figure~\ref{fig:ui-public-portal}.
+When farmers first visit AgriVerify, they land on a public page explaining what the platform does and why they should use it, as shown in Figure~\ref{fig:ui-landing}. Since many rural farmers speak regional languages, the interface supports language selection---farmers can switch between English and their local dialect (see Figure~\ref{fig:ui-language}). The combined public portal and language interface are shown in Figure~\ref{fig:ui-public-portal}.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Main landing page showing AgriVerify's value and features.]{\includegraphics[width=0.48\textwidth]{{"thesis/Landing.png"}}\label{fig:ui-landing}}
+  \subfloat[Main landing page showing AgriVerify's value and features.]{\includegraphics[width=0.48\textwidth]{images/landing.png}\label{fig:ui-landing}}
   \hfill
-  \subfloat[Language selection interface so rural farmers can use their preferred language.]{\includegraphics[width=0.48\textwidth]{{"thesis/language.png"}}\label{fig:ui-language}}
+  \subfloat[Language selection interface so rural farmers can use their preferred language.]{\includegraphics[width=0.48\textwidth]{images/language.png}\label{fig:ui-language}}
   \caption{Welcome pages for onboarding and language selection.}
   \label{fig:ui-public-portal}
 \end{figure}
 
-New farmers can create accounts by providing their name, email, location, and agricultural district, as shown in Figure~\ref{fig:ui-onboarding}. Figure~\ref{fig:ui-login-landing} shows the role selection page, and Figure~\ref{fig:ui-new-account} displays the registration form. This information is essential for the complaint system—it verifies that users are real people in the agricultural community.
+New farmers can create accounts by providing their name, email, location, and agricultural district, as shown in Figure~\ref{fig:ui-onboarding}. Figure~\ref{fig:ui-login-landing} shows the role selection page, and Figure~\ref{fig:ui-new-account} displays the registration form. This information is essential for the complaint system---it verifies that users are real people in the agricultural community.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Login and role selection interface.]{\includegraphics[width=0.48\textwidth]{{"thesis/login landing.png"}}\label{fig:ui-login-landing}}
+  \subfloat[Login and role selection interface.]{\includegraphics[width=0.48\textwidth]{images/login-landing.png}\label{fig:ui-login-landing}}
   \hfill
-  \subfloat[Farmer registration form collecting demographic and location information.]{\includegraphics[width=0.48\textwidth]{{"thesis/new account.png"}}\label{fig:ui-new-account}}
+  \subfloat[Farmer registration form collecting demographic and location information.]{\includegraphics[width=0.48\textwidth]{images/new-account.png}\label{fig:ui-new-account}}
   \caption{Login and farmer account registration.}
   \label{fig:ui-onboarding}
 \end{figure}
@@ -349,7 +349,7 @@ For agricultural officers and system administrators, there's a separate secure l
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.75\textwidth}
-    \includegraphics[width=\textwidth]{{"thesis/admin login.png"}}
+    \includegraphics[width=\textwidth]{images/admin-login.png}
   \end{adjustbox}
   \caption{Secure admin login requiring multi-factor authentication.}
   \label{fig:ui-admin-login}
@@ -361,20 +361,20 @@ Once logged in, farmers see a personalized dashboard showing their verification 
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Main farmer dashboard showing verification history and activity summary.]{\includegraphics[width=0.48\textwidth]{{"thesis/dashboard.png"}}\label{fig:ui-dashboard}}
+  \subfloat[Main farmer dashboard showing verification history and activity summary.]{\includegraphics[width=0.48\textwidth]{images/dashboard.png}\label{fig:ui-dashboard}}
   \hfill
-  \subfloat[Farmer profile page showing account information and verification badges.]{\includegraphics[width=0.48\textwidth]{{"thesis/profile.png"}}\label{fig:ui-profile}}
+  \subfloat[Farmer profile page showing account information and verification badges.]{\includegraphics[width=0.48\textwidth]{images/profile.png}\label{fig:ui-profile}}
   \caption{Farmer dashboard and profile management.}
   \label{fig:ui-farmer-portal}
 \end{figure}
 
-Farmers can update their profile information at any time, using the edit interface shown in Figure~\ref{fig:ui-rename}. The core feature is submitting seed photos—farmers take pictures of the front and back of seed packaging using their phone or computer camera, as shown in Figure~\ref{fig:ui-adding-seed} (with the full upload flow compiled in Figure~\ref{fig:ui-capture-workflow}).
+Farmers can update their profile information at any time, using the edit interface shown in Figure~\ref{fig:ui-rename}. The core feature is submitting seed photos---farmers take pictures of the front and back of seed packaging using their phone or computer camera, as shown in Figure~\ref{fig:ui-adding-seed} (with the full upload flow compiled in Figure~\ref{fig:ui-capture-workflow}).
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Profile editing interface.]{\includegraphics[width=0.48\textwidth]{{"thesis/rename.png"}}\label{fig:ui-rename}}
+  \subfloat[Profile editing interface.]{\includegraphics[width=0.48\textwidth]{images/rename.png}\label{fig:ui-rename}}
   \hfill
-  \subfloat[Mobile-friendly camera interface for uploading front and back seed packaging photos.]{\includegraphics[width=0.48\textwidth]{{"thesis/adding seed image.png"}}\label{fig:ui-adding-seed}}
+  \subfloat[Mobile-friendly camera interface for uploading front and back seed packaging photos.]{\includegraphics[width=0.48\textwidth]{images/adding-seed-image.png}\label{fig:ui-adding-seed}}
   \caption{Account settings and seed photo submission.}
   \label{fig:ui-capture-workflow}
 \end{figure}
@@ -383,9 +383,9 @@ After submitting photos, the system analyzes them and returns a detailed report.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Verification result for genuine seeds showing extracted physical parameters.]{\includegraphics[width=0.48\textwidth]{{"thesis/geniune.png"}}\label{fig:ui-genuine}}
+  \subfloat[Verification result for genuine seeds showing extracted physical parameters.]{\includegraphics[width=0.48\textwidth]{images/genuine.png}\label{fig:ui-genuine}}
   \hfill
-  \subfloat[Alert for counterfeit seeds with confidence breakdown and reporting instructions.]{\includegraphics[width=0.48\textwidth]{{"thesis/counterfeit.png"}}\label{fig:ui-counterfeit}}
+  \subfloat[Alert for counterfeit seeds with confidence breakdown and reporting instructions.]{\includegraphics[width=0.48\textwidth]{images/counterfeit.png}\label{fig:ui-counterfeit}}
   \caption{Seed quality assessment results.}
   \label{fig:ui-verification-results}
 \end{figure}
@@ -396,9 +396,9 @@ If a farmer encounters fake or damaged seeds, they can file a formal complaint. 
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Complaint form where farmers describe the problem and adjust severity.]{\includegraphics[width=0.48\textwidth]{{"thesis/complains.png"}}\label{fig:ui-complaints-form}}
+  \subfloat[Complaint form where farmers describe the problem and adjust severity.]{\includegraphics[width=0.48\textwidth]{images/complains.png}\label{fig:ui-complaints-form}}
   \hfill
-  \subfloat[Farmer's complaint tracking page showing status updates.]{\includegraphics[width=0.48\textwidth]{{"thesis/complains queue.png"}}\label{fig:ui-complaints-queue}}
+  \subfloat[Farmer's complaint tracking page showing status updates.]{\includegraphics[width=0.48\textwidth]{images/complains-queue.png}\label{fig:ui-complaints-queue}}
   \caption{Complaint filing and tracking for farmers.}
   \label{fig:ui-grievance}
 \end{figure}
@@ -407,9 +407,9 @@ Agricultural officers have a separate dashboard showing all complaints in their 
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Officer dashboard showing regional complaint summary and workload metrics.]{\includegraphics[width=0.48\textwidth]{{"thesis/officer dashboard.png"}}\label{fig:ui-officer-dashboard}}
+  \subfloat[Officer dashboard showing regional complaint summary and workload metrics.]{\includegraphics[width=0.48\textwidth]{images/officer-dashboard.png}\label{fig:ui-officer-dashboard}}
   \hfill
-  \subfloat[Investigation queue that officers can filter and sort by severity and location.]{\includegraphics[width=0.48\textwidth]{{"thesis/investication queue.png"}}\label{fig:ui-investigation-queue}}
+  \subfloat[Investigation queue that officers can filter and sort by severity and location.]{\includegraphics[width=0.48\textwidth]{images/investigation-queue.png}\label{fig:ui-investigation-queue}}
   \caption{Agricultural officer portal and complaint queue.}
   \label{fig:ui-officer-portal}
 \end{figure}
@@ -419,7 +419,7 @@ When officers click on a specific complaint, they can see the farmer's photos, r
 \begin{figure}[htbp]
   \centering
   \begin{adjustbox}{max width=0.85\textwidth}
-    \includegraphics[width=\textwidth]{{"thesis/complains officer.png"}}
+    \includegraphics[width=\textwidth]{images/complains-officer.png}
   \end{adjustbox}
   \caption{Officer view of a complaint with farmer evidence and status update options.}
   \label{fig:ui-complaint-officer}
@@ -431,9 +431,9 @@ System administrators have a complete dashboard showing real-time system health:
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Admin telemetry dashboard showing system performance metrics in real time.]{\includegraphics[width=0.48\textwidth]{{"thesis/Admin Dashboard.png"}}\label{fig:ui-admin-dashboard}}
+  \subfloat[Admin telemetry dashboard showing system performance metrics in real time.]{\includegraphics[width=0.48\textwidth]{images/admin-dashboard.png}\label{fig:ui-admin-dashboard}}
   \hfill
-  \subfloat[User management interface for creating officers and monitoring farmer accounts.]{\includegraphics[width=0.48\textwidth]{{"thesis/user management.png"}}\label{fig:ui-user-mgmt}}
+  \subfloat[User management interface for creating officers and monitoring farmer accounts.]{\includegraphics[width=0.48\textwidth]{images/user-management.png}\label{fig:ui-user-mgmt}}
   \caption{Administrator dashboard and user management.}
   \label{fig:ui-admin-governance}
 \end{figure}
@@ -442,9 +442,9 @@ The platform also provides detailed analytics showing verification trends over t
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Analytics dashboard showing verification trends and fake seed detection rates over time.]{\includegraphics[width=0.48\textwidth]{{"thesis/reports and analytics.png"}}\label{fig:ui-reports-1}}
+  \subfloat[Analytics dashboard showing verification trends and fake seed detection rates over time.]{\includegraphics[width=0.48\textwidth]{images/reports-and-analytics.png}\label{fig:ui-reports-1}}
   \hfill
-  \subfloat[Regional analysis showing which districts have the most counterfeit seed problems.]{\includegraphics[width=0.48\textwidth]{{"thesis/reports and analytics 2nd.png"}}\label{fig:ui-reports-2}}
+  \subfloat[Regional analysis showing which districts have the most counterfeit seed problems.]{\includegraphics[width=0.48\textwidth]{images/reports-and-analytics-2nd.png}\label{fig:ui-reports-2}}
   \caption{System analytics and reporting dashboards.}
   \label{fig:ui-analytics}
 \end{figure}

@@ -183,7 +183,7 @@
 % Bibliography
 % -------------------------------------------------
 \usepackage[style=ieee, backend=biber]{biblatex}
-\addbibresource{references.bib}
+\addbibresource{bibliography/references.bib}
 \DefineBibliographyStrings{english}{
   bibliography = {REFERENCES},
 }
@@ -192,7 +192,7 @@
 % Hyperlinks (Must be loaded last)
 % -------------------------------------------------
 \usepackage{xurl}
-\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black]{hyperref}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black, hypertexnames=false]{hyperref}
 
 \makeatletter
 % Wrap list and bibliography commands to disable first-paragraph indentation inside them
@@ -216,7 +216,7 @@
 
 % TITLE PAGE
 \begin{titlepage}
-    \input{title-page.tex}
+    \input{chapters/title-page.tex}
 \end{titlepage}
 
 \clearpage
@@ -230,12 +230,12 @@
 \newpage
 \thispagestyle{empty}
 % DEDICATION
-\input{dedication.tex}
+\input{chapters/dedication.tex}
 
 \newpage
 \thispagestyle{empty}
 % Inside Title Page
-\input{title-page.tex}
+\input{chapters/title-page.tex}
 
 % Set Roman page numbering
 \pagenumbering{roman}
@@ -248,7 +248,7 @@
 % \begin{center}
 %     {\fontsize{16}{19}\selectfont\textbf{BONAFIDE CERTIFICATE}}
 % \end{center}
-\input{bonafide-certificate.tex}
+\input{chapters/bonafide-certificate.tex}
 
 
 
@@ -259,25 +259,25 @@
 % \begin{center}
 %     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
 % \end{center}
-\input{decleration-Joymangol}
+\input{chapters/decleration-Joymangol.tex}
 
 \newpage
 % \begin{center}
 %     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
 % \end{center}
-\input{decleration-Nilambar}
+\input{chapters/decleration-Nilambar.tex}
 
 \newpage
 % \begin{center}
 %     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
 % \end{center}
-\input{decleration-Yaiphaba}
+\input{chapters/decleration-Yaiphaba.tex}
 
 \newpage
 % \begin{center}
 %     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
 % \end{center}
-\input{decleration-Dayananda}
+\input{chapters/decleration-Dayananda.tex}
 % ---------------------------------------------------
 
 % ---------------------ACKNOWLEDGEMENT--------------
@@ -287,7 +287,7 @@
 % \begin{center}
 %     {\fontsize{16}{19}\selectfont\bfseries ACKNOWLEDGEMENT}
 % \end{center}
-\input{acknowledgement.tex}
+\input{chapters/acknowledgement.tex}
 % -------------------------------------------------
 
 % ------------------ABSTRACT------------------------
@@ -297,7 +297,7 @@
 \begin{center}
     {\fontsize{16}{19}\selectfont\bfseries ABSTRACT}
 \end{center}
-\input{abstract.tex}
+\input{chapters/abstract.tex}
 % --------------------------------------------------
 
 
@@ -325,7 +325,7 @@
 \addcontentsline{toc}{chapter}{Symbols and Acronyms}
 \renewcommand{\nomname}{Symbols and Acronyms}
 \markboth{Symbols and Acronyms}{Symbols and Acronyms}
-\input{abbreviations.tex} % This loads the list of \nomenclature entries
+\input{chapters/abbreviations.tex} % This loads the list of \nomenclature entries
 \printnomenclature
 % --------------------------------------------------------
 
@@ -337,53 +337,53 @@
 
 % -----------------CHAPTER-1-----------------
 \chapter{Introduction}
-\input{chapter1.tex}
+\input{chapters/chapter1.tex}
 % ----------------------------------
 
 % % -----------------CHAPTER-2-----------------
 \chapter{Literature Review}
-\input{chapter2.tex}
+\input{chapters/chapter2.tex}
 % % ----------------------------------
 
 % % -----------------CHAPTER-3-----------------
 \chapter{System Design and Architecture}
-\input{chapter3.tex}
+\input{chapters/chapter3.tex}
 % % % ----------------------------------
 
 % % % -----------------CHAPTER-4-----------------
 % \chapter{Deep Learning Model for Paddy Seed Quality Assessment}
-% \input{chapter4.tex}
+% \input{chapters/chapter4.tex}
 % % ----------------------------------
 
 % % -----------------CHAPTER-5-----------------
 \chapter{Model Serving API}
-\input{chapter5.tex}
+\input{chapters/chapter5.tex}
 % % ----------------------------------
 
 % % -----------------CHAPTER-6-----------------
 \chapter{Backend System Architecture and Implementation}
-\input{chapter6.tex}
+\input{chapters/chapter6.tex}
 % ----------------------------------
 
 % % -----------------CHAPTER-7-----------------
 \chapter{Frontend System Architecture and Implementation}
-\input{chapter7.tex}
+\input{chapters/chapter7.tex}
 % ----------------------------------
 
 % % -----------------CHAPTER-8-----------------
  \chapter{System Integration}
- \input{chapter8.tex}
+ \input{chapters/chapter8.tex}
 % ----------------------------------
 
 % % -----------------CHAPTER-9-----------------
  \chapter{Results and Evaluation}
- \input{chapter9.tex}
+ \input{chapters/chapter9.tex}
 % ----------------------------------
 
 
 % % -----------------CHAPTER-10-----------------
  \chapter{Conclusion And Future Work}
- \input{conclusion.tex}
+ \input{chapters/conclusion.tex}
 % ----------------------------------
 
 
@@ -398,23 +398,23 @@
 % \appendix
 % \chapter{Source Code}
 % \label{app:source-code}
-% \input{appendix-a.tex}
+% \input{appendices/appendix-a.tex}
 
 % \chapter{API Documentation}
 % \label{app:api-doc}
-% \input{appendix-b.tex}
+% \input{appendices/appendix-b.tex}
 
 % \chapter{Database Schema and ERD}
 % \label{app:db-schema}
-% \input{appendix-c.tex}
+% \input{appendices/appendix-c.tex}
 
 % \chapter{Model Configuration and DUS Database}
 % \label{app:model-config}
-% \input{appendix-d.tex}
+% \input{appendices/appendix-d.tex}
 
 % \chapter{Deployment Guide}
 % \label{app:deployment}
-% \input{appendix-e.tex}
+% \input{appendices/appendix-e.tex}
 
 \end{document}
     
