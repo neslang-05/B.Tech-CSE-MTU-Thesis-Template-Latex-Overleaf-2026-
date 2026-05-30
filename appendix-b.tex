@@ -20,9 +20,9 @@ Executes real-time visual seed classification and extracts physical DUS paramete
     \addlinespace
     \textbf{Success Response (200)} & \texttt{application/json} & Returns classified status, confidence, and DUS geometry. \\
     \addlinespace
-    \textbf{Sample JSON Payload} & Object & \texttt{\{"QualityClass": "Healthy", "Confidence": 92.15, "DUSParameters": \{"Length": 9.4, "Width": 2.8, "AspectRatio": 3.36\}\}} \\
+    \textbf{Sample JSON Payload} & Object & \texttt{\textbraceleft"QualityClass": "Healthy", "Confidence": 92.15, "DUSParameters": \textbraceleft"Length": 9.4, "Width": 2.8, "AspectRatio": 3.36\textbraceright\textbraceright} \\
     \addlinespace
-    \textbf{Error Response (400)} & \texttt{application/json} & \texttt{\{"detail": "Unsupported file format"\}} (Non-image uploads). \\
+    \textbf{Error Response (400)} & \texttt{application/json} & \texttt{\textbraceleft"detail": "Unsupported file format"\textbraceright} (Non-image uploads). \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -47,7 +47,7 @@ Accepts multipart uploads from client browsers, forwards imagery to the inferenc
     \addlinespace
     \textbf{Success Response (201)} & \texttt{application/json} & Returns committed database record ID alongside AI verdict. \\
     \addlinespace
-    \textbf{Sample JSON Payload} & Object & \texttt{\{"recordId": "a89d3c-...", "qualityClass": "Healthy", "confidence": 92.15, "isGenuine": true\}} \\
+    \textbf{Sample JSON Payload} & Object & \texttt{\textbraceleft"recordId": "a89d3c-...", "qualityClass": "Healthy", "confidence": 92.15, "isGenuine": true\textbraceright} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -66,9 +66,9 @@ Submits formal farmer grievances regarding counterfeit batches or observed germi
     \midrule
     \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer security context required for auditing. \\
     \addlinespace
-    \textbf{Request Body (JSON)} & \texttt{ComplaintCreationDto} & \texttt{\{"batchId": "B-99812", "narrative": "Zero germination", "severity": 4\}} \\
+    \textbf{Request Body (JSON)} & \texttt{ComplaintCreationDto} & \texttt{\textbraceleft"batchId": "B-99812", "narrative": "Zero germination", "severity": 4\textbraceright} \\
     \addlinespace
-    \textbf{Success Response (201)} & \texttt{application/json} & \texttt{\{"complaintId": "C-1049", "status": "Open", "submittedAt": "2026-05-17T09:00:00Z"\}} \\
+    \textbf{Success Response (201)} & \texttt{application/json} & \texttt{\textbraceleft"complaintId": "C-1049", "status": "Open", "submittedAt": "2026-05-17T09:00:00Z"\textbraceright} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -106,11 +106,11 @@ Validates user credentials and issues cryptographically signed JWT pairs.
     \toprule
     \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
     \midrule
-    \textbf{Request Body (JSON)} & \texttt{LoginRequestDto} & \texttt{\{"email": "farmer@manipur.gov.in", "password": "SecurePassword123!"\}} \\
+    \textbf{Request Body (JSON)} & \texttt{LoginRequestDto} & \texttt{\textbraceleft"email": "farmer@manipur.gov.in", "password": "SecurePassword123!"\textbraceright} \\
     \addlinespace
-    \textbf{Success Response (200)} & \texttt{application/json} & \texttt{\{"accessToken": "eyJhbGciOi...", "refreshToken": "d8e9a...", "user": \{"role": "Farmer"\}\}} \\
+    \textbf{Success Response (200)} & \texttt{application/json} & \texttt{\textbraceleft"accessToken": "eyJhbGciOi...", "refreshToken": "d8e9a...", "user": \textbraceleft"role": "Farmer"\textbraceright\textbraceright} \\
     \addlinespace
-    \textbf{Error Response (401)} & \texttt{application/json} & \texttt{\{"message": "Invalid email or authentication credentials"\}} \\
+    \textbf{Error Response (401)} & \texttt{application/json} & \texttt{\textbraceleft"message": "Invalid email or authentication credentials"\textbraceright} \\
     \bottomrule
   \end{tabularx}
 \end{table}
