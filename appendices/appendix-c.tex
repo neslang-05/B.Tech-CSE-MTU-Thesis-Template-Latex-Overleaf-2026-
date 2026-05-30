@@ -14,24 +14,24 @@ Stores authentication credentials, role assignments, and regional jurisdiction m
   \caption{Data Dictionary for \texttt{dbo.Users} Table}
   \label{tab:db-users}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|c|X|}
+    \hline
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
-    \midrule
+    \hline
     \texttt{Id} & \texttt{NVARCHAR(450)} & No & Primary Key. Cryptographic GUID string. \\
-    \addlinespace
+
     \texttt{Email} & \texttt{NVARCHAR(256)} & No & Unique Index. User login email address. \\
-    \addlinespace
+
     \texttt{PasswordHash} & \texttt{NVARCHAR(MAX)} & No & BCrypt / PBKDF2 hashed password digest. \\
-    \addlinespace
+
     \texttt{Role} & \texttt{NVARCHAR(32)} & No & RBAC Enum: \texttt{Farmer}, \texttt{Officer}, or \texttt{Admin}. \\
-    \addlinespace
+
     \texttt{District} & \texttt{NVARCHAR(128)} & Yes & Regional agricultural district assignment in Manipur. \\
-    \addlinespace
+
     \texttt{CreatedAt} & \texttt{DATETIME2} & No & UTC timestamp of user onboarding. Default \texttt{GETUTCDATE()}. \\
-    \addlinespace
+
     \texttt{IsActive} & \texttt{BIT} & No & Boolean flag indicating active login eligibility. Default 1. \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -43,28 +43,28 @@ Maintains an immutable historical record of all seed imagery submitted for AI ev
   \caption{Data Dictionary for \texttt{dbo.VerificationHistories} Table}
   \label{tab:db-verifications}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|c|X|}
+    \hline
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
-    \midrule
+    \hline
     \texttt{Id} & \texttt{NVARCHAR(450)} & No & Primary Key. Unique transaction GUID. \\
-    \addlinespace
+
     \texttt{UserId} & \texttt{NVARCHAR(450)} & No & Foreign Key referencing \texttt{dbo.Users(Id)}. \\
-    \addlinespace
+
     \texttt{BatchNumber} & \texttt{NVARCHAR(64)} & Yes & Commercial seed lot identifier extracted via OCR. \\
-    \addlinespace
+
     \texttt{PredictedClass} & \texttt{NVARCHAR(64)} & No & Model verdict: \texttt{Healthy}, \texttt{Damaged}, or \texttt{Fake}. \\
-    \addlinespace
+
     \texttt{ConfidenceScore} & \texttt{FLOAT} & No & Model certainty percentage ($0.00 - 100.00$). \\
-    \addlinespace
+
     \texttt{ExtractedLength} & \texttt{FLOAT} & Yes & Physical grain length measurement in millimeters. \\
-    \addlinespace
+
     \texttt{ExtractedWidth} & \texttt{FLOAT} & Yes & Physical grain width measurement in millimeters. \\
-    \addlinespace
+
     \texttt{ImageUrl} & \texttt{NVARCHAR(512)} & No & Azure Blob Storage secure path to uploaded sample image. \\
-    \addlinespace
+
     \texttt{CreatedAt} & \texttt{DATETIME2} & No & UTC timestamp of inference execution. \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -76,28 +76,28 @@ Captures formal farmer grievances and tracks investigation workflows by assigned
   \caption{Data Dictionary for \texttt{dbo.ProductComplaints} Table}
   \label{tab:db-complaints}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|c|X|}
+    \hline
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
-    \midrule
+    \hline
     \texttt{Id} & \texttt{NVARCHAR(450)} & No & Primary Key. Unique grievance ID. \\
-    \addlinespace
+
     \texttt{UserId} & \texttt{NVARCHAR(450)} & No & Foreign Key referencing \texttt{dbo.Users(Id)}. \\
-    \addlinespace
+
     \texttt{BatchNumber} & \texttt{NVARCHAR(64)} & No & Seed lot identifier under dispute. Indexed for rapid joins. \\
-    \addlinespace
+
     \texttt{Narrative} & \texttt{NVARCHAR(MAX)} & No & Detailed description of crop failure or physical anomalies. \\
-    \addlinespace
+
     \texttt{Severity} & \texttt{INT} & No & User-assigned severity index ($1 - 5$). \\
-    \addlinespace
+
     \texttt{Status} & \texttt{NVARCHAR(32)} & No & Workflow State: \texttt{Open}, \texttt{Investigating}, or \texttt{Resolved}. \\
-    \addlinespace
+
     \texttt{OfficerId} & \texttt{NVARCHAR(450)} & Yes & Foreign Key to \texttt{dbo.Users(Id)} for investigating officer. \\
-    \addlinespace
+
     \texttt{ResolutionNotes} & \texttt{NVARCHAR(MAX)} & Yes & Official investigation summary upon status closure. \\
-    \addlinespace
+
     \texttt{CreatedAt} & \texttt{DATETIME2} & No & UTC timestamp of grievance filing. \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -109,19 +109,19 @@ Aggregates automated warnings and crowdsourced failure counts to flag suspect co
   \caption{Data Dictionary for \texttt{dbo.BatchRiskRegistries} Table}
   \label{tab:db-riskregistry}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l c X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|c|X|}
+    \hline
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
-    \midrule
+    \hline
     \texttt{BatchNumber} & \texttt{NVARCHAR(64)} & No & Primary Key. Unique seed lot identifier. \\
-    \addlinespace
+
     \texttt{RiskLevel} & \texttt{NVARCHAR(32)} & No & Evaluated threat: \texttt{Low}, \texttt{Moderate}, \texttt{High}, or \texttt{Critical}. \\
-    \addlinespace
+
     \texttt{FailureReportsCount} & \texttt{INT} & No & Cumulative count of filed grievances against this batch. \\
-    \addlinespace
+
     \texttt{SupplierName} & \texttt{NVARCHAR(256)} & Yes & Registered manufacturer or distributor name. \\
-    \addlinespace
+
     \texttt{LastReportedAt} & \texttt{DATETIME2} & No & UTC timestamp of the most recent failure occurrence. \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}

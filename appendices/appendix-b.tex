@@ -10,20 +10,20 @@ Executes real-time visual seed classification and extracts physical DUS paramete
   \caption{Specification for \texttt{POST /predict} Endpoint}
   \label{tab:api-predict}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
     \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \midrule
+    \hline
     \textbf{Content-Type} & \texttt{multipart/form-data} & Requires binary file upload stream. \\
-    \addlinespace
+
     \textbf{Payload Attribute} & \texttt{file} (Binary Stream) & JPEG or PNG seed sample imagery ($224 \times 224$ px optimized). \\
-    \addlinespace
+
     \textbf{Success Response (200)} & \texttt{application/json} & Returns classified status, confidence, and DUS geometry. \\
-    \addlinespace
+
     \textbf{Sample JSON Payload} & Object & \texttt{\textbraceleft"QualityClass": "Healthy", "Confidence": 92.15, "DUSParameters": \textbraceleft"Length": 9.4, "Width": 2.8, "AspectRatio": 3.36\textbraceright\textbraceright} \\
-    \addlinespace
+
     \textbf{Error Response (400)} & \texttt{application/json} & \texttt{\textbraceleft"detail": "Unsupported file format"\textbraceright} (Non-image uploads). \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -37,18 +37,18 @@ Accepts multipart uploads from client browsers, forwards imagery to the inferenc
   \caption{Specification for \texttt{POST /api/v1/verification/submit} Endpoint}
   \label{tab:api-verifysubmit}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
     \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \midrule
+    \hline
     \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Valid access token associated with registered farmer account. \\
-    \addlinespace
+
     \textbf{Payload} & \texttt{multipart/form-data} & \texttt{frontImage} (Binary) and \texttt{backImage} (Binary). \\
-    \addlinespace
+
     \textbf{Success Response (201)} & \texttt{application/json} & Returns committed database record ID alongside AI verdict. \\
-    \addlinespace
+
     \textbf{Sample JSON Payload} & Object & \texttt{\textbraceleft"recordId": "a89d3c-...", "qualityClass": "Healthy", "confidence": 92.15, "isGenuine": true\textbraceright} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -60,16 +60,16 @@ Submits formal farmer grievances regarding counterfeit batches or observed germi
   \caption{Specification for \texttt{POST /api/v1/complaints} Endpoint}
   \label{tab:api-complaintpost}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
     \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \midrule
+    \hline
     \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer security context required for auditing. \\
-    \addlinespace
+
     \textbf{Request Body (JSON)} & \texttt{ComplaintCreationDto} & \texttt{\textbraceleft"batchId": "B-99812", "narrative": "Zero germination", "severity": 4\textbraceright} \\
-    \addlinespace
+
     \textbf{Success Response (201)} & \texttt{application/json} & \texttt{\textbraceleft"complaintId": "C-1049", "status": "Open", "submittedAt": "2026-05-17T09:00:00Z"\textbraceright} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -81,16 +81,16 @@ Retrieves complete audit histories and evidence artifacts for an assigned grieva
   \caption{Specification for \texttt{GET /api/v1/complaints/\{id\}} Endpoint}
   \label{tab:api-complaintget}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
     \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \midrule
+    \hline
     \textbf{Path Parameter} & \texttt{id} (GUID / String) & Unique identifier assigned to the grievance record. \\
-    \addlinespace
+
     \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer who created record or assigned Agricultural Officer. \\
-    \addlinespace
+
     \textbf{Success Response (200)} & \texttt{application/json} & Returns complete audit details and current investigation milestones. \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
 
@@ -102,15 +102,15 @@ Validates user credentials and issues cryptographically signed JWT pairs.
   \caption{Specification for \texttt{POST /api/v1/auth/login} Endpoint}
   \label{tab:api-authlogin}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l l X @{}}
-    \toprule
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
     \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \midrule
+    \hline
     \textbf{Request Body (JSON)} & \texttt{LoginRequestDto} & \texttt{\textbraceleft"email": "farmer@manipur.gov.in", "password": "SecurePassword123!"\textbraceright} \\
-    \addlinespace
+
     \textbf{Success Response (200)} & \texttt{application/json} & \texttt{\textbraceleft"accessToken": "eyJhbGciOi...", "refreshToken": "d8e9a...", "user": \textbraceleft"role": "Farmer"\textbraceright\textbraceright} \\
-    \addlinespace
+
     \textbf{Error Response (401)} & \texttt{application/json} & \texttt{\textbraceleft"message": "Invalid email or authentication credentials"\textbraceright} \\
-    \bottomrule
+    \hline
   \end{tabularx}
 \end{table}
