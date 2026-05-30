@@ -68,11 +68,11 @@ specific set of responsibilities. The core responsibilities and components encap
   \caption{Backend Architectural Layers and Responsibilities}
   \label{tab:backend_layers}
   \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{\textwidth}{@{} l >{\raggedright\arraybackslash}X @{}}
+  \begin{tabularx}{\textwidth}{@{} l X @{}}
     \toprule
     \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
     \midrule
-    \textbf{Domain Layer} & This is where we define the heart of our application: core entities like \texttt{User} and \texttt{VerificationHistory}, value objects, and error types. Importantly, this layer has zero dependencies on external frameworks or services—it's pure business logic. \\
+    \textbf{Domain Layer} & This is where we define the heart of our application: core entities like \texttt{User} and \texttt{VerificationHistory}, value objects, and error types. Importantly, this layer has zero dependencies on external frameworks or services---it's pure business logic. \\
     \addlinespace
     \textbf{Application Layer} & Think of this as the conductor of our application. It orchestrates how different business operations flow together using application services (\texttt{VerificationService}, \texttt{UserService}), data transfer objects (DTOs) for communication, mapping configurations, and validation rules. It depends only on the Domain layer. \\
     \addlinespace
