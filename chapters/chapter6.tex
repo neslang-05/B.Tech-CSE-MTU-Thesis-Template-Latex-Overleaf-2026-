@@ -2,13 +2,7 @@
 % CHAPTER 6: BACKEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
 % AgriVerify --- AI-Powered Fake Seed Detection System
 % ============================================================
-
-% NOTE: Make sure to add \usepackage{enumitem} to your main.tex preamble 
-% and \setlist{noitemsep} to apply this tightly spaced styling globally.
-% Alternatively, [noitemsep] has been added locally below to each list environment.
-
 The backend of the AgriVerify system is responsible for managing business logic, AI model integration, authentication, database operations, and communication between frontend clients and cloud services. The system was developed using ASP.NET Core Web API following the Clean Architecture approach to achieve modularity, maintainability, and scalability.
-
 The backend integrates multiple services including SQL Server, Azure AI services, JWT authentication, and cloud storage. The architecture separates core business logic from infrastructure and presentation concerns, enabling easier maintenance and future system expansion.
 
 % ============================================================
@@ -20,7 +14,6 @@ The backend follows a layered architecture based on Clean Architecture principle
 
 \begin{figure}[H]
 \centering
-
 \begin{tikzpicture}[
 node distance=2cm,
 every node/.style={
@@ -32,30 +25,22 @@ align=center,
 font=\small
 }
 ]
-
 \node[fill=blue!10] (api) {Presentation Layer\\REST APIs and Middleware};
-
 \node[fill=green!10, below of=api] (application) {Application Layer\\Services, DTOs and Validation};
-
 \node[fill=yellow!10, below of=application] (domain) {Domain Layer\\Entities and Interfaces};
-
 \node[fill=orange!10, below of=domain] (infra) {Infrastructure Layer\\Database and External Services};
-
 \draw[->, thick] (api) -- (application);
 \draw[->, thick] (application) -- (domain);
 \draw[->, thick] (infra) -- (domain);
 \draw[->, thick] (infra.west) -- ++(-1.2cm,0) |- (application.west);
 
 \end{tikzpicture}
-
 \caption{Backend Clean Architecture Layers}
 \label{fig:backend-clean-architecture}
-
 \end{figure}
 
 The layered architecture improves:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item Separation of concerns
     \item Code maintainability
     \item Scalability
@@ -81,65 +66,35 @@ The backend uses modern technologies for API development, authentication, AI int
 \hline
 \textbf{Technology} & \textbf{Purpose} \\
 \hline
-
 ASP.NET Core Web API & Backend API framework \\
-
 \hline
-
 C\char35{} and .NET 8 & Backend programming environment \\
-
 \hline
-
 Entity Framework Core & Database ORM and migrations \\
-
 \hline
-
 SQL Server & Relational database management \\
-
 \hline
-
 JWT Authentication & Secure user authentication \\
-
 \hline
-
 ASP.NET Core Identity & User and role management \\
-
 \hline
-
 Azure Custom Vision & Seed authenticity classification \\
-
 \hline
-
 Azure OCR & Text extraction from seed packets \\
-
 \hline
-
 Azure OpenAI & AI-generated explanations \\
-
 \hline
-
 Azure Blob Storage & Cloud image storage \\
-
 \hline
-
 FluentValidation & Input validation \\
-
 \hline
-
 AutoMapper & DTO mapping \\
-
 \hline
-
 Swagger & API documentation \\
-
 \hline
-
 Serilog & Request logging and monitoring \\
-
 \hline
-
 \end{tabularx}
-
 \end{table}
 
 % ============================================================
@@ -160,41 +115,23 @@ The backend source code is divided into multiple layers and modules to maintain 
 \hline
 \textbf{Folder / Layer} & \textbf{Purpose} \\
 \hline
-
 Domain & Business entities and interfaces \\
-
 \hline
-
 Application & Services, DTOs and validation \\
-
 \hline
-
 Infrastructure & Database and cloud integrations \\
-
 \hline
-
 Presentation & API controllers and middleware \\
-
 \hline
-
 Persistence & Repositories and migrations \\
-
 \hline
-
 Services & AI and Azure integrations \\
-
 \hline
-
 Configurations & Application configuration files \\
-
 \hline
-
 Middleware & Authentication and exception handling \\
-
 \hline
-
 \end{tabularx}
-
 \end{table}
 
 % ============================================================
@@ -205,10 +142,8 @@ Middleware & Authentication and exception handling \\
 The Domain Layer contains the core business entities and contracts of the application. This layer is independent from external frameworks and infrastructure components.
 
 \subsection{Core Entities}
-
 The major entities in the system include:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item User
     \item Farmer
     \item Officer
@@ -218,21 +153,17 @@ The major entities in the system include:
     \item Complaint
     \item AuditLog
 \end{itemize}
-
 These entities represent the primary agricultural and administrative components of the platform.
 
 \subsection{Interfaces}
-
 Interfaces define contracts between layers and improve abstraction.
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item IRepository
     \item IVerificationService
     \item IAuthenticationService
     \item IComplaintService
     \item IAnalyticsService
 \end{itemize}
-
 This approach improves modularity and testing flexibility.
 
 % ============================================================
@@ -243,21 +174,17 @@ This approach improves modularity and testing flexibility.
 The Application Layer coordinates business workflows and request processing.
 
 \subsection{Application Services}
-
 The system includes several services responsible for handling business operations:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item Verification Service
     \item Authentication Service
     \item Complaint Service
     \item Analytics Service
     \item Admin Service
 \end{itemize}
-
 These services manage AI processing, validation, database interaction, and response generation.
 
 \subsection{DTOs}
-
 Data Transfer Objects (DTOs) are used for request and response communication between layers. The primary DTOs utilized in the system and their respective purposes are listed in Table~\ref{tab:important-dtos}.
 
 \begin{table}[htbp]
@@ -271,51 +198,32 @@ Data Transfer Objects (DTOs) are used for request and response communication bet
 \hline
 \textbf{DTO} & \textbf{Purpose} \\
 \hline
-
 VerificationRequest & Seed verification request \\
-
 \hline
-
 VerificationResponse & AI verification result \\
-
 \hline
-
 LoginRequest & User login request \\
-
 \hline
-
 AuthResponse & JWT authentication response \\
-
 \hline
-
 CreateComplaintRequest & Complaint submission \\
-
 \hline
-
 OfficerDto & Officer information \\
-
 \hline
-
 AdminDashboardResponse & Dashboard statistics \\
-
 \hline
-
 \end{tabularx}
-
 \end{table}
 
 \subsection{Validation}
-
 FluentValidation is integrated into the application layer to validate:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item File formats
     \item Image sizes
     \item Email structure
     \item Password complexity
     \item Required fields
 \end{itemize}
-
 This reduces invalid requests and improves system reliability.
 
 % ============================================================
@@ -326,10 +234,8 @@ This reduces invalid requests and improves system reliability.
 The Infrastructure Layer manages database operations, external integrations, and cloud services.
 
 \subsection{Database Management}
-
 Entity Framework Core is used for:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item Database migrations
     \item Entity mapping
     \item Relationship configuration
@@ -338,10 +244,8 @@ Entity Framework Core is used for:
 \end{itemize}
 
 \subsection{Repository Pattern}
-
 The repository pattern abstracts database operations from business logic.
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item Generic Repository
     \item Seed Repository
     \item Complaint Repository
@@ -349,7 +253,6 @@ The repository pattern abstracts database operations from business logic.
 \end{itemize}
 
 \subsection{AI and Cloud Integrations}
-
 The system integrates multiple Azure services for AI processing and storage, as detailed in Table~\ref{tab:external-services}.
 
 \begin{table}[htbp]
@@ -363,29 +266,17 @@ The system integrates multiple Azure services for AI processing and storage, as 
 \hline
 \textbf{Service} & \textbf{Purpose} \\
 \hline
-
 Azure Custom Vision & Seed authenticity classification \\
-
 \hline
-
 Azure OCR & Text extraction from seed packets \\
-
 \hline
-
 Azure OpenAI & AI-generated recommendations \\
-
 \hline
-
 Azure Blob Storage & Cloud image storage \\
-
 \hline
-
 ResNet Classifier & Paddy seed classification \\
-
 \hline
-
 \end{tabularx}
-
 \end{table}
 
 % ============================================================
@@ -397,7 +288,6 @@ The backend database maintains relationships between users, seed batches, verifi
 
 \begin{figure}[H]
 \centering
-% tikz libraries already loaded in main.tex preamble
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     entity/.style={
@@ -436,7 +326,6 @@ The backend database maintains relationships between users, seed batches, verifi
     OfficerId \\
     IsActive
 };
-
 \node[entity, right=4cm of users] (profiles) {
     \textbf{Profiles}
     \nodepart{second}
@@ -507,6 +396,8 @@ The backend database maintains relationships between users, seed batches, verifi
 };
 
 % ---- RELATIONSHIPS ----
+\draw[relation] (users) -- node[left]{\scriptsize 1:1} (profiles);
+\draw[relation] (profiles) -- (roles);
 \draw[relation] (users) -- node[left]{\scriptsize 1:N} (verification);
 \draw[relation] (users) -- node[above]{\scriptsize 1:1} (profiles);
 \draw[relation] (users) -- node[above, sloped, pos=0.5]{\scriptsize 1:N} (tokens);
@@ -531,24 +422,20 @@ The backend database maintains relationships between users, seed batches, verifi
     1:N = One-to-Many \quad
     M:N = Many-to-Many
 };
-
 \end{tikzpicture}
 }%
 \caption{Entity Relationship Diagram -- FakeSeedDetection System}
 \label{fig:er-diagram}
-
 \end{figure}
 
 The database schema supports:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item User management
     \item Seed batch tracking
     \item AI verification history
     \item Complaint workflows
     \item Audit logging
 \end{itemize}
-
 Foreign key relationships maintain referential integrity across all entities.
 
 % ============================================================
@@ -559,7 +446,6 @@ Foreign key relationships maintain referential integrity across all entities.
 The Presentation Layer exposes RESTful APIs for frontend communication.
 
 \subsection{API Controllers}
-
 The backend contains multiple API controllers responsible for different system modules. These controllers and their design objectives are summarized in Table~\ref{tab:api-controllers}.
 
 \begin{table}[htbp]
@@ -573,45 +459,28 @@ The backend contains multiple API controllers responsible for different system m
 \hline
 \textbf{Controller} & \textbf{Purpose} \\
 \hline
-
 AuthController & Authentication operations \\
-
 \hline
-
 VerificationController & Seed verification endpoints \\
-
 \hline
-
 ComplaintsController & Complaint management \\
-
 \hline
-
 AdminController & Administrative operations \\
-
 \hline
-
 AnalyticsController & Dashboard analytics \\
-
 \hline
-
 ReferenceDataController & Dropdown reference data \\
-
 \hline
-
 \end{tabularx}
-
 \end{table}
 
 \subsection{Middleware}
-
 Middleware components manage authentication, logging, and centralized exception handling.
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item Authentication Middleware
     \item Request Logging Middleware
     \item Exception Handling Middleware
 \end{itemize}
-
 These middleware components improve system security and monitoring.
 
 % ============================================================
@@ -623,7 +492,6 @@ The backend uses JWT-based authentication with role-based authorization, followi
 
 \begin{figure}[H]
 \centering
-
 \begin{tikzpicture}[
 node distance=2cm,
 every node/.style={
@@ -635,32 +503,22 @@ align=center,
 font=\small
 }
 ]
-
 \node (login) {User Login};
-
 \node (jwt) [below of=login] {JWT Token Generation};
-
 \node (middleware) [below of=jwt] {Authentication Middleware};
-
 \node (api) [below of=middleware] {Protected API Access};
-
 \node (roles) [right of=middleware, xshift=4cm] {Role Validation};
-
 \draw[->, thick] (login) -- (jwt);
 \draw[->, thick] (jwt) -- (middleware);
 \draw[->, thick] (middleware) -- (api);
 \draw[->, thick] (middleware) -- (roles);
-
 \end{tikzpicture}
-
 \caption{JWT Authentication Flow}
 \label{fig:jwt-backend-flow}
-
 \end{figure}
 
 Security features include:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item JWT Bearer authentication
     \item Role-based authorization
     \item Password hashing
@@ -668,10 +526,8 @@ Security features include:
     \item HTTPS communication
     \item Protected API endpoints
 \end{itemize}
-
 The system supports multiple user roles:
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item Farmer
     \item Officer
     \item Administrator
@@ -686,7 +542,6 @@ The seed verification workflow integrates AI classification, OCR analysis, and d
 
 \begin{figure}[H]
 \centering
-
 \begin{tikzpicture}[
 node distance=1.7cm,
 every node/.style={
@@ -698,38 +553,26 @@ align=center,
 font=\small
 }
 ]
-
 \node (upload) {Image Upload};
-
 \node (validation) [below of=upload] {Input Validation};
-
 \node (quality) [below of=validation] {Image Quality Analysis};
-
 \node (ai) [below of=quality] {AI Seed Classification};
-
 \node (ocr) [below of=ai] {OCR Text Extraction};
-
 \node (database) [below of=ocr] {Database Storage};
-
 \node (response) [below of=database] {Verification Response};
-
 \draw[->, thick] (upload) -- (validation);
 \draw[->, thick] (validation) -- (quality);
 \draw[->, thick] (quality) -- (ai);
 \draw[->, thick] (ai) -- (ocr);
 \draw[->, thick] (ocr) -- (database);
 \draw[->, thick] (database) -- (response);
-
 \end{tikzpicture}
-
 \caption{Seed Verification Workflow}
 \label{fig:verification-workflow}
-
 \end{figure}
 
 The workflow includes:
-
-\begin{enumerate}[noitemsep]
+\begin{enumerate}[nosep, topsep=2pt]
     \item Image upload
     \item Request validation
     \item Image quality analysis
@@ -745,41 +588,6 @@ The workflow includes:
 % ============================================================
 
 The backend uses multiple configuration files for different deployment environments.
-
-\begin{itemize}[noitemsep]
+\begin{itemize}[nosep, topsep=2pt]
     \item \texttt{appsettings.json}
-    \item \texttt{appsettings.Development.json}
-    \item \texttt{appsettings.Production.json}
-\end{itemize}
-
-These files manage:
-
-\begin{itemize}[noitemsep]
-    \item Database connections
-    \item JWT settings
-    \item Azure credentials
-    \item Logging configuration
-    \item API endpoints
-\end{itemize}
-
-Application startup is configured through \texttt{Program.cs}, which initializes:
-
-\begin{itemize}[noitemsep]
-    \item Database services
-    \item Authentication services
-    \item Dependency injection
-    \item Middleware pipeline
-    \item Swagger documentation
-    \item Logging services
-\end{itemize}
-
-% ============================================================
-\section{Summary}
-\label{sec:backend-summary}
-% ============================================================
-
-This chapter presented the backend architecture and implementation of the AgriVerify system. The backend was developed using ASP.NET Core Web API following the Clean Architecture pattern.
-
-The system integrates database management, AI services, authentication, cloud storage, and REST APIs into a modular and scalable architecture. Entity Framework Core, JWT authentication, Azure AI services, and structured middleware improve system reliability, maintainability, and security.
-
-The backend successfully supports seed verification, complaint management, user authentication, analytics, and administrative operations within the AgriVerify platform.
+    \item \texttt{app
