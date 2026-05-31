@@ -3,7 +3,9 @@
 % AgriVerify --- AI-Powered Fake Seed Detection System
 % ============================================================
 
-
+% NOTE: Make sure to add \usepackage{enumitem} to your main.tex preamble 
+% and \setlist{noitemsep} to apply this tightly spaced styling globally.
+% Alternatively, [noitemsep] has been added locally below to each list environment.
 
 The backend of the AgriVerify system is responsible for managing business logic, AI model integration, authentication, database operations, and communication between frontend clients and cloud services. The system was developed using ASP.NET Core Web API following the Clean Architecture approach to achieve modularity, maintainability, and scalability.
 
@@ -42,7 +44,6 @@ font=\small
 \draw[->, thick] (api) -- (application);
 \draw[->, thick] (application) -- (domain);
 \draw[->, thick] (infra) -- (domain);
-\draw[->, thick] (infra) -- (application);
 
 \end{tikzpicture}
 
@@ -53,7 +54,7 @@ font=\small
 
 The layered architecture improves:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Separation of concerns
     \item Code maintainability
     \item Scalability
@@ -204,7 +205,7 @@ The Domain Layer contains the core business entities and contracts of the applic
 
 The major entities in the system include:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item User
     \item Farmer
     \item Officer
@@ -221,7 +222,7 @@ These entities represent the primary agricultural and administrative components 
 
 Interfaces define contracts between layers and improve abstraction.
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item IRepository
     \item IVerificationService
     \item IAuthenticationService
@@ -242,7 +243,7 @@ The Application Layer coordinates business workflows and request processing.
 
 The system includes several services responsible for handling business operations:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Verification Service
     \item Authentication Service
     \item Complaint Service
@@ -303,7 +304,7 @@ AdminDashboardResponse & Dashboard statistics \\
 
 FluentValidation is integrated into the application layer to validate:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item File formats
     \item Image sizes
     \item Email structure
@@ -324,7 +325,7 @@ The Infrastructure Layer manages database operations, external integrations, and
 
 Entity Framework Core is used for:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Database migrations
     \item Entity mapping
     \item Relationship configuration
@@ -336,7 +337,7 @@ Entity Framework Core is used for:
 
 The repository pattern abstracts database operations from business logic.
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Generic Repository
     \item Seed Repository
     \item Complaint Repository
@@ -535,7 +536,7 @@ The backend database maintains relationships between users, seed batches, verifi
 
 The database schema supports:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item User management
     \item Seed batch tracking
     \item AI verification history
@@ -599,7 +600,7 @@ ReferenceDataController & Dropdown reference data \\
 
 Middleware components manage authentication, logging, and centralized exception handling.
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Authentication Middleware
     \item Request Logging Middleware
     \item Exception Handling Middleware
@@ -612,7 +613,7 @@ These middleware components improve system security and monitoring.
 \label{sec:backend-security}
 % ============================================================
 
-The backend uses JWT-based authentication with role-based authorization, following the flow depicted in Figure~\ref{fig:jwt-backend-flow}.
+The backend uses JWT-based authentication with role-based authorization, following the flow depicted in Figure~\fig:jwt-backend-flow}.
 
 \begin{figure}[H]
 \centering
@@ -653,7 +654,7 @@ font=\small
 
 Security features include:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item JWT Bearer authentication
     \item Role-based authorization
     \item Password hashing
@@ -664,7 +665,7 @@ Security features include:
 
 The system supports multiple user roles:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Farmer
     \item Officer
     \item Administrator
@@ -722,7 +723,7 @@ font=\small
 
 The workflow includes:
 
-\begin{enumerate}
+\begin{enumerate}[noitemsep]
     \item Image upload
     \item Request validation
     \item Image quality analysis
@@ -739,7 +740,7 @@ The workflow includes:
 
 The backend uses multiple configuration files for different deployment environments.
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item \texttt{appsettings.json}
     \item \texttt{appsettings.Development.json}
     \item \texttt{appsettings.Production.json}
@@ -747,7 +748,7 @@ The backend uses multiple configuration files for different deployment environme
 
 These files manage:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Database connections
     \item JWT settings
     \item Azure credentials
@@ -757,7 +758,7 @@ These files manage:
 
 Application startup is configured through \texttt{Program.cs}, which initializes:
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
     \item Database services
     \item Authentication services
     \item Dependency injection

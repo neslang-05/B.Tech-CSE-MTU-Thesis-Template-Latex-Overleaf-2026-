@@ -19,15 +19,15 @@ The backend API follows Onion Architecture principles, dividing responsibilities
   \renewcommand{\arraystretch}{1.35}
   \begin{tabularx}{\textwidth}{|p{3.8cm}|X|}
     \hline
-    \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
+    \textbf{Architectural Layer} \& \textbf{Core Responsibilities and Encapsulated Components} \\
     \hline
-    \textbf{Domain Layer} & Core domain entities (\texttt{User}, \texttt{VerificationHistory}), value objects, and domain exceptions. Completely independent of external frameworks. \\
+    \textbf{Domain Layer} \& Core domain entities (\texttt{User}, \texttt{VerificationHistory}), value objects, and domain exceptions. Completely independent of external frameworks. \\
     \hline
-    \textbf{Application Layer} & Orchestration logic (\texttt{VerificationService}, \texttt{UserService}), Data Transfer Objects (DTOs), mapping configurations and request validation rules. \\
+    \textbf{Application Layer} \& Orchestration logic (\texttt{VerificationService}, \texttt{UserService}), Data Transfer Objects (DTOs), mapping configurations and request validation rules. \\
     \hline
-    \textbf{Infrastructure Layer} & External integration implementations, including database persistence via Entity Framework Core, Azure Cognitive Services and Blob storage managers. \\
+    \textbf{Infrastructure Layer} \& External integration implementations, including database persistence via Entity Framework Core, Azure Cognitive Services and Blob storage managers. \\
     \hline
-    \textbf{API Layer} & REST API controllers, request-response handling, JWT authentication middleware and unified exception filters. \\
+    \textbf{API Layer} \& REST API controllers, request-response handling, JWT authentication middleware and unified exception filters. \\
     \hline
   \end{tabularx}
 \end{table}
