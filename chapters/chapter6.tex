@@ -42,7 +42,7 @@ font=\small
 \draw[->, thick] (api) -- (application);
 \draw[->, thick] (application) -- (domain);
 \draw[->, thick] (infra) -- (domain);
-\draw[->, thick] (infra) -- (application);
+\draw[->, thick] (infra.west) -- ++(-1.2cm,0) |- (application.west);
 
 \end{tikzpicture}
 
@@ -414,7 +414,14 @@ The backend database maintains relationships between users, seed batches, verifi
 ]
 
 % ---- TOP ROW ----
-\node[entity] (users) {
+\node[entity] (roles) {
+    \textbf{AspNetRoles}
+    \nodepart{second}
+    PK: Id \\
+    RoleName
+};
+
+\node[entity, right=4cm of roles] (users) {
     \textbf{Users}
     \nodepart{second}
     PK: Id \\
@@ -434,14 +441,16 @@ The backend database maintains relationships between users, seed batches, verifi
     Phone
 };
 
-\node[entity, right=4cm of profiles] (roles) {
-    \textbf{AspNetRoles}
+% ---- MIDDLE ROW ----
+\node[entity, below=3cm of roles] (tokens) {
+    \textbf{RefreshTokens}
     \nodepart{second}
     PK: Id \\
-    RoleName
+    FK: UserId \\
+    Token \\
+    ExpiresAt
 };
 
-% ---- MIDDLE ROW ----
 \node[entity, below=3cm of users] (verification) {
     \textbf{VerificationHistories}
     \nodepart{second}
@@ -452,7 +461,7 @@ The backend database maintains relationships between users, seed batches, verifi
     Confidence
 };
 
-\node[entity, right=4cm of verification] (complaints) {
+\node[entity, below=3cm of profiles] (complaints) {
     \textbf{ProductComplaints}
     \nodepart{second}
     PK: Id \\
@@ -462,17 +471,16 @@ The backend database maintains relationships between users, seed batches, verifi
     AssignedOfficerId
 };
 
-\node[entity, right=4cm of complaints] (actions) {
-    \textbf{ComplaintActions}
+% ---- BOTTOM ROW ----
+\node[entity, below=3cm of tokens] (systemlogs) {
+    \textbf{SystemLogs}
     \nodepart{second}
     PK: Id \\
-    FK: ComplaintId \\
-    FK: OfficerId \\
-    ActionType \\
-    RiskLevel
+    Level \\
+    Message \\
+    Timestamp
 };
 
-% ---- BOTTOM ROW ----
 \node[entity, below=3cm of verification] (audit) {
     \textbf{AuditLogs}
     \nodepart{second}
@@ -482,31 +490,23 @@ The backend database maintains relationships between users, seed batches, verifi
     EntityType
 };
 
-\node[entity, right=4cm of audit] (tokens) {
-    \textbf{RefreshTokens}
+\node[entity, below=3cm of complaints] (actions) {
+    \textbf{ComplaintActions}
     \nodepart{second}
     PK: Id \\
-    FK: UserId \\
-    Token \\
-    ExpiresAt
-};
-
-\node[entity, below=3cm of actions] (systemlogs) {
-    \textbf{SystemLogs}
-    \nodepart{second}
-    PK: Id \\
-    Level \\
-    Message \\
-    Timestamp
+    FK: ComplaintId \\
+    FK: OfficerId \\
+    ActionType \\
+    RiskLevel
 };
 
 % ---- RELATIONSHIPS ----
 \draw[relation] (users) -- node[left]{\scriptsize 1:N} (verification);
 \draw[relation] (users) -- node[above]{\scriptsize 1:1} (profiles);
-\draw[relation] (users) |- node[left, pos=0.75]{\scriptsize 1:N} (tokens);
+\draw[relation] (users) -- node[above, sloped, pos=0.5]{\scriptsize 1:N} (tokens);
 \draw[relation] (verification) -- node[above]{\scriptsize 1:N} (complaints);
-\draw[relation] (complaints) -- node[above]{\scriptsize 1:N} (actions);
-\draw[relation] (actions) -- node[left]{\scriptsize 1:N} (audit);
+\draw[relation] (complaints) -- node[left]{\scriptsize 1:N} (actions);
+\draw[relation] (actions) -- node[above]{\scriptsize 1:N} (audit);
 \draw[relation] (roles) -- node[above]{\scriptsize M:N} (users);
 
 % ---- LEGEND ----

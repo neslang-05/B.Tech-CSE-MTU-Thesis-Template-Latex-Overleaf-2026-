@@ -278,33 +278,6 @@ DUS Reference DB & \texttt{.csv} & $<$1\,MB & The 12 reference seed varieties fo
 }
 \end{table}
 
-\section{Model Deployment}
-
-After training was complete, we integrated the model into a web service and deployed it to Google Cloud Platform (GCP). The goal was to make the model accessible as a live API that other applications can call to classify seeds in real-time.
-
-\subsection{Serving Infrastructure}
-
-We wrapped the trained model in FastAPI, a fast and modern Python web framework. The API has a single endpoint that works like this: it receives a seed image, resizes and normalizes it, runs it through ResNet50, extracts the 17 physical parameters, matches the seed against our 12 reference varieties, and returns everything as a neat JSON response. The steps are:
-
-\begin{enumerate}
-    \item \textbf{Request}---The FastAPI endpoint receives the image file.
-    \item \textbf{Preprocessing}---The image is resized to $224 \times 224$ pixels and normalized using ImageNet's standard values.
-    \item \textbf{Model Inference}---ResNet50 processes the image and produces raw scores (logits) for each of the three classes.
-    \item \textbf{Post-processing}---Softmax converts those scores into probabilities, we extract the 17 physical measurements, and we find the best-matching varieties.
-    \item \textbf{Response}---A JSON response is sent back with the prediction, confidence scores, physical measurements, and the top-3 variety matches.
-\end{enumerate}
-
-\subsection{Containerisation and CI/CD Pipeline}
-
-We packaged everything---the model weights, the FastAPI server, and all required libraries---into a Docker container. Docker is like a lightweight virtual machine that ensures the model works the same way on any computer or cloud platform.
-
-Deployment happens automatically: whenever we push new code to our GitHub repository's main branch, a GitHub Actions workflow automatically builds a fresh Docker image, uploads it to Google Cloud's storage service (Artifact Registry), and deploys it to Google Cloud Run. Cloud Run is perfect for this because it automatically scales up when there are many requests and scales down when there's little traffic, so we don't pay for idle servers.
-
-The live API is publicly accessible at:
-\begin{center}
-\href{https://resnet-api-297419987783.asia-south1.run.app/}{\nolinkurl{https://resnet-api-297419987783.asia-south1.run.app/}}
-\end{center}
-
 \section{Model Comparison and Selection}
 
 Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared ResNet50, MobileNetV2, DenseNet121, and GoogleNet, with the comparative results detailed in Table~\ref{tab:architecture_comparison}.
