@@ -12,7 +12,7 @@ The first source is the Paddy Seeds Quality Classification dataset published on 
 \href{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}{\nolinkurl{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}}
 \end{center}
 
-This dataset contains 1,213 labeled images split into three categories: Healthy, Damaged, and Fake/Low Quality seeds. The images take up about 183~MB of storage. These images were captured under many different lighting conditions and backgrounds, which made them a solid foundation for our model to learn general patterns about what different seed qualities look like.
+This dataset contains 1,213 labeled images split into three categories: Genuine, Suspicious, or Low Quality seeds. The images take up about 183~MB of storage. These images were captured under many different lighting conditions and backgrounds, which made them a solid foundation for our model to learn general patterns about what different seed qualities look like.
 
 \subsubsection{Custom Source}
 The second source is a dataset we collected directly from ICAR's Manipur laboratory. ICAR researchers took photographs of paddy seeds under controlled lab conditions, focusing on the specific varieties grown in northeastern India. This custom collection includes 350 images occupying about 24.7~MB of storage. We've published this dataset on Kaggle as an open resource so other researchers can use it:
@@ -68,11 +68,11 @@ ICAR Manipur Custom Dataset & 350 & $\sim$23.7\,MB & \nolinkurl{nilambarelangbam
 \hline
 \textbf{Class} & \textbf{Number of Images} & \textbf{Percentage (\%)} \\
 \hline
-Healthy Paddy Seeds & $\sim$750 & $\sim$48.0 \\
+Genuine Paddy Seeds & $\sim$750 & $\sim$48.0 \\
 \hline
-Damaged Paddy Seeds & $\sim$510 & $\sim$32.6 \\
+Suspicious Paddy Seeds & $\sim$510 & $\sim$32.6 \\
 \hline
-Fake/Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
+Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
 \hline
 \textbf{Total} & \textbf{1,563} & \textbf{100.0} \\
 \hline
@@ -80,11 +80,11 @@ Fake/Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
 }
 \end{table}
 
-From Table 4.2 we observed that, the dataset we have contain more healthy seed images than damaged or fake ones---which makes sense because in real life, most seeds are healthy. However, this imbalance could cause the model to become biased toward recognizing healthy seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
+From Table 4.2 we observed that, the dataset we have contain more Genuine seed images than Suspicious or Low Quality ones which makes sense because in real life, most seeds are genuine. However, this imbalance could cause the model to become biased toward recognizing genuine seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
 
 \subsection{Train/Validation/Test Split Strategy}
 
-We divided the 1,563 images into three separate groups: one for training, one for validation, and one for testing. A key principle we followed was stratified splitting, which means we made sure each group had roughly the same mix of healthy, damaged, and fake seeds as the overall dataset. The proportions, approximate image counts, and primary objectives of each split are summarized in Table~\ref{tab:dataset_split}. This partitioning prevents any group from accidentally having too many of one type, which could give us misleading results.
+We divided the 1,563 images into three separate groups: one for training, one for validation, and one for testing. A key principle we followed was stratified splitting, which means we made sure each group had roughly the same mix of Genuine, Suspicious, and Counterfeit seeds as the overall dataset. The proportions, approximate image counts, and primary objectives of each split are summarized in Table~\ref{tab:dataset_split}. This partitioning prevents any group from accidentally having too many of one type, which could give us misleading results.
 
 \begin{table}[htbp]
 \centering
@@ -106,7 +106,7 @@ Test Set & 10\% & $\sim$156 & Held completely separate to give a final, unbiased
 \end{tabular}%
 }
 \end{table}
-Table 4.3 presents the data split statistics used in this study. The training set is used to train the model, allowing it to learn from the images and adjust its internal parameters to improve classification performance. The validation set serves as a quality control mechanism; after each training epoch, the model is evaluated on this set to monitor its performance and detect potential overfitting, where the model memorizes the training data rather than learning generalizable patterns. The test set remains completely unseen during the training and validation phases. It is used only once at the end of the process to provide an unbiased and reliable evaluation of the model's performance on previously unseen images.
+Table 4.3 presents the data split statistics used in this study. The training set is used to train the model, allowing it to learn from the images and adjust its internal parameters to improve model performance. The validation set serves as a quality control mechanism; after each training epoch, the model is evaluated on this set to monitor its performance and detect potential overfitting, where the model memorizes the training data rather than learning generalizable patterns. The test set remains completely unseen during the training and validation phases. It is used only once at the end of the process to provide an unbiased and reliable evaluation of the model's performance on previously unseen images.
 \subsection{Data Preprocessing and Augmentation}
 \label{subsec:augmentation}
 
@@ -120,30 +120,30 @@ This normalization step is important because the pre-trained model we started wi
 To make the model more robust and help it learn from our limited training data, we applied six data augmentation techniques during training. Think of augmentation as artificially creating new training examples by tweaking the original images in realistic ways:
 
 \begin{enumerate}
-    \item \textbf{Random Resized Crop}---We randomly crop a portion of the image and resize it to $224 \times 224$ pixels. This simulates seeds being photographed from different distances and positions within the frame.
+    \item \textbf{Random Resized Crop} We randomly crop a portion of the image and resize it to $224 \times 224$ pixels. This simulates seeds being photographed from different distances and positions within the frame.
     
-    \item \textbf{Horizontal Flip}---We randomly flip images left-to-right about half the time. Seeds have a natural bilateral symmetry, so this helps the model learn that a flipped seed is still the same seed.
+    \item \textbf{Horizontal Flip} We randomly flip images left-to-right about half the time. Seeds have a natural bilateral symmetry, so this helps the model learn that a flipped seed is still the same seed.
     
-    \item \textbf{Vertical Flip}---We randomly flip images top-to-bottom about half the time, adding more variation in how the seeds appear.
+    \item \textbf{Vertical Flip} We randomly flip images top-to-bottom about half the time, adding more variation in how the seeds appear.
     
-    \item \textbf{Random Rotation}---We rotate images randomly by up to $\pm 30^{\circ}$ (30 degrees in either direction). Real seed photos might not be perfectly aligned, so this prepares the model for that reality.
+    \item \textbf{Random Rotation} We rotate images randomly by up to $\pm 30^{\circ}$ (30 degrees in either direction). Real seed photos might not be perfectly aligned, so this prepares the model for that reality.
     
-    \item \textbf{Translation/Random Shift}---We randomly shift the image content left, right, up, or down. This prevents the model from relying on the seed always appearing in the center of the photo.
+    \item \textbf{Translation/Random Shift} We randomly shift the image content left, right, up, or down. This prevents the model from relying on the seed always appearing in the center of the photo.
     
-    \item \textbf{Colour Jitter}---We randomly adjust brightness, contrast, color saturation, and hue. Since real agricultural photos are taken under different lighting conditions, this helps the model handle that variation.
+    \item \textbf{Colour Jitter} We randomly adjust brightness, contrast, color saturation, and hue. Since real agricultural photos are taken under different lighting conditions, this helps the model handle that variation.
 \end{enumerate}
 
 \section{Model Architecture}
 
 \subsection{ResNet50 Backbone (25.6M Parameters)}
 
-We chose ResNet50 as the foundation of our classification model. This neural network has 50 layers and about 25.6 million parameters (adjustable settings inside the network). What makes ResNet special is its use of "skip connections"---shortcuts that let information flow directly around groups of layers. This design makes it much easier to train very deep networks because it prevents the gradient (the training signal) from fading as it travels backward through the network.
+We chose ResNet50 as the foundation of our detection model. This neural network has 50 layers and about 25.6 million parameters (adjustable settings inside the network). What makes ResNet special is its use of "skip connections" shortcuts that let information flow directly around groups of layers. This design makes it much easier to train very deep networks because it prevents the gradient (the training signal) from fading as it travels backward through the network.
 
 Rather than training from scratch, we started with weights that were pre-trained on ImageNet, a massive dataset of millions of everyday images. This pre-trained starting point is like giving the model a head start: it already knows how to recognize edges, textures, and shapes, so we only need to teach it the specific patterns that distinguish different seed qualities.
 
-\subsection{Custom Classification Head}
+\subsection{Custom Model Head}
 
-On top of the ResNet50 backbone, we added a custom section designed specifically for seed classification. This section takes the features learned by ResNet and processes them into a final decision about whether a seed is Healthy, Damaged, or Fake/Low Quality. Here's what this custom section does:
+On top of the ResNet50 backbone, we added a custom section designed specifically for seed quality assessment.  This section takes the features learned by ResNet and processes them into a final decision about whether a seed is Genuine, Suspicious, or Low Quality. Here's what this custom section does:
 
 \begin{enumerate}
     \item Compresses the spatial information into a single summary vector (Global Average Pooling)
@@ -151,7 +151,7 @@ On top of the ResNet50 backbone, we added a custom section designed specifically
     \item Applies Batch Normalisation to stabilize the values
     \item Uses ReLU activation to introduce non-linearity
     \item Applies Dropout (randomly ignoring 50\% of values) to reduce overfitting
-    \item Outputs 3 final scores (one for each seed quality class) with softmax to convert them to probabilities
+    \item Outputs 3 final scores (one for each seed quality) with softmax to convert them to probabilities
 \end{enumerate}
 
 \subsection{Anti-Overfitting Techniques}
@@ -159,9 +159,9 @@ On top of the ResNet50 backbone, we added a custom section designed specifically
 Overfitting is the enemy of machine learning---it's when a model memorizes the training data instead of learning generalizable patterns. We used several techniques to prevent this:
 
 \begin{itemize}
-    \item \textbf{Dropout}---During training, we randomly "turn off" 50\% of neurons in the classification head. This forces the network to learn redundant representations, so it can't rely on a few specific neurons. Think of it like training a team where you randomly swap out players---the team learns to work together, not depend on one star player.
+    \item \textbf{Dropout}---During training, we randomly "turn off" 50\% of neurons in the model head. This forces the network to learn redundant representations, so it can't rely on a few specific neurons. Think of it like training a team where you randomly swap out players---the team learns to work together, not depend on one star player.
     
-    \item \textbf{Batch Normalisation}---After each layer, we normalize the values to keep them in a healthy range. This stabilizes training and acts as a natural regularizer.
+    \item \textbf{Batch Normalisation}---After each layer, we normalize the values to keep them in a genuine range. This stabilizes training and acts as a natural regularizer.
     
     \item \textbf{Label Smoothing}---Instead of forcing the network to be 100\% confident about each prediction, we "soften" the targets slightly (using $\epsilon = 0.1$). This prevents the model from becoming overconfident and improves generalization.
     
@@ -176,7 +176,7 @@ Overfitting is the enemy of machine learning---it's when a model memorizes the t
 
 \subsection{Feature Extraction---17 Physical Parameters}
 
-Beyond just classifying seeds as Healthy, Damaged, or Fake, we wanted our model to extract physical measurements that agriculture experts understand. The standard set of measurements in agriculture is called DUS---Distinctiveness, Uniformity, and Stability. We programmed our model to extract 17 of these physical parameters from each seed image:
+Beyond just classifying seeds as Genuine, Suspicious, or Low quality, we wanted our model to extract physical measurements that agriculture experts understand. The standard set of measurements in agriculture is called DUS---Distinctiveness, Uniformity, and Stability. We programmed our model to extract 17 of these physical parameters from each seed image:
 
 \begin{itemize}
     \item How long and how wide each seed is
@@ -210,15 +210,15 @@ Here, $p_j$ is one of the 17 measurements from the new seed, $r_{i,j}$ is the st
 
 \section{Training Pipeline}
 
-\subsection{Phase 1---Classification Head Training (Epochs 1--8)}
+\subsection{Phase 1---Model Head Training (Epochs 1--8)}
 
-We trained the model in two phases. In Phase 1 (the first 8 training cycles), we froze the ResNet50 backbone---meaning its weights didn't change---and only trained the custom classification head we added on top. Think of this like keeping a well-established expert's knowledge fixed and just training a new student to interpret their findings. We used a learning rate of 0.001, which controls how big the weight updates are. A learning rate that's too high causes instability; too low and training is slow. The batch size (number of images processed before updating weights) was set to 32.
+We trained the model in two phases. In Phase 1 (the first 8 training cycles), we froze the ResNet50 backbone---meaning its weights didn't change---and only trained the custom model head we added on top. Think of this like keeping a well-established expert's knowledge fixed and just training a new student to interpret their findings. We used a learning rate of 0.001, which controls how big the weight updates are. A learning rate that's too high causes instability; too low and training is slow. The batch size (number of images processed before updating weights) was set to 32.
 
 At the end of each of these 8 epochs, we checked performance on the validation set to make sure the head was learning properly and not starting to overfit.
 
 \subsection{Phase 2---Full Fine-Tuning (Epochs 9--15)}
 
-In Phase 2 (epochs 9--15), we unfroze the entire network and trained everything end-to-end. We reduced the learning rate by 10 times to 0.0001---a smaller rate because we're now adjusting a fully-trained backbone and don't want to destroy what it's already learned. This phase refined the backbone's features to specialize better for seed classification.
+In Phase 2 (epochs 9--15), we unfroze the entire network and trained everything end-to-end. We reduced the learning rate by 10 times to 0.0001---a smaller rate because we're now adjusting a fully-trained backbone and don't want to destroy what it's already learned. This phase refined the backbone's features to specialize better for seed detection.
 
 We monitored validation performance carefully and stopped training at epoch 15 when we noticed the validation loss starting to increase (a sign the model was beginning to overfit). We then loaded the best weights we'd found during the entire training run---these became our final model.
 
@@ -329,7 +329,7 @@ We chose ResNet50 for three practical reasons:
     
     \item It has excellent support across different deployment platforms---PyTorch, TorchScript, ONNX, and more---giving us flexibility in where and how we deploy it.
     
-    \item Most published agricultural image classification research uses ResNet50, so our results are directly comparable to other teams' work, helping the scientific community benchmark progress.
+    \item Most published agricultural image detection research uses ResNet50, so our results are directly comparable to other teams' work, helping the scientific community benchmark progress.
 \end{enumerate} 
 The extra 4.4 minutes of training time is a small price to pay for these advantages, especially since training only happens once.
 \newpage
@@ -362,7 +362,7 @@ Train-Validation Gap & $<$5\% & Great generalization---model isn't overfitting \
 }
 \end{table}
 
-From Table~4.7 we observed that, the final test accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality classification. The near-perfect precision, recall, and F1-score indicate highly reliable performance across all seed quality categories. These results demonstrate that the proposed system is suitable for practical deployment and can support accurate seed quality assessment in agricultural applications.
+From Table~4.7 we observed that, the final test accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality detection/assessment. The near-perfect precision, recall, and F1-score indicate highly reliable performance across all seed quality categories. These results demonstrate that the proposed system is suitable for practical deployment and can support accurate seed quality assessment in agricultural applications.
 ```
 \newpage
 Table~\ref{tab:training_behaviour} summarizes the key observations recorded during the training phase of the ResNet50 model. Monitoring training and validation accuracy along with loss values helps evaluate convergence, learning stability, and generalization capability. The observations presented below indicate that the model learned effectively, maintained stable performance throughout training, and benefited from the use of early stopping.

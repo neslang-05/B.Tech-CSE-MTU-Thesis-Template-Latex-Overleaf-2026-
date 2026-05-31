@@ -1,6 +1,6 @@
 % ============================================================
 %  CHAPTER 9: RESULTS AND EVALUATION
-%  AgriVerify --- AI-Powered Fake Seed Detection System
+%  AgriVerify --- AI-Powered Seed Quality Assessment System
 %  Manipur Technical University, Final Year Project Report
 % ============================================================
 
@@ -8,7 +8,7 @@
 
 Upon completion of the training phase, the ResNet50 model was rigorously evaluated using an independent test dataset consisting of previously unseen images. Model performance was quantified using standard statistical metrics, namely Accuracy, Precision, Recall, and the F1 Score~\cite{mohanty2016}. These metrics provide a multi-dimensional assessment of the model's capacity to distinguish between genuine and defective (damaged or counterfeit) paddy seeds~\cite{he2016deep, xu2021}.
 
-The evaluation results demonstrate high classification performance. The model consistently classified seed samples into two primary categories: \texttt{Pure} (certified, legitimate seeds) and \texttt{Impure} (damaged, defective, or counterfeit seeds). The empirical results suggest that the AgriVerify system is suitable for deployment in real-world agricultural scenarios, particularly within resource-constrained environments.
+The evaluation results demonstrate high model performance. The model consistently classified seed samples into two primary categories: \texttt{Pure} (certified, legitimate seeds) and \texttt{Impure} (damaged, defective, or counterfeit seeds). The empirical results suggest that the AgriVerify system is suitable for deployment in real-world agricultural scenarios, particularly within resource-constrained environments.
 
 \subsection{Accuracy, Precision, Recall, and F1 Score}
 
@@ -40,13 +40,13 @@ The overall performance metrics of the model on the test dataset are summarized 
   \begin{adjustbox}{max width=0.85\textwidth}
     \includegraphics[width=\textwidth]{images/model-performance.jpeg}
   \end{adjustbox}
-  \caption{How the model improved over 15 training cycles. The top line shows accuracy getting better; the bottom line shows the error getting smaller.}
+  \caption{Training accuracy and loss across 15 epochs.}
   \label{fig:model-performance}
 \end{figure}
 
-An accuracy rate of 99.57\% indicates that the model successfully generalizes classification features across varying seed textures and illumination conditions. The equivalence of precision and recall (both at 99.57\%) is critical for agricultural applications; it signifies a minimized rate of both false positives (misclassifying impure seeds as pure) and false negatives (misclassifying pure seeds as impure). The F1 Score confirms a robust balance between these two critical classification objectives~\cite{mohanty2016}.
+An accuracy rate of 99.57\% indicates that the model successfully generalizes features across varying seed textures and illumination conditions. The equivalence of precision and recall (both at 99.57\%) is critical for agricultural applications; it signifies a minimized rate of both false positives (misclassifying impure seeds as pure) and false negatives (misclassifying pure seeds as impure). The F1 Score confirms a robust balance between these two critical objectives~\cite{mohanty2016}.
 
-Notably, the classification accuracy of 99.57\% surpasses the typical baseline of 85--90\% reported in existing literature for automated seed quality assessment systems~\cite{dyrmann2016, ni2009}. This performance gain validates the integration of transfer learning with tailored image augmentation and regularization techniques.
+From the figure 9.1 notably, the accuracy of 99.57\% surpasses the typical baseline of 85--90\% reported in existing literature for automated seed quality assessment systems~\cite{dyrmann2016, ni2009}. This performance gain validates the integration of transfer learning with tailored image augmentation and regularization techniques.
 
 \section{Seed Quality Results: Pure vs. Impure Seeds}
 
@@ -62,21 +62,21 @@ To evaluate the class-specific performance of the classifier, metrics were compu
     \hline
     \textbf{Seed Type} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{What This Means} \\
     \hline
-    Pure (Genuine) & 100.0\% & 99.19\% & 99.60\% & Perfect at recognizing genuine seeds---never wrongly approves a fake one \\
+    Genuine & 100.0\% & 99.19\% & 99.60\% & Perfect at recognizing genuine seeds never wrongly approves a low quality one \\
     \hline
-    Impure (Damaged/Fake) & 99.07\% & 100.0\% & 99.53\% & Perfect at detecting problems---catches every single defective seed \\
+    Low Quality & 99.07\% & 100.0\% & 99.53\% & Perfect at detecting problems catches every single defective seed \\
     \hline
   \end{tabularx}
 \\
 \end{table}
 
-The model achieved 100.0\% precision for the pure category, which can be attributed to the highly distinct visual markers of genuine paddy seeds, such as uniform golden-brown coloration, intact husks, and consistent surface textures. Conversely, the model demonstrated 100.0\% recall for the impure category, successfully flagging every damaged, defective, or counterfeit seed. This asymmetric performance is highly desirable for agricultural quality control, ensuring that sub-standard seed batches are consistently intercepted while minimizing the false rejection of certified stock~\cite{liu2020}.
+As shown in Table 9.2 the model achieved 100.0\% precision for the pure category, which can be attributed to the highly distinct visual markers of genuine paddy seeds, such as uniform golden-brown coloration, intact husks, and consistent surface textures. In contrast, the model demonstrated 100.0\% recall for the impure category, successfully identifying all damaged, defective, or counterfeit seeds. This asymmetric performance is highly desirable for agricultural quality control, ensuring that sub-standard seed batches are consistently intercepted while minimizing the false rejection of certified stock~\cite{liu2020}.
 
-The high classification performance is primarily due to class-weighted loss functions and data augmentation strategies employed during training. These techniques mitigate class imbalance issues and prevent the network from exhibiting classification bias toward the majority class.
+The high performance is mainly due to the class-weighted loss functions and data augmentation strategies employed during training. These techniques mitigate class imbalance issues and prevent the network from exhibiting bias toward the majority class.
 \newpage
 \section{Confusion Matrix Analysis}
 
-To analyze the distribution of classification errors, a confusion matrix was constructed. The quantitative prediction distributions are detailed in Table~\ref{tab:confusion}, and the corresponding normalized confusion matrix is visualized in Figure~\ref{fig:confusion-matrix}.
+To analyze the distribution of errors, a confusion matrix was constructed. The quantitative prediction distributions are detailed in Table~\ref{tab:confusion}, and the corresponding normalized confusion matrix is visualized in Figure~\ref{fig:confusion-matrix}.
 
 \begin{table}[htbp]
   \centering
@@ -104,14 +104,14 @@ To analyze the distribution of classification errors, a confusion matrix was con
     \label{fig:confusion-matrix}
 \end{figure}
 
-Out of the 231 test samples evaluated, the model correctly classified 230 samples. The specific classification outcomes are analyzed below:
+From the Table 9.3 and Figure 9.2 we observed that out of the 231 test samples evaluated, the model correctly classified 230 samples. The specific model outcomes are analyzed below:
 
 \textbf{Impure Class (107 Samples):}
 All 107 impure samples were correctly classified as impure (True Positives), yielding zero false negatives. From an agricultural safety perspective, this prevents the inadvertent distribution and planting of defective or counterfeit seed batches.
 
 \textbf{Pure Class (124 Samples):}
 The model correctly identified 123 pure samples (True Negatives), with only 1 sample misclassified as impure (False Positive). This conservative error is preferable in agricultural workflows; while a false positive merely necessitates a secondary manual inspection, a false negative (failing to identify impure seeds) could lead to complete crop failure and economic losses for the farmer.
-\newpage
+
 \section{Regularization Effectiveness}
 
 With a dataset size of 1,563 images, training deep neural networks introduces a significant risk of overfitting, where the model memorizes high-frequency noise in the training set rather than extracting generalizable morphological features. To mitigate this, several regularization techniques were evaluated, as compared in Table~\ref{tab:regularization}.
@@ -126,7 +126,7 @@ With a dataset size of 1,563 images, training deep neural networks introduces a 
     \hline
     \textbf{Configuration} & \textbf{Train vs. Validation Gap} & \textbf{What Happened} \\
     \hline
-    No Protection & 25--30\% & Bad---the model memorized training data and performed much worse on new seeds \\
+    System with overfitting & 25--30\% & Bad---the model memorized training data and performed worse on unseen seeds \\
     \hline
     Dropout Only & 8--12\% & Better, but still some overfitting on tricky seed textures \\
     \hline
@@ -151,7 +151,7 @@ From the table 9.5 we observed that the validation-to-training accuracy gap was 
 
 \section{Model Comparison and Architecture Selection}
 
-Prior to selecting ResNet50 as the primary backbone, a comparative analysis was conducted using four prominent convolutional neural network architectures trained under identical hyperparameters and optimization settings. The quantitative evaluation metrics are compiled in Table~\ref{tab:modelcomparison}, and the trade-off between classification accuracy and training computational overhead is illustrated in Figure~\ref{fig:model-comparison}.
+Prior to selecting ResNet50 as the primary backbone, a comparative analysis was conducted using four prominent convolutional neural network architectures trained under identical hyperparameters and optimization settings. The quantitative evaluation metrics are compiled in Table~\ref{tab:modelcomparison}, and the trade-off between model accuracy and training computational overhead is illustrated in Figure~\ref{fig:model-comparison}.
 
 \begin{table}[htbp]
   \centering
@@ -181,13 +181,13 @@ Prior to selecting ResNet50 as the primary backbone, a comparative analysis was 
   \label{fig:model-comparison}
 \end{figure}
 
-As shown in table 9.6 ResNet50, DenseNet121, and GoogLeNet achieved identical classification accuracies of 99.57\%. MobileNetV2 registered a slightly lower accuracy of 99.13\% but required significantly less training time. ResNet50 was selected as the final architecture due to several specific advantages.
+As shown in table 9.6 ResNet50, DenseNet121, and GoogLeNet achieved identical model accuracies of 99.57\%. MobileNetV2 registered a slightly lower accuracy of 99.13\% but required significantly less training time. ResNet50 was selected as the final architecture due to several specific advantages.
 
 The residual connections (skip connections) in ResNet50 address the vanishing gradient problem, allowing efficient backpropagation through the 50-layer architecture and facilitating fine-tuning without information loss~\cite{he2016deep, xu2021}. Furthermore, ResNet50 exhibits superior compatibility across deployment frameworks, including PyTorch, TorchScript, ONNX, and edge-optimized runtime engines. This cross-platform compatibility supports future plans to deploy AgriVerify as a native mobile application. The marginal training time overhead (an additional 4.4 minutes compared to GoogLeNet) is offset by these deployment advantages, given that model training is an offline process~\cite{pytorch2019}.
 
 \section{System Performance and Production Latency}
 
-In addition to classification accuracy, computational efficiency and response latency are critical parameters for real-time applications deployed in agricultural fields.
+In addition to model accuracy, computational efficiency and response latency are critical parameters for real-time applications deployed in agricultural fields.
 
 \subsection{Inference Latency Evaluation}
 
@@ -241,11 +241,11 @@ The system demonstrated high stability and responsiveness under peak concurrent 
 
 \section{Functional Verification and Test Execution}
 
-System validation was conducted to verify functional correctness, security enforcement, and data integrity across all primary operational workflows.
+System validation was conducted to verify functional correctness, security enforcement and data integrity across all primary operational workflows.
 
-\subsection{Seed Classification Subsystem Validation}
+\subsection{Seed Quality Assessment Validation}
 
-The image processing pipeline and classification subsystem were validated against diverse input scenarios. The specific test cases, expected behaviors, and execution results are detailed in Table~\ref{tab:seedtestcases}.
+The image processing pipeline and quality assessment subsystem were validated against diverse input scenarios. The specific test cases, expected behaviors, and execution results are detailed in Table~\ref{tab:seedtestcases}.
 
 \begin{table}[htbp]
   \centering
@@ -260,8 +260,6 @@ The image processing pipeline and classification subsystem were validated agains
     \textbf{SV-01} & Upload clear photos of genuine seed packaging & Correctly classified as Pure with physical measurements extracted & \textbf{Pass} \\
     \hline
     \textbf{SV-02} & Upload photos of cracked or discolored seeds & Classified as Impure (Damaged) with warnings shown & \textbf{Pass} \\
-    \hline
-    \textbf{SV-03} & Upload fake packaging with counterfeit branding & Classified as Impure (Fake) with high confidence & \textbf{Pass} \\
     \hline
     \textbf{SV-04} & Try uploading wrong file types (.exe, .zip, .txt) & System rejects and shows helpful error message & \textbf{Pass} \\
     \hline
@@ -406,7 +404,7 @@ User details can be modified via the profile configuration interface (Figure~\re
   \label{fig:ui-adding-seed}
 \end{figure}
 
-Following image processing, the model generates a comprehensive quality report. If the seed batch is certified as pure, the interface displays extracted physical characteristics and purity metrics (Figure~\ref{fig:ui-genuine}). Conversely, if defects or counterfeit markers are detected, a warning interface highlights classification confidence and offers remedial instructions (Figure~\ref{fig:ui-counterfeit}).
+Following image processing, the model generates a comprehensive quality report. If the seed batch is certified as pure, the interface displays extracted physical characteristics and purity metrics (Figure~\ref{fig:ui-genuine}). Conversely, if defects or counterfeit markers are detected, a warning interface highlights quality assessment confidence and offers remedial instructions (Figure~\ref{fig:ui-counterfeit}).
 
 \begin{figure}[htbp]
   \centering
@@ -463,9 +461,9 @@ Agricultural officers access a dedicated monitoring dashboard summarizing region
   \label{fig:ui-complaint-officer}
 \end{figure}
 
-\subsection{Platform Administration, User Governance, and Telemetry}
+\subsection{Platform Administration, User Governance and Telemetry}
 
-Platform administrators monitor system telemetry, API response times, active sessions, and database load via the real-time administrator dashboard (Figure~\ref{fig:ui-admin-dashboard}). Administrative user governance, including account creation and role modification, is managed through the user governance portal (Figure~\ref{fig:ui-user-mgmt}).
+Platform administrators monitor system telemetry, API response times, active sessions and database load via the real-time administrator dashboard (Figure~\ref{fig:ui-admin-dashboard}). Administrative user governance, including account creation and role modification, is managed through the user governance portal (Figure~\ref{fig:ui-user-mgmt}).
 
 \begin{figure}[htbp]
   \centering
@@ -481,7 +479,7 @@ Platform administrators monitor system telemetry, API response times, active ses
   \label{fig:ui-user-mgmt}
 \end{figure}
 
-System analytics are visualized through reporting dashboards that highlight verification trends and fake seed detection rates over time (Figure~\ref{fig:ui-reports-1}). Geographical visualization dashboards map the distribution of counterfeit seed incidents across different administrative districts, aiding policymakers in identifying counterfeit hotspots (Figure~\ref{fig:ui-reports-2}).
+System analytics are visualized through reporting dashboards that highlight verification trends and low quality seed detection rates over time (Figure~\ref{fig:ui-reports-1}). Geographical visualization dashboards map the distribution of counterfeit seed incidents across different administrative districts, aiding policymakers in identifying counterfeit hotspots (Figure~\ref{fig:ui-reports-2}).
 
 \begin{figure}[htbp]
   \centering
@@ -507,28 +505,9 @@ The development and deployment of AgriVerify encountered several technical chall
 \begin{itemize}
     \item \textbf{Data Scarcity:} The training dataset comprised only 1,563 images, introducing a high risk of model overfitting. This constraint was mitigated by utilizing transfer learning with pre-trained ImageNet weights, applying data augmentation to simulate sample diversity, and employing weight decay to regularize model complexity~\cite{krizhevsky2012imagenet, loshchilov2019adamw}.
     
-    \item \textbf{Fine-Grained Feature Similarity:} Discriminating between mechanically damaged seeds and high-quality counterfeit packaging required high classification sensitivity. The system mitigated this by combining visual texture analysis with Optical Character Recognition (OCR) to extract text features from the packaging labels, providing multi-modal confirmation~\cite{mohanty2016}.
+    \item \textbf{Fine-Grained Feature Similarity:} Discriminating between mechanically damaged seeds and high-quality counterfeit packaging required high sensitivity. The system mitigated this by combining visual texture analysis with Optical Character Recognition (OCR) to extract text features from the packaging labels, providing multi-modal confirmation~\cite{mohanty2016}.
     
-    \item \textbf{Environmental Illumination Variations:} Field photographs taken by farmers under uncontrolled ambient lighting conditions could degrade classification accuracy. To resolve this, automatic preprocessing algorithms adjust image contrast and brightness before inference, and training images were augmented with random color jittering to enhance model robustness.
+    \item \textbf{Environmental Illumination Variations:} Field photographs taken by farmers under uncontrolled ambient lighting conditions could degrade quality assessment accuracy. To resolve this, automatic preprocessing algorithms adjust image contrast and brightness before inference, and training images were augmented with random color jittering to enhance model robustness.
     
-    \item \textbf{Resource Constraints and Model Scale:} Deploying a standard ResNet50 model (approximately 100 MB) on edge servers introduces latency and memory bottlenecks. This was mitigated by implementing half-precision floating-point quantization (FP16) and model optimization, reducing memory footprints without compromising classification accuracy~\cite{pytorch2019}.
+    \item \textbf{Resource Constraints and Model Scale:} Deploying a standard ResNet50 model (approximately 100 MB) on edge servers introduces latency and memory bottlenecks. This was mitigated by implementing half-precision floating-point quantization (FP16) and model optimization, reducing memory footprints without compromising accuracy~\cite{pytorch2019}.
 \end{itemize}
-
-% ──────────────────────────────────────────────────────────────
-\section{Summary and System Limitations}
-\label{sec:limitations}
-% ──────────────────────────────────────────────────────────────
-
-This chapter presented a multi-dimensional evaluation of the AgriVerify platform, spanning model classification performance, system latency under concurrent loads, and functional validation. The ResNet50 classifier achieved an accuracy of 99.57\% and an F1 Score of 99.57\%, demonstrating performance in distinguishing certified seeds from damaged or counterfeit counterparts. Functional validation verified that the platform's core workflows operate correctly and securely.
-
-Despite these positive results, several system limitations remain to be addressed in future work:
-
-\begin{itemize}
-    \item \textbf{Single-Crop Dependency:} The classifier is currently optimized exclusively for paddy seeds. Extending support to other major crops, such as wheat, maize, or soybeans, would require compiling specialized image datasets and retraining the network~\cite{xu2021}.
-    
-    \item \textbf{Network Connectivity Requirements:} The system relies on cloud-based API serving, restricting use in remote agricultural areas with poor internet connectivity. Quantizing models for offline, local execution on mobile devices represents a critical future development path.
-    
-    \item \textbf{Lack of Diagnostic Specificity:} While the system detects seed impurity, it does not identify specific seed-borne diseases or pathogens. Integrating phytopathological diagnostic capabilities would enhance agricultural value~\cite{mohanty2016}.
-\end{itemize}
-
-Addressing these limitations---through edge optimization, multi-crop expansion, and explainable AI (XAI) features to visualize classification attention maps---constitutes the primary roadmap for future research.

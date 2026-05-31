@@ -2,22 +2,22 @@
 % CHAPTER 9: FRONTEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
 % ============================================================
 
-The AgriVerify frontend connects the inference engine and backend services to a browser interface that has to work for two quite different users: farmers on mid-range Android handsets with variable connectivity, and state administrators managing supply chain dashboards. The stack --- Next.js~16, React~19, TypeScript~5, and Tailwind CSS --- was chosen to handle that range without the interface becoming slow or hard to maintain \cite{salim2024microservices, singh2026impact}.
+The AgriVerify frontend provides a responsive and secure browser interface that connects users to the backend services. It is designed to accommodate two distinct user profiles: farmers accessing the system via mid-range Android devices over unstable field networks, and state administrators managing comprehensive supply chain dashboards. The technology stack Next.js~16, React~19, TypeScript~5 and Tailwind CSS was selected to ensure optimal client-side performance, accessibility and clean architectural separation of concerns without sacrificing maintainability \cite{salim2024microservices, singh2026impact}.
 
 % ============================================================
 \section{Frontend Architecture and Design Patterns}
 \label{sec:frontend-architecture}
 
-The architecture separates UI rendering from data fetching, API communication, and authorization. Each concern lives in its own layer.
+The architecture separates UI rendering from data fetching, API communication and authorization. Each concern lives in its own layer.
 
 \subsection{Architectural Layers}
 A request passes through four layers before reaching backend services (Figure~\ref{fig:frontend_architecture}):
-\begin{itemize}
-    \item \textbf{Presentation UI (React \& Next.js):} Handles component rendering, form validation, and responsive layout \cite{react2024}.
-    \item \textbf{Client-Side State (TanStack Query):} Manages async data fetching, caching, and optimistic mutations \cite{tanstack2024}.
+\begin{enumerate}
+    \item \textbf{Presentation UI (React \& Next.js):} Handles component rendering, form validation and responsive layout \cite{react2024}.
+    \item \textbf{Client-Side State (TanStack Query):} Manages async data fetching, caching and optimistic mutations \cite{tanstack2024}.
     \item \textbf{Service Client (Axios):} Wraps network calls, standardising payloads and error handling.
     \item \textbf{API Proxy (Next.js Routes):} Routes client requests to ASP.NET Core endpoints without exposing internal URLs to the browser.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
 \centering
@@ -34,14 +34,12 @@ A request passes through four layers before reaching backend services (Figure~\r
 \node[fill=green!10, below=of ui] (hooks) {\textbf{State Synchronization}\\(TanStack Query)};
 \node[fill=yellow!10, below=of hooks] (services) {\textbf{Service Layer}\\(Axios API Client)};
 \node[fill=orange!10, below=of services] (proxy) {\textbf{API Proxy Route}\\(Next.js Intermediary)};
-\node[fill=red!10, right=1.2cm of proxy] (backend) {\textbf{ASP.NET Backend}\\(Business \& Data)};
-\node[fill=purple!10, below=of backend] (ml) {\textbf{AI Inference}\\(Model Engine)};
+\node[fill=red!10, right=1.2cm of proxy] (backend) {\textbf{ASP.NET Core Backend}\\(Business \& Data Tier)};
 
 \draw[arrow] (ui) -- (hooks);
 \draw[arrow] (hooks) -- (services);
 \draw[arrow] (services) -- (proxy);
 \draw[arrow] (proxy) -- (backend);
-\draw[arrow] (backend) -- (ml);
 \end{tikzpicture}
 \end{adjustbox}
 \caption{Frontend Layered Architecture and Request Execution Flow}
@@ -83,6 +81,7 @@ Zustand 4.5 & Lightweight atomic state slices for session persistence. \\
 \end{table}
 
 % ============================================================
+\newpage
 \section{Modular Project Structure}
 \label{sec:frontend-project-structure}
 
@@ -95,34 +94,32 @@ The source tree follows domain-driven modularity. Key directories: \texttt{src/a
 The frontend uses Role-Based Access Control (RBAC) to separate public and protected routes.
 
 \subsection{Role Partitioning}
-The application supports four user profiles: \textbf{Farmers} (verification and dispute submission), \textbf{Agricultural Officers} (inspection queues and evidence review), \textbf{Administrators} (system governance and telemetry), and \textbf{Public Users} (anonymous checks).
+The application supports four user profiles: \textbf{Farmers} (verification and dispute submission), \textbf{Agricultural Officers} (inspection queues and evidence review), \textbf{Administrators} (system governance and telemetry) and \textbf{Public Users} (anonymous checks).
 
 \subsection{Route Protection Middleware}
-A \texttt{RoleGuard} component checks JWT claims against required permissions before mounting any protected React component, preventing privilege escalation at the route level.
+A \texttt{RoleGuard} component checks JWT claims against required permissions before mounting any protected React component, preventing privilege escalation at the route level. The core implementation logic is detailed in Listing~\ref{lst:role_guard}.
 
-% \begin{lstlisting}[
-%     language=TypeScript,
-%     caption={Core Logic of the Role-Based Route Protection Guard},
-%     label={lst:role_guard},
-%     basicstyle=\ttfamily\scriptsize,
-%     breaklines=true,
-%     frame=single
-% ]
-% export const RoleGuard: React.FC<{ children: React.ReactNode; allowedRoles: Role[] }> = ({ children, allowedRoles }) => {
-%     const { token, role, isLoading } = useAuthStore();
-%     const router = useRouter();
+\begin{lstlisting}[
+    style=mystyle,
+    language=TypeScript,
+    caption={Core Logic of the Role-Based Route Protection Guard},
+    label={lst:role_guard}
+]
+export const RoleGuard: React.FC<{ children: React.ReactNode; allowedRoles: Role[] }> = ({ children, allowedRoles }) => {
+    const { token, role, isLoading } = useAuthStore();
+    const router = useRouter();
 
-%     useEffect(() => {
-%         if (!isLoading) {
-%             if (!token) return router.replace('/login');
-%             if (role && !allowedRoles.includes(role)) return router.replace('/unauthorized');
-%         }
-%     }, [token, role, isLoading, router, allowedRoles]);
+    useEffect(() => {
+        if (!isLoading) {
+            if (!token) return router.replace('/login');
+            if (role && !allowedRoles.includes(role)) return router.replace('/unauthorized');
+        }
+    }, [token, role, isLoading, router, allowedRoles]);
 
-%     if (isLoading || !token) return <Loader />;
-%     return <>{children}</>;
-% };
-% \end{lstlisting}
+    if (isLoading || !token) return <Loader />;
+    return <>{children}</>;
+};
+\end{lstlisting}
 
 % ============================================================
 \section{Authentication and Secure Persistence}
@@ -134,39 +131,37 @@ Sessions are secured using a dual-token JWT exchange designed to limit exposure 
 Short-lived access tokens are held in the Zustand in-memory store, keeping them out of reach of malicious scripts. Long-lived refresh tokens are persisted in encrypted storage or \texttt{HttpOnly} cookies, allowing background session renewal without exposing token values to client-side code.
 
 \subsection{Automated Token Rotation}
-Axios interceptors handle token expiry without user intervention. On a \texttt{401 Unauthorized} response, the interceptor pauses pending requests, runs a refresh cycle, and replays the original request with the new token. From the user's side, the session continues uninterrupted.
+Axios interceptors handle token expiry without user intervention. On a \texttt{401 Unauthorized} response, the interceptor pauses pending requests, runs a refresh cycle, and replays the original request with the new token. From the user's side, the session continues uninterrupted. The automated refresh interceptor configuration is shown in Listing~\ref{lst:axios_interceptor}.
 
-% \begin{lstlisting}[
-%     language=TypeScript,
-%     caption={Axios Interceptor for Automated JWT Token Rotation},
-%     label={lst:axios_interceptor},
-%     basicstyle=\ttfamily\scriptsize,
-%     breaklines=true,
-%     frame=single
-% ]
-% apiClient.interceptors.response.use(res => res, async (error) => {
-%     const origReq = error.config;
-%     if (error.response?.status === 401 && !origReq._retry) {
-%         origReq._retry = true;
-%         try {
-%             const res = await axios.post('/api/proxy/auth/refresh', { token: useAuthStore.getState().refreshToken });
-%             useAuthStore.getState().setTokens(res.data.accessToken, res.data.refreshToken);
-%             origReq.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
-%             return apiClient(origReq);
-%         } catch (err) {
-%             useAuthStore.getState().logout();
-%             return Promise.reject(err);
-%         }
-%     }
-%     return Promise.reject(error);
-% });
-% \end{lstlisting}
+\begin{lstlisting}[
+    style=mystyle,
+    language=TypeScript,
+    caption={Axios Interceptor for Automated JWT Token Rotation},
+    label={lst:axios_interceptor}
+]
+apiClient.interceptors.response.use(res => res, async (error) => {
+    const origReq = error.config;
+    if (error.response?.status === 401 && !origReq._retry) {
+        origReq._retry = true;
+        try {
+            const res = await axios.post('/api/proxy/auth/refresh', { token: useAuthStore.getState().refreshToken });
+            useAuthStore.getState().setTokens(res.data.accessToken, res.data.refreshToken);
+            origReq.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
+            return apiClient(origReq);
+        } catch (err) {
+            useAuthStore.getState().logout();
+            return Promise.reject(err);
+        }
+    }
+    return Promise.reject(error);
+});
+\end{lstlisting}
 
 % ============================================================
 \section{API Integration and Type Safety}
 \label{sec:api-integration}
 
-TypeScript DTOs enforce compile-time verification of HTTP payloads across all integration modules --- Auth, Verification, Analytics, and Complaint Services. Each mirrors the corresponding ASP.NET Core schema, so data arriving at the frontend matches what the UI expects without runtime coercion or defensive casting.
+TypeScript DTOs enforce compile-time verification of HTTP payloads across all integration modules Auth, Verification, Analytics, and Complaint Services. Each mirrors the corresponding ASP.NET Core schema, so data arriving at the frontend matches what the UI expects without runtime coercion or defensive casting.
 
 % ============================================================
 \section{State Management}
@@ -212,9 +207,3 @@ The interface is built from a set of reusable primitives (Table~\ref{tab:ui-comp
 
 \subsection{Accessibility Enhancements}
 The UI meets WCAG AAA contrast ratios for readability in bright outdoor conditions, uses a minimum touch target size of $48\times 48$px to reduce input errors, and includes full ARIA semantic tagging for screen-reader compatibility.
-
-% % ============================================================
-% \section{Summary}
-% \label{sec:frontend-summary}
-
-% The AgriVerify frontend connects the AI inference engine and backend services to a browser interface designed for two distinct user groups: farmers operating on mid-range Android devices with potentially unstable internet connections, and state administrators managing administrative dashboards. The selection of the technology stack---specifically Next.js~16, React~19, TypeScript~5, and Tailwind CSS---is deliberate, aiming to deliver a high-performance, maintainable application that remains responsive and intuitive even under these challenging field conditions \cite{singh2026impact}.

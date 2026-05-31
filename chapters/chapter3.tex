@@ -20,24 +20,24 @@ The backend API follows Onion Architecture principles, dividing responsibilities
   \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.8cm}|X|}
     \hline
-    \textbf{Architectural Layer} \& \textbf{Core Responsibilities and Encapsulated Components} \\
+    \textbf{Architectural Layer} & \textbf{Core Responsibilities and Encapsulated Components} \\
     \hline
-    \textbf{Domain Layer} \& Core domain entities (\texttt{User}, \texttt{VerificationHistory}), value objects, and domain exceptions. Completely independent of external frameworks. \\
+    \textbf{Domain Layer} & Core domain entities (\texttt{User}, \texttt{VerificationHistory}), value objects and domain exceptions. Completely independent of external frameworks. \\
     \hline
-    \textbf{Application Layer} \& Orchestration logic (\texttt{VerificationService}, \texttt{UserService}), Data Transfer Objects (DTOs), mapping configurations and request validation rules. \\
+    \textbf{Application Layer} & Orchestration logic (\texttt{VerificationService}, \texttt{UserService}), Data Transfer Objects (DTOs), mapping configurations and request validation rules. \\
     \hline
-    \textbf{Infrastructure Layer} \& External integration implementations, including database persistence via Entity Framework Core, Azure Cognitive Services and Blob storage managers. \\
+    \textbf{Infrastructure Layer} & External integration implementations, including database persistence via Entity Framework Core, Azure Cognitive Services and Blob storage managers. \\
     \hline
-    \textbf{API Layer} \& REST API controllers, request-response handling, JWT authentication middleware and unified exception filters. \\
+    \textbf{API Layer} & REST API controllers, request-response handling, JWT authentication middleware and unified exception filters. \\
     \hline
   \end{tabularx}
 \end{table}
 
-Table~\ref{tab:technology_stack} details the software development kits (SDKs), frameworks, libraries, and cloud platforms employed across the frontend, backend, and machine learning components.
+Table~\ref{tab:technology_stack} details the software development kits (SDKs), frameworks, libraries and cloud platforms employed across the frontend, backend and machine learning components.
 
 \begin{table}[htbp]
   \centering
-  \caption{Consolidated Technology Stack of AgriVerify}
+  \caption{Technology Stack of AgriVerify}
   \label{tab:technology_stack}
   \small
   \renewcommand{\arraystretch}{1.1}
@@ -46,7 +46,7 @@ Table~\ref{tab:technology_stack} details the software development kits (SDKs), f
     \textbf{Component} & \textbf{Framework / Library} & \textbf{Functionality / Purpose} \\
     \hline
     \multirow{4}{*}{\textbf{Frontend}}
-      & Next.js 14 (TS) & Client interface, server-side rendering, and API proxy routing~\cite{nextjs2023docs}. \\
+      & Next.js 14 (TS) & Client interface, server-side rendering and API proxy routing~\cite{nextjs2023docs}. \\
       \cline{2-3}
       & TanStack Query & Server state synchronization and asynchronous data caching~\cite{tanstack2023query}. \\
       \cline{2-3}
@@ -55,7 +55,7 @@ Table~\ref{tab:technology_stack} details the software development kits (SDKs), f
       & Tailwind CSS & Styling system and component customization~\cite{tailwind2024}. \\
     \hline
     \multirow{4}{*}{\textbf{Backend}}
-      & ASP.NET Core 8 & Orchestration Web API, routing, and controller layer~\cite{microsoft2023aspnet}. \\
+      & ASP.NET Core 8 & Orchestration Web API, routing and controller layer~\cite{microsoft2023aspnet}. \\
       \cline{2-3}
       & Entity Framework Core & Object-Relational Mapping (ORM) for SQL Server database access. \\
       \cline{2-3}
@@ -66,7 +66,7 @@ Table~\ref{tab:technology_stack} details the software development kits (SDKs), f
     \multirow{4}{*}{\textbf{ML}}
       & PyTorch 2.1 & Deep learning framework for neural network training~\cite{pytorch2019}. \\
       \cline{2-3}
-      & ResNet-50 & Pre-trained CNN backbone for seed variety classification~\cite{he2016deep}. \\
+      & ResNet-50 & Pre-trained CNN backbone for seed quality assessment~\cite{he2016deep}. \\
       \cline{2-3}
       & OpenCV & Preprocessing and morphometric DUS parameter analysis~\cite{opencv2015}. \\
       \cline{2-3}
@@ -74,16 +74,13 @@ Table~\ref{tab:technology_stack} details the software development kits (SDKs), f
     \hline
   \end{tabularx}
 \end{table}
-
-The PyTorch ResNet-50 model is containerized and deployed as a FastAPI microservice on Google Cloud Platform (GCP) Cloud Run to enable automatic, serverless scaling~\cite{fastapi2023docs}. During inference, input images undergo size standardization to $224 \times 224$ pixels and normalization using ImageNet statistics ($\boldsymbol{\mu} = [0.485, 0.456, 0.406]$, $\boldsymbol{\sigma} = [0.229, 0.224, 0.225]$). OpenCV extracts 17 Distinctness, Uniformity, and Stability (DUS) morphometric parameters, which are compared against reference variety profiles to compute similarity scores~\cite{upov2002dus}.
-
 % ──────────────────────────────────────────────────────────────
 \section{Functional and Non-Functional Requirements}
 % ──────────────────────────────────────────────────────────────
 
 System requirements are categorized into functional specifications, defining the core operations and roles within the application, and non-functional specifications, outlining quality attributes and system constraints. These requirements ensure that the platform meets both agricultural user needs and architectural standards.
 
-The functional requirements (Table~\ref{tab:functional_requirements}) define the core capabilities across different system actors (farmers, agricultural officers, and administrators). Concurrently, the non-functional requirements (Table~\ref{tab:non_functional_requirements}) dictate operational performance, security, and portability parameters, ensuring standard enterprise scalability and reliability.
+The functional requirements (Table~\ref{tab:functional_requirements}) define the core capabilities across different system actors (farmers, agricultural officers and administrators). Concurrently, the non-functional requirements (Table~\ref{tab:non_functional_requirements}) dictate operational performance, security and portability parameters, ensuring standard enterprise scalability and reliability.
 
 \begin{table}[htbp]
   \centering
@@ -95,15 +92,15 @@ The functional requirements (Table~\ref{tab:functional_requirements}) define the
     \hline
     \textbf{ID} & \textbf{Module / Role} & \textbf{Functional Specification} \\
     \hline
-    FR-01 & Authentication & User registration and authentication via JWT for farmers, officers, and administrators. \\
+    FR-01 & Authentication & User registration and authentication via JWT for farmers, officers and administrators. \\
     \hline
     FR-02 & Image Submission & Multi-modal submission (packaging and seed image) for real-time verification. \\
     \hline
-    FR-03 & AI Inference & Execution of Custom Vision, OCR text extraction, and ResNet-50 DUS profiling. \\
+    FR-03 & AI Inference & Execution of Custom Vision, OCR text extraction and ResNet-50 DUS profiling. \\
     \hline
     FR-04 & Feedback System & Reporting mechanism allowing farmers to submit grievances on counterfeit seed batches. \\
     \hline
-    FR-05 & Case Management & Dashboards for officers to track, update, and resolve seed complaints. \\
+    FR-05 & Case Management & Dashboards for officers to track, update and resolve seed complaints. \\
     \hline
     FR-06 & Risk Analytics & Automated aggregation of regional complaints in a Batch Risk Registry for analytics. \\
     \hline
@@ -118,13 +115,13 @@ The functional requirements (Table~\ref{tab:functional_requirements}) define the
   \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{1.7cm}|p{3.2cm}|X|}
     \hline
-    \textbf{ID} & \textbf{Quality Attribute} & \textbf{Specification} \\
+    \textbf{ID} & \textbf{Attributes} & \textbf{Specification} \\
     \hline
     NFR-01 & Performance & Target end-to-end inference latency under 3.0 seconds through parallel service calls. \\
     \hline
     NFR-02 & Scalability & Stateless API design facilitating horizontal scaling and microservice containment. \\
     \hline
-    NFR-03 & Security & HTTPS communication, JWT session control, role-based authorization (RBAC), and hashed secrets~\cite{owasp2021top10}. \\
+    NFR-03 & Security & HTTPS communication, JWT session control, role-based authorization (RBAC) and hashed secrets~\cite{owasp2021top10}. \\
     \hline
     NFR-04 & Reliability & Atomic database operations and soft-delete implementation for data auditability. \\
     \hline
@@ -137,7 +134,7 @@ The functional requirements (Table~\ref{tab:functional_requirements}) define the
 \section{High-Level System Architecture}
 % ──────────────────────────────────────────────────────────────
 
-The system architecture is structured as a three-tier model: the Client Layer, the Backend Orchestration Tier, and the Cloud AI and Data Infrastructure Tier. As illustrated in Figure~\ref{fig:high_level_arch}, client applications do not interact directly with the backend API; rather, all requests are routed through a server-side proxy in the Next.js frontend web tier. This proxy injects JSON Web Tokens (JWT) for authentication and forwards requests to the ASP.NET Core 8 Web API. The API layer orchestrates calls to the persistent data store (SQL Server), cloud storage, and AI inference services.
+The system architecture is structured as a three-tier model: the Client Layer, the Backend Orchestration Tier and the Cloud AI and Data Infrastructure Tier. As illustrated in Figure~\ref{fig:high_level_arch}, client applications do not interact directly with the backend API; rather, all requests are routed through a server-side proxy in the Next.js frontend web tier. This proxy injects JSON Web Tokens (JWT) for authentication and forwards requests to the ASP.NET Core 8 Web API. The API layer orchestrates calls to the persistent data store (SQL Server), cloud storage and AI inference services.
 
 \begin{figure}[htbp]
   \centering
@@ -149,7 +146,7 @@ The system architecture is structured as a three-tier model: the Client Layer, t
       % Nodes
       \node[box=blue, text width=12cm] (client) {\textbf{Client Layer}\\Browser \& Mobile Applications (Farmers, Officers, System Administrators)};
 
-      \node[box=cyan, text width=12cm, below=1.5cm of client] (frontend) {\textbf{Frontend Web Tier}\\Next.js 14 App Router \& Server-Side API Proxy Route};
+      \node[box=cyan, text width=12cm, below=1.5cm of client] (frontend) {\textbf{Frontend Web Tier}\\Next.js 16 App Router \& Server-Side API Proxy Route};
 
       \node[box=teal, text width=12cm, below=1.5cm of frontend] (backend) {\textbf{Backend Orchestration Tier}\\ASP.NET Core 8 Web API (Clean Architecture: API, Application, Domain, Infrastructure)};
 
@@ -177,7 +174,7 @@ The system architecture is structured as a three-tier model: the Client Layer, t
       \draw[-Stealth, thick, draw=teal!80!black] ([xshift=2.5cm]backend.south) -- (db.north) node[pos=0.25, right, font=\footnotesize] {EF Core / SQL};
     \end{tikzpicture}
   \end{adjustbox}
-  \caption{High-level system architecture of the AgriVerify platform.}
+  \caption{High-level system architecture of the AgriVerify.}
   \label{fig:high_level_arch}
 \end{figure}
 
@@ -207,48 +204,76 @@ The step-by-step verification pipeline and data transmission flow are depicted i
       box/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\small, inner sep=10pt},
       subbox/.style={draw=#1!80!black, fill=#1!8, thick, rounded corners=6pt, align=center, font=\footnotesize, inner sep=8pt}
     ]
+
       % Nodes
-      \node[box=green, text width=10cm] (farmer) {\textbf{1. Farmer / User Client}\\Captures \& Submits Seed Images};
+      \node[box=green, text width=10cm] (farmer)
+      {\textbf{1. Farmer / User Client}\\Captures \& Uploads Seed Images};
 
-      \node[box=cyan, text width=10cm, below=1cm of farmer] (proxy) {\textbf{2. Next.js Proxy Route}\\Intercepts Request, Injects Secure JWT Bearer Token \& Forwards Payload};
+      \node[box=cyan, text width=10cm, below=1cm of farmer] (proxy)
+      {\textbf{2. Next.js API Route}\\Handles Multipart Upload \& Forwards Request Securely};
 
-      \node[box=teal, text width=10cm, below=1cm of proxy] (orch) {\textbf{3. ASP.NET Core VerificationService}\\Orchestrates Verification Pipeline \& Triggers Parallel Asynchronous Tasks (\texttt{Task.WhenAll})};
+      \node[box=teal, text width=10cm, below=1cm of proxy] (backend)
+      {\textbf{3. ASP.NET Core Backend Service}\\Coordinates Verification Workflow \& Sends Images for AI Inference};
 
-      \node[subbox=purple, text width=4.2cm, below=2cm of orch] (ocr) {\textbf{3b. Azure AI Vision}\\Extracts OCR Text \&\\Seed Batch Numbers};
-      \node[subbox=blue, text width=4.2cm, left=0.5cm of ocr.north west, anchor=north east] (custom) {\textbf{3a. Azure Custom}\\Vision\\Classifies Packaging as\\Genuine, Counterfeit\\or Suspicious};
-      \node[subbox=orange, text width=4.2cm, right=0.5cm of ocr.north east, anchor=north west] (resnet) {\textbf{3c. GCP Cloud Run}\\(ResNet-50)\\Extracts 17 DUS\\Parameters \& Performs\\Variety Matching};
+      % Parallel inference blocks
+      \node[subbox=orange, text width=4.5cm, below=2cm of backend, xshift=-2.75cm] (resnet)
+      {\textbf{3a. GCP Cloud Run}\\ResNet-50 Deep Learning\\Model for Seed Quality Assessment};
 
-      % Background box around parallel step
+      \node[subbox=purple, text width=4.5cm, below=2cm of backend, xshift=2.75cm] (analysis)
+      {\textbf{3b. Prediction Analysis}\\Confidence Score Generation\\\& Result Validation};
+
+      % Background box
       \begin{scope}[on background layer]
-        \coordinate (parallel_top) at ([yshift=1.2cm]ocr.north);
-        \node[draw=purple!40, fill=purple!5, dashed, rounded corners=8pt, inner sep=12pt, fit=(custom) (resnet) (ocr) (parallel_top)] (parallel_bg) {};
-        \node[anchor=north west, font=\scriptsize\bfseries\color{purple!80!black}, xshift=6pt, yshift=-8pt, text width=2.4cm, align=left] at (parallel_bg.north west) {Parallel AI\\Inference\\Execution};
+        \node[
+          draw=purple!40,
+          fill=purple!5,
+          dashed,
+          rounded corners=8pt,
+          inner sep=12pt,
+          fit=(resnet) (analysis)
+        ] (parallel_bg) {};
       \end{scope}
 
-      \node[box=teal, text width=10cm, below=2cm of ocr] (openai) {\textbf{4. Azure OpenAI Service}\\Aggregates Parallel AI Inference Outputs \& Synthesises Natural Language Report};
+      \node[box=blue, text width=10cm, below=2cm of resnet, xshift=2.75cm] (db)
+      {\textbf{4. Entity Framework Core \& SQL Server}\\Stores Verification Results in Database};
 
-      \node[box=blue, text width=10cm, below=1cm of openai] (db) {\textbf{5. Entity Framework Core \& SQL Server}\\Persists Verification Record to \texttt{VerificationHistory} Table (with Soft Delete)};
-
-      \node[box=green, text width=10cm, below=1cm of db] (response) {\textbf{6. Client Interface}\\Displays Structured Verification Status, Confidence Score \& Summary Report};
+      \node[box=green, text width=10cm, below=1cm of db] (response)
+      {\textbf{5. Client Dashboard}\\Displays Prediction Result, Confidence Score\\\& Verification Summary};
 
       % Arrows
-      \draw[-Stealth, thick] (farmer.south) -- (proxy.north) node[midway, right, font=\footnotesize] {Multipart Image Payload};
-      \draw[-Stealth, thick] (proxy.south) -- (orch.north) node[midway, right, font=\footnotesize] {Authenticated HTTP POST};
+      \draw[-Stealth, thick]
+      (farmer.south) -- (proxy.north)
+      node[midway, right, font=\footnotesize]
+      {Image Upload};
 
-      \draw[-Stealth, thick] (orch.south) -- (ocr.north);
-      \draw[-Stealth, thick] (orch.south) -- (custom.north);
-      \draw[-Stealth, thick] (orch.south) -- (resnet.north);
+      \draw[-Stealth, thick]
+      (proxy.south) -- (backend.north)
+      node[midway, right, font=\footnotesize]
+      {HTTP Request};
 
-      \draw[-Stealth, thick] (ocr.south) -- (openai.north);
-      \draw[-Stealth, thick] (custom.south) -- (openai.north);
-      \draw[-Stealth, thick] (resnet.south) -- (openai.north);
+      \draw[-Stealth, thick]
+      (backend.south) -- (resnet.north);
 
-      \draw[-Stealth, thick] (openai.south) -- (db.north) node[midway, right, font=\footnotesize] {Domain Entity Record};
-      \draw[-Stealth, thick] (db.south) -- (response.north) node[midway, right, font=\footnotesize] {JSON Response (DTO)};
+      \draw[-Stealth, thick]
+      (backend.south) -- (analysis.north);
+
+      \draw[-Stealth, thick]
+      (resnet.south) -- (db.north);
+
+      \draw[-Stealth, thick]
+      (analysis.south) -- (db.north);
+
+      \draw[-Stealth, thick]
+      (db.south) -- (response.north)
+      node[midway, right, font=\footnotesize]
+      {JSON Response};
+
     \end{tikzpicture}
   \end{adjustbox}
+
   \caption{Data flow diagram for the seed verification pipeline}
   \label{fig:dfd}
+
 \end{figure}
 
 % ──────────────────────────────────────────────────────────────
@@ -302,7 +327,7 @@ The relational database schema is modeled to ensure data consistency, minimize r
           \textbf{PK} & VerificationHistoryId \\
           \textbf{FK} & UserId \\
           & ImageUrl, OCRText \\
-          & ClassificationResult \\
+          & QualityResult \\
           & ConfidenceScore \\
           & CreatedAt, IsDeleted \\
         \end{tabular}
@@ -363,6 +388,6 @@ The relational database schema is modeled to ensure data consistency, minimize r
         node[midway, right, label] {disputes};
     \end{tikzpicture}
   \end{adjustbox}
-  \caption{Simplified entity-relationship diagram for the AgriVerify domain model. Cardinality notation follows UML conventions.}
+  \caption{Simplified ER Diagram of the AgriVerify Platform}
   \label{fig:erd}
 \end{figure}

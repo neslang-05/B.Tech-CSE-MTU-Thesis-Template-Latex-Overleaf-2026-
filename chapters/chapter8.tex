@@ -1,35 +1,35 @@
-This chapter explains how all the pieces of AgriVerify work together. We've designed the system to be flexible, modular, and secure---the frontend (what users see) is completely separate from the backend (where the hard work happens), and both are separated from the AI services. This separation makes the system easier to build, test, and scale.
+This chapter details the system integration and communication framework of the AgriVerify platform. The architecture is designed to be highly modular, secure and extensible, decoupling the user interface (presentation tier) from the core business logic (application tier) and the specialized machine learning model serving components (inference tier) \cite{martin2018clean}. By separating these concerns, the system enhances maintainability, facilitates isolated component testing and allows each subsystem to scale horizontally based on computational demand.
 
-\section{System Integration Matrix}
+\section{System Integration}
 
-AgriVerify communicates across four main boundaries. To keep everything secure, all communication flows through a secure proxy layer. This proxy acts like a security guard: it sits between the browser and the backend, injecting authentication tokens and preventing users' browsers from ever directly connecting to backend systems. Table~\ref{tab:integration_matrix} shows how everything talks to everything else, what format the data takes, and how we keep it all secure.
+The AgriVerify architecture orchestrates communication across five distinct operational boundaries. To ensure data integrity, prevent unauthorized access and protect internal services, all client-to-server interactions are routed through a dedicated Next.js API proxy gateway \cite{nextjs2024}. This proxy layer acts as an intermediary, injecting security tokens and abstracting internal backend endpoints from direct exposure to the public internet, thereby mitigating potential cross-origin and data exposure risks \cite{masue2024quantifying}. Table~\ref{tab:integration_matrix} outlines the integration paths, communication protocols, payload details and security measures implemented across the system.
 
 \begin{table}[htbp]
 \centering
-\caption{How Different Parts of AgriVerify Communicate}
+\caption{System Integration and Communication Matrix}
 \label{tab:integration_matrix}
 \small
 \renewcommand{\arraystretch}{1.1}
 \begin{tabularx}{\textwidth}{|p{3.5cm}|p{3.5cm}|X|}
 \hline
-\textbf{Communication Path} & \textbf{Protocol} & \textbf{What Happens \& Security} \\
+\textbf{Communication Path} & \textbf{Protocol} & \textbf{Technical Implementation \& Security} \\
 \hline
-\textbf{Browser to Proxy} & HTTPS with file uploads & Axios automatically adds JWT security tokens and handles token refresh if they expire. \\
+\textbf{Browser to Proxy} & HTTPS with multipart uploads & Client-side Axios interceptors automatically inject JSON Web Tokens (JWT) into request headers and coordinate silent token rotation upon expiry \cite{axios2024, jones2015jwt}. \\
 \hline
-\textbf{Proxy to Backend} & REST over HTTPS & The proxy forwards all requests, checks data is valid, and hides real backend addresses from browsers. \\
+\textbf{Proxy to Backend} & REST API over HTTPS & The proxy gateway intercepts incoming requests, performs schema validation and forwards payloads to internal ASP.NET Core endpoints, encapsulating internal network topology \cite{freeman2020pro}. \\
 \hline
-\textbf{Backend to AI} & HTTPS or gRPC & Backend sends images, checks for blurriness/lighting issues, extracts text, and runs the ResNet50 model. \\
+\textbf{Backend to AI} & REST (HTTPS) & The backend orchestrates parallel requests, transmitting image binaries to dedicated AI services for quality checks (blur/illumination detection) and Quality Assessment models (ResNet50) \cite{he2016deep}. \\
 \hline
-\textbf{Cloud Services} & Azure official libraries & Uses Azure Custom Vision for packaging, Azure OpenAI to write reports, and Azure Blob Storage to save images. \\
+\textbf{Cloud Services} & Azure SDK Client Libraries & Azure OpenAI Service for text synthesis and Azure Blob Storage for unstructured binary object persistence \cite{copard2020azure}. \\
 \hline
-\textbf{Deployment} & Container systems & Multi-stage Docker builds prepare the code, store it securely, and deploy with automatic scaling. \\
+\textbf{Deployment} & Container Orchestration & Multi-stage Docker builds compile and optimize service codebases, which are stored in the Azure Container Registry and deployed using container orchestration tools \cite{merkel2014docker}. \\
 \hline
 \end{tabularx}
 \end{table}
 
 \section{End-to-End Architectural Workflow}
 
-When a farmer submits a seed image, it travels through several stages: from the browser, through the proxy, into the backend for processing, out to AI services for analysis, and finally gets stored in the cloud. Meanwhile, our deployment system works behind the scenes automatically managing code updates. Figure~\ref{fig:unified_integration_flow} shows both journeys: how a verification request flows through the system, and how code automatically gets deployed to keep the system running.
+The lifecycle of a seed quality verification request spans multiple sequential processing stages: user submission via the client application, routing through the proxy gateway, validation and business logic execution on the backend server, parallel inference by external AI services and persistent storage in cloud databases. Concurrently, a continuous integration and continuous deployment (CI/CD) pipeline automates system updates and resource provisioning. Figure~\ref{fig:unified_integration_flow} illustrates this dual-pipeline architecture, detailing both the operational verification workflow and the automated cloud deployment pipeline.
 
 \begin{figure}[htbp]
 \centering
@@ -82,22 +82,22 @@ When a farmer submits a seed image, it travels through several stages: from the 
 
 \end{tikzpicture}%
 }
-\caption{How AgriVerify processes seed verification requests and automatically deploys updates. Top section shows what happens when a farmer submits images; bottom section shows how we keep the system updated.}
+\caption{Architectural Workflow and Cloud Deployment Pipeline}
 \label{fig:unified_integration_flow}
 \end{figure}
 
-Let's walk through what happens at each stage:
+The detailed execution sequence for each operational phase is described below:
 
 \begin{enumerate}
-    \item \textbf{Browser to Proxy (HTTPS with file uploads):} A farmer opens AgriVerify on their phone or computer and takes a photo of their seed packet. They hit ``upload'' and the image travels over encrypted HTTPS. The Next.js proxy receives it and automatically adds their security token (so the backend knows who they are). If the security token has expired, the proxy handles getting a fresh one without bothering the farmer.
+    \item \textbf{Client Submission and Proxy Routing (HTTPS):} The user initiates a verification request by uploading a high-resolution image of the seed packaging via the responsive web interface. This payload is transmitted over an encrypted HTTPS connection. The Next.js proxy gateway intercepts the request, appends the active JWT authentication token and coordinates silent token rotation if the token has expired, ensuring a seamless user session \cite{axios2024, jones2015jwt}.
     
-    \item \textbf{Proxy to Backend (REST API over HTTPS):} The proxy forwards the farmer's request to the ASP.NET backend, but hides the real backend address from the browser. The backend receives the image and validation data, checks that everything looks correct, and is ready to process it.
+    \item \textbf{Gateway Proxying and Backend Ingestion (REST API over HTTPS):} The proxy forwards the request payload to the internal ASP.NET Core API endpoints, effectively masking the internal network topology from the client. The backend server performs schema validation and prepares the image binary for downstream analytical processing \cite{freeman2020pro}.
     
-    \item \textbf{Backend to AI Services (HTTPS / gRPC):} The backend doesn't try to analyze the image itself---it's too complex. Instead, it sends the image to specialized AI services. First, it checks if the image is blurry or too dark (if so, it warns the farmer). Then it runs three analyses in parallel: Azure's text extraction pulls batch numbers from the packaging, Azure's packaging classifier checks if it looks genuine, and our custom ResNet50 model extracts the 17 physical seed measurements. All three work simultaneously to save time.
+    \item \textbf{Distributed AI Inference (HTTPS):} To optimize resource utilization and processing speed, the backend delegates analysis to specialized AI services rather than performing CPU-bound image processing locally. An initial quality check detects motion blur or inadequate illumination. Once cleared, the image is dispatched in parallel to three downstream models: Azure Cognitive Services for OCR text extraction (identifying batch numbers) and a custom ResNet50 convolutional neural network \cite{he2016deep, copard2020azure}.
     
-    \item \textbf{Cloud Storage (Azure Blob \& SQL Database):} As results come back from the AI services, they're immediately saved to the cloud: the image goes to Azure Blob Storage, and the results go into SQL Server. This ensures data is safely stored and the farmer's verification history is preserved for future reference.
+    \item \textbf{Data Persistence (Azure Blob \& SQL Database):} Upon receipt of the model inference outputs, the backend commits the structured and unstructured data to cloud storage. The raw image is persisted in Azure Blob Storage, while the extracted metadata, quality assessment and transaction history are written to a secure Azure SQL Database, ensuring durability and traceability \cite{copard2020azure}.
     
-    \item \textbf{Response Back to Browser:} The backend synthesizes all the AI results into a clear report using Azure OpenAI to write explanations in plain language. This report travels back through the proxy to the farmer's browser, where they see the results within seconds.
+    \item \textbf{Report Generation and Client Delivery:} The backend aggregates the analytical outputs and invokes Azure OpenAI to synthesize a cohesive, plain-language assessment report. The generated report is transmitted back through the API proxy to the client browser, rendering the results to the user within a low-latency window.
 \end{enumerate}
 
-Meanwhile, the \textbf{deployment pipeline} (shown in dashed lines) works independently in the background. Whenever our development team pushes new code to GitHub, Docker automatically builds a containerized version, stores it in Azure's secure registry, and deploys it to Azure Container Apps---which automatically scales up or down based on how many farmers are using AgriVerify at any given time.
+In parallel, the \textbf{continuous deployment pipeline} operates asynchronously. Upon code commit to the version control system (GitHub), a CI/CD workflow builds container images using multi-stage Dockerfiles. These images are pushed to the Azure Container Registry (ACR) and subsequently deployed to Azure Container Apps (ACA), which dynamically scales resources horizontally based on real-time traffic demand \cite{merkel2014docker}.

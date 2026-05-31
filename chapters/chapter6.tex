@@ -1,6 +1,6 @@
 % ============================================================
 % CHAPTER 6: BACKEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
-% AgriVerify --- AI-Powered Fake Seed Detection System
+% AgriVerify --- AI-Powered Seed Quality Assessment and Farmer Feedback System
 % ============================================================
 The backend of the AgriVerify system is responsible for managing business logic, AI model integration, authentication, database operations, and communication between frontend clients and cloud services. The system was developed using ASP.NET Core Web API following the Clean Architecture approach to achieve modularity, maintainability, and scalability.
 The backend integrates multiple services including SQL Server, Azure AI services, JWT authentication, and cloud storage. The architecture separates core business logic from infrastructure and presentation concerns, enabling easier maintenance and future system expansion.
@@ -77,8 +77,6 @@ SQL Server & Relational database management \\
 JWT Authentication & Secure user authentication \\
 \hline
 ASP.NET Core Identity & User and role management \\
-\hline
-Azure Custom Vision & Seed authenticity classification \\
 \hline
 Azure OCR & Text extraction from seed packets \\
 \hline
@@ -266,15 +264,13 @@ The system integrates multiple Azure services for AI processing and storage, as 
 \hline
 \textbf{Service} & \textbf{Purpose} \\
 \hline
-Azure Custom Vision & Seed authenticity classification \\
-\hline
 Azure OCR & Text extraction from seed packets \\
 \hline
 Azure OpenAI & AI-generated recommendations \\
 \hline
 Azure Blob Storage & Cloud image storage \\
 \hline
-ResNet Classifier & Paddy seed classification \\
+ResNet Model & Paddy seed Quality Determination\\
 \hline
 \end{tabularx}
 \end{table}
@@ -284,7 +280,7 @@ ResNet Classifier & Paddy seed classification \\
 \label{sec:database-schema}
 % ============================================================
 
-The backend database maintains relationships between users, seed batches, verification results, complaints, and audit records. The database schema and its corresponding primary/foreign key mappings are represented in the Entity-Relationship Diagram in Figure~\ref{fig:er-diagram}.
+The backend database maintains relationships between users, verification results, complaints, and audit records. The database schema and its corresponding primary/foreign key mappings are represented in the Entity-Relationship Diagram in Figure~\ref{fig:er-diagram}.
 
 \begin{figure}[H]
 \centering
@@ -326,6 +322,7 @@ The backend database maintains relationships between users, seed batches, verifi
     OfficerId \\
     IsActive
 };
+
 \node[entity, right=4cm of users] (profiles) {
     \textbf{Profiles}
     \nodepart{second}
@@ -396,15 +393,13 @@ The backend database maintains relationships between users, seed batches, verifi
 };
 
 % ---- RELATIONSHIPS ----
-\draw[relation] (users) -- node[left]{\scriptsize 1:1} (profiles);
-\draw[relation] (profiles) -- (roles);
-\draw[relation] (users) -- node[left]{\scriptsize 1:N} (verification);
 \draw[relation] (users) -- node[above]{\scriptsize 1:1} (profiles);
-\draw[relation] (users) -- node[above, sloped, pos=0.5]{\scriptsize 1:N} (tokens);
+\draw[relation] (users) -- node[above]{\scriptsize M:N} (roles);
+\draw[relation] (users) -- node[above, sloped, pos=0.4]{\scriptsize 1:N} (tokens);
+\draw[relation] (users) -- node[left]{\scriptsize 1:N} (verification);
 \draw[relation] (verification) -- node[above]{\scriptsize 1:N} (complaints);
 \draw[relation] (complaints) -- node[left]{\scriptsize 1:N} (actions);
 \draw[relation] (actions) -- node[above]{\scriptsize 1:N} (audit);
-\draw[relation] (roles) -- node[above]{\scriptsize M:N} (users);
 
 % ---- LEGEND ----
 \node[
@@ -424,7 +419,7 @@ The backend database maintains relationships between users, seed batches, verifi
 };
 \end{tikzpicture}
 }%
-\caption{Entity Relationship Diagram -- FakeSeedDetection System}
+\caption{Entity Relationship Diagram --  AgriVerify  System}
 \label{fig:er-diagram}
 \end{figure}
 
@@ -437,7 +432,6 @@ The database schema supports:
     \item Audit logging
 \end{itemize}
 Foreign key relationships maintain referential integrity across all entities.
-
 % ============================================================
 \section{Presentation Layer}
 \label{sec:presentation-layer}
@@ -538,7 +532,7 @@ The system supports multiple user roles:
 \label{sec:verification-workflow}
 % ============================================================
 
-The seed verification workflow integrates AI classification, OCR analysis, and database persistence, as shown in Figure~\ref{fig:verification-workflow}.
+The seed verification workflow integrates AI quality assessment, AI Summary Generation and database persistence, as shown in Figure~\ref{fig:verification-workflow}.
 
 \begin{figure}[H]
 \centering
@@ -556,7 +550,7 @@ font=\small
 \node (upload) {Image Upload};
 \node (validation) [below of=upload] {Input Validation};
 \node (quality) [below of=validation] {Image Quality Analysis};
-\node (ai) [below of=quality] {AI Seed Classification};
+\node (ai) [below of=quality] {AI Seed Quality Assessment};
 \node (ocr) [below of=ai] {OCR Text Extraction};
 \node (database) [below of=ocr] {Database Storage};
 \node (response) [below of=database] {Verification Response};
@@ -576,12 +570,12 @@ The workflow includes:
     \item Image upload
     \item Request validation
     \item Image quality analysis
-    \item AI classification
-    \item OCR text extraction
+    \item AI Seed Quality Assessment
     \item Database persistence
     \item Response generation
 \end{enumerate}
 
+% ============================================================
 % ============================================================
 \section{Configuration and Deployment}
 \label{sec:configuration-deployment}
@@ -590,4 +584,23 @@ The workflow includes:
 The backend uses multiple configuration files for different deployment environments.
 \begin{itemize}[nosep, topsep=2pt]
     \item \texttt{appsettings.json}
-    \item \texttt{app
+    \item \texttt{appsettings.Development.json}
+    \item \texttt{appsettings.Production.json}
+\end{itemize}
+These files manage:
+\begin{itemize}[nosep, topsep=2pt]
+    \item Database connections
+    \item JWT settings
+    \item Azure credentials
+    \item Logging configuration
+    \item API endpoints
+\end{itemize}
+Application startup is configured through \texttt{Program.cs}, which initializes:
+\begin{itemize}[nosep, topsep=2pt]
+    \item Database services
+    \item Authentication services
+    \item Dependency injection
+    \item Middleware pipeline
+    \item Swagger documentation
+    \item Logging services
+\end{itemize}

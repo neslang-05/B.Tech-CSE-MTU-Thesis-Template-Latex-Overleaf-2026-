@@ -5,7 +5,7 @@
 % \chapter{Model Serving API}
 % \label{ch:model-serving-api}
 
-Deploying a trained model as a live service introduces a different set of problems than training it. Model development focuses on architecture and accuracy; the serving layer determines response latency, concurrent throughput, and uptime under real load \cite{martin2017clean}. In AgriVerify, the PyTorch ResNet-50 classifier from Chapter 4 runs inside a dedicated inference microservice built specifically for this purpose.
+Deploying a trained model as a live service introduces a different set of problems than training it. Model development focuses on architecture and accuracy; the serving layer determines response latency, concurrent throughput and uptime under real load \cite{martin2017clean}. In AgriVerify, the PyTorch ResNet-50 model from \textbf{Chapter 4} runs inside a dedicated inference microservice built specifically for this purpose.
 
 This chapter describes the design of that microservice, implemented with FastAPI and Uvicorn \cite{ramirez2023fastapi}. It covers the asynchronous request lifecycle, the tensor normalization pipeline, the API endpoint contracts, and the containerised deployment approach using Docker multi-stage builds on GCP Cloud Run \cite{merkel2014docker}.
 
@@ -21,15 +21,15 @@ The stack separates network deserialization, Pydantic validation, OpenCV preproc
 \subsection{End-to-End Model Request Flow}
 As illustrated in Figure~\ref{fig:model_request_flow}, an inference request begins when the ASP.NET Core backend sends a multipart POST containing a seed image. FastAPI validates the MIME type and payload boundaries, then decodes the byte stream into an OpenCV matrix in memory.
 
-From there, two operations run in parallel: a PyTorch inference engine --- with ResNet-50 weights pre-loaded to avoid cold-start delays --- computes classification logits \cite{paszke2019pytorch, he2016deep}, while OpenCV contour routines extract 17 DUS (Distinctness, Uniformity, and Stability) morphological parameters \cite{bradski2000opencv}. The results are aggregated, scored against reference cultivars, and returned as JSON.
+From there, two operations run in parallel: a PyTorch inference engine with ResNet-50 weights pre-loaded to avoid cold-start delays\cite{paszke2019pytorch, he2016deep}, while OpenCV contour routines extract 17 DUS (Distinctness, Uniformity, and Stability) morphological parameters \cite{bradski2000opencv}. The results are aggregated, scored against reference cultivars and returned as JSON.
 
 The sequential execution steps of this request flow are defined as follows:
 \begin{enumerate}
     \item \textbf{Request:} The FastAPI endpoint receives the image payload via a multipart POST request from the backend proxy.
     \item \textbf{Preprocessing:} The image is decoded into an OpenCV matrix, resized to $224 \times 224$ pixels, and normalized using the standard ImageNet channel moments.
-    \item \textbf{Model Inference:} The pre-loaded ResNet50 model runs inference in a background thread pool to generate raw classification logits.
+    \item \textbf{Model Inference:} The pre-loaded ResNet50 model runs inference in a background thread pool to generate raw seed quality assessment.
     \item \textbf{Morphological Post-processing:} Simultaneously, OpenCV contour analysis extracts the 17 DUS physical measurements, and the system performs variety matching against the 12 reference profiles.
-    \item \textbf{Response:} The API aggregates the model predictions, confidence levels, variety distance scores, and DUS metrics into a structured JSON payload returned to the client.
+    \item \textbf{Response:} The API aggregates the model predictions, confidence levels, variety distance scores and DUS metrics into a structured JSON payload returned to the client.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -69,24 +69,6 @@ The sequential execution steps of this request flow are defined as follows:
   \caption{Asynchronous model request processing flow.}
   \label{fig:model_request_flow}
 \end{figure}
-
-% % ──────────────────────────────────────────────────────────────
-% \section{Inference Execution and Preprocessing Pipeline}
-% \label{sec:inference-pipeline}
-
-% \subsection{Tensor Normalization Mathematics}
-% Deep neural networks are sensitive to distributional shifts in input data. To keep incoming images consistent with the training domain, a fixed preprocessing sequence is applied. BGR byte buffers are converted to RGB, resized to $224 \times 224$ pixels via bicubic interpolation, and scaled to the $[0.0, 1.0]$ float range. Channel-wise standardization then uses the ImageNet distribution moments \cite{paszke2019pytorch}:
-% \begin{equation}
-%     \mathbf{X}_{\text{norm}} = \frac{\mathbf{X} - \boldsymbol{\mu}}{\boldsymbol{\sigma}}
-% \end{equation}
-% where $\boldsymbol{\mu} = [0.485, 0.456, 0.406]$ and $\boldsymbol{\sigma} = [0.229, 0.224, 0.225]$. The resulting tensor is expanded to batch shape $(1, 3, 224, 224)$.
-
-% \subsection{Confidence Scoring and Latency Telemetry}
-% After the forward pass, unnormalized logits $\mathbf{z} = [z_1, z_2, z_3]$ are converted to class probabilities via softmax:
-% \begin{equation}
-%     P(y = i \mid \mathbf{z}) = \frac{e^{z_i / T}}{\sum_{j=1}^{3} e^{z_j / T}}
-% \end{equation}
-% where $T=1.0$. To avoid overconfident predictions on out-of-distribution images, a threshold is applied: if the top-1 probability $P(y=i^*) < 0.75$, the sample is flagged as \texttt{Suspicious}. Wall-clock inference time is captured using \texttt{time.perf\_counter()} and returned in the response as \texttt{inference\_ms} for upstream telemetry.
 
 % ──────────────────────────────────────────────────────────────
 \section{API Specification and Endpoint Contracts}
@@ -140,7 +122,7 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
 \section{Containerisation and Deployment Architecture}
 \label{sec:containerization}
 
-The service uses a multi-stage Docker build to balance reproducibility against image size \cite{merkel2014docker}. The \textbf{Builder Stage} compiles Python binaries (\texttt{.whl}) with \texttt{gcc}. The \textbf{Runtime Stage} copies those pre-compiled binaries into a minimal, security-hardened Debian base (\texttt{python:3.10-slim}), discarding the build toolchain entirely. The final image is approximately 850MB --- down from over 3GB --- with a correspondingly smaller attack surface. The automated containerization, versioning, and deployment pipeline is illustrated in Figure~\ref{fig:container_deployment_workflow}.
+The service uses a multi-stage Docker build to balance reproducibility against image size \cite{merkel2014docker}. The \textbf{Builder Stage} compiles Python binaries (\texttt{.whl}) with \texttt{gcc}. The \textbf{Runtime Stage} copies those pre-compiled binaries into a minimal, security-hardened Debian base (\texttt{python:3.10-slim}), discarding the build toolchain entirely. The final image is approximately 850MB  down from over 3GB  with a correspondingly smaller attack surface. The automated containerization, versioning and deployment pipeline is illustrated in Figure~\ref{fig:container_deployment_workflow}.
 
 \begin{figure}[H]
   \centering
@@ -182,16 +164,3 @@ To demonstrate the functionality of the serving layer under real-world condition
 \end{center}
 
 
-% % ──────────────────────────────────────────────────────────────
-% \section{Configuration and Defensive Security Hardening}
-% \label{sec:configuration-management}
-
-% Following the 12-Factor application methodology \cite{wiggins2011twelve}, all runtime configuration --- including \texttt{ALLOWED\_CORS\_ORIGINS}, \texttt{MAX\_IMAGE\_SIZE\_MB}, and the \texttt{API\_KEY\_SECRET} --- is injected via GCP Secret Manager rather than baked into the image or committed to version control.
-
-% Input sanitization runs at the ASGI middleware layer. Requests with anomalous \texttt{Content-Length} values are dropped before memory is allocated, which blocks payload-based denial-of-service attempts. TLS~1.3 is enforced for data in transit, and global exception handlers strip Python stack traces from error responses to avoid leaking implementation details to potential attackers.
-
-% % ──────────────────────────────────────────────────────────────
-% \section{Summary}
-% \label{sec:chapter5-summary}
-
-% This chapter described the engineering design of the AgriVerify Model Serving microservice. FastAPI, PyTorch, and OpenCV are composed within an asynchronous execution model to handle concurrent inference requests at low latency. Strict Pydantic API contracts, multi-stage Docker containerisation, and serverless GCP deployment address the practical requirements of a production inference service: reproducible builds, bounded resource usage, and predictable failure modes.
