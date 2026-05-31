@@ -20,6 +20,14 @@ The second source is a dataset we collected directly from ICAR's Manipur laborat
 \href{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}{\nolinkurl{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}}
 \end{center}
 
+% Dataset Image
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/Paddy-seed.jpeg}
+    \caption{Sample images collected from ICAR Manipur.}
+    \label{fig:icar_dataset_samples}
+\end{figure}
+\newpage
 When we combined both datasets, we ended up with 1,563 images that represent a wider variety of seed conditions than either dataset alone. This combined dataset better reflects what farmers and agricultural officers actually encounter in the field across different regions of India.
 
 \subsection{Dataset Statistics and Class Distribution}
@@ -72,7 +80,7 @@ Fake/Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
 }
 \end{table}
 
-As you can see, we have more healthy seed images than damaged or fake ones---which makes sense because in real life, most seeds are healthy. However, this imbalance could cause the model to become biased toward recognizing healthy seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
+From Table 4.2 we observed that, the dataset we have contain more healthy seed images than damaged or fake ones---which makes sense because in real life, most seeds are healthy. However, this imbalance could cause the model to become biased toward recognizing healthy seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
 
 \subsection{Train/Validation/Test Split Strategy}
 
@@ -98,9 +106,7 @@ Test Set & 10\% & $\sim$156 & Held completely separate to give a final, unbiased
 \end{tabular}%
 }
 \end{table}
-
-Here's how we used each group: The training set is where the model learns---we show it images and let it adjust its internal parameters to get better at classification. The validation set is our quality control checkpoint---after each training cycle, we test on these images to see if the model is still improving or starting to overfit (basically, memorizing the training data instead of learning general patterns). The test set is completely hidden until the very end. We only use it once to get a fair, final assessment of the model's performance on images it has never seen before.
-
+Table 4.3 presents the data split statistics used in this study. The training set is used to train the model, allowing it to learn from the images and adjust its internal parameters to improve classification performance. The validation set serves as a quality control mechanism; after each training epoch, the model is evaluated on this set to monitor its performance and detect potential overfitting, where the model memorizes the training data rather than learning generalizable patterns. The test set remains completely unseen during the training and validation phases. It is used only once at the end of the process to provide an unbiased and reliable evaluation of the model's performance on previously unseen images.
 \subsection{Data Preprocessing and Augmentation}
 \label{subsec:augmentation}
 
@@ -290,7 +296,7 @@ DUS Reference DB & \texttt{.csv} & $<$1\,MB & The 12 reference seed varieties fo
 
 \section{Model Comparison and Selection}
 
-Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared ResNet50, MobileNetV2, DenseNet121, and GoogleNet, with the comparative results detailed in Table~\ref{tab:architecture_comparison}.
+A performance comparison among all four models is shown in table 4.6. Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared MobileNetV2, DenseNet121, and GoogleNet, with the comparative results detailed in Table~\ref{tab:architecture_comparison}.
 
 \begin{table}[htbp]
 \centering
@@ -314,8 +320,7 @@ MobileNetV2 & 99.13\% & 99.15\% & 99.13\% & 99.13\% & 8.5 \\
 \end{tabular}%
 }
 \end{table}
-
-The results show that ResNet50, DenseNet121, and GoogleNet all achieved the same 99.57\% accuracy, demonstrating that our dataset is rich enough that all three architectures can learn to classify seeds nearly perfectly. MobileNetV2 achieved slightly lower accuracy at 99.13\% but trained much faster---in just 8.5 minutes compared to 16.4 minutes for ResNet50.
+As from the table 4.6 we observed that ResNet50, DenseNet121, and GoogleNet all achieved the same 99.57\% accuracy, demonstrating that our dataset is rich enough that all three architectures can learn to classify seeds nearly perfectly. MobileNetV2 achieved slightly lower accuracy at 99.13\% but trained much faster---in just 8.5 minutes compared to 16.4 minutes for ResNet50.
 
 We chose ResNet50 for three practical reasons:
 
@@ -325,10 +330,9 @@ We chose ResNet50 for three practical reasons:
     \item It has excellent support across different deployment platforms---PyTorch, TorchScript, ONNX, and more---giving us flexibility in where and how we deploy it.
     
     \item Most published agricultural image classification research uses ResNet50, so our results are directly comparable to other teams' work, helping the scientific community benchmark progress.
-\end{enumerate}
-
+\end{enumerate} 
 The extra 4.4 minutes of training time is a small price to pay for these advantages, especially since training only happens once.
-
+\newpage
 \section{Final Model Performance Summary}
 
 After completing both training phases, we evaluated our final ResNet50 model on the test set---the images we'd held back and never shown the model during training. The final evaluation metrics are compiled in Table~\ref{tab:final_test_performance}, and a detailed summary of the training trajectory and learning stability is provided in Table~\ref{tab:training_behaviour}.
@@ -358,6 +362,11 @@ Train-Validation Gap & $<$5\% & Great generalization---model isn't overfitting \
 }
 \end{table}
 
+From Table~4.7 we observed that, the final test accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality classification. The near-perfect precision, recall, and F1-score indicate highly reliable performance across all seed quality categories. These results demonstrate that the proposed system is suitable for practical deployment and can support accurate seed quality assessment in agricultural applications.
+```
+\newpage
+Table~\ref{tab:training_behaviour} summarizes the key observations recorded during the training phase of the ResNet50 model. Monitoring training and validation accuracy along with loss values helps evaluate convergence, learning stability, and generalization capability. The observations presented below indicate that the model learned effectively, maintained stable performance throughout training, and benefited from the use of early stopping.
+
 \begin{table}[htbp]
 \centering
 \caption{Training Behaviour Summary}
@@ -383,4 +392,4 @@ Training Stopped at & Epoch 15---we detected the first signs of overfitting and 
 }
 \end{table}
 
-The final accuracy of 99.57\% is significantly better than the typical industry standard of 85--90\% for automated seed quality classification. The near-perfect precision (very few false alarms) and recall (catches nearly all problems) across all three seed quality categories mean our model is reliable and trustworthy for real agricultural use. This is exactly what we needed---a system that farmers and agricultural officers at ICAR Manipur can depend on to accurately identify problematic seeds before they're planted.
+The observations in Table~\ref{tab:training_behaviour} show that the training process was stable and effective. The model converged quickly, maintained high accuracy throughout training, and exhibited a small gap between training and validation performance. Early stopping further helped preserve the best-performing model while minimizing the risk of overfitting.
