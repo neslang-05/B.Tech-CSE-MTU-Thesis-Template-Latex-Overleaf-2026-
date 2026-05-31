@@ -18,7 +18,8 @@ The overall performance metrics of the model on the test dataset are summarized 
   \centering
   \caption{Overall Model Evaluation Results}
   \label{tab:overallmetrics}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{4.5cm}|c|X|}
     \hline
     \textbf{Performance Metric} & \textbf{Result} & \textbf{What This Means} \\
@@ -36,8 +37,10 @@ The overall performance metrics of the model on the test dataset are summarized 
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{images/model-performance.jpeg}
-  \caption{Validation for No. of epoch of ResNet50.}
+  \begin{adjustbox}{max width=0.85\textwidth}
+    \includegraphics[width=\textwidth]{images/model-performance.jpeg}
+  \end{adjustbox}
+  \caption{How the model improved over 15 training cycles. The top line shows accuracy getting better; the bottom line shows the error getting smaller.}
   \label{fig:model-performance}
 \end{figure}
 
@@ -53,7 +56,8 @@ To evaluate the class-specific performance of the classifier, metrics were compu
   \centering
   \caption{Performance on Each Seed Category}
   \label{tab:perclass}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.8cm}|c|c|c|X|}
     \hline
     \textbf{Seed Type} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{What This Means} \\
@@ -75,46 +79,22 @@ The high classification performance is primarily due to class-weighted loss func
 To analyze the distribution of classification errors, a confusion matrix was constructed. The quantitative prediction distributions are detailed in Table~\ref{tab:confusion}, and the corresponding normalized confusion matrix is visualized in Figure~\ref{fig:confusion-matrix}.
 
 \begin{table}[htbp]
-    \centering
-    \caption{Detailed Look at Every Prediction}
-    \label{tab:confusion}
-    \renewcommand{\arraystretch}{1.35}
-
-    \resizebox{0.75\textwidth}{!}{%
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \multirow{2}{*}{\textbf{Actual Seed Type}} &
-        \multicolumn{2}{c|}{\textbf{What the Model Predicted}} \\
-        \cline{2-3}
-        & \textbf{Impure} & \textbf{Pure} \\
-        \hline
-        \textbf{Impure} & 107 & 0 \\
-        \hline
-        \textbf{Pure} & 1 & 123 \\
-        \hline
-    \end{tabular}%
-    }
-\end{table}
-
-\begin{table}[htbp]
-    \centering
-    \caption{Confusion Matrix Components}
-    \label{tab:confusion_components}
-    \renewcommand{\arraystretch}{1.25}
-
-    \begin{tabular}{|l|c|}
-        \hline
-        \textbf{Metric} & \textbf{Value} \\
-        \hline
-        True Positive (TP) & 107 \\
-        \hline
-        True Negative (TN) & 123 \\
-        \hline
-        False Positive (FP) & 1 \\
-        \hline
-        False Negative (FN) & 0 \\
-        \hline
-    \end{tabular}
+  \centering
+  \caption{Detailed Look at Every Prediction}
+  \label{tab:confusion}
+  \small
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{|l|c|c|}
+    \hline
+    \multirow{2}{*}{\textbf{Actual Seed Type}} & \multicolumn{2}{c|}{\textbf{What the Model Predicted}} \\
+    \cline{2-3}
+    & \textbf{Impure} & \textbf{Pure} \\
+    \hline
+    \textbf{Impure} & 107 & 0 \\
+    \hline
+    \textbf{Pure} & 1 & 123 \\
+    \hline
+  \end{tabular}
 \end{table}
 
 \begin{figure}[htbp]
@@ -140,7 +120,8 @@ With a dataset size of 1,563 images, training deep neural networks introduces a 
   \centering
   \caption{How Our Anti-Overfitting Techniques Helped}
   \label{tab:regularization}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{4.2cm}|p{4.8cm}|X|}
     \hline
     \textbf{Configuration} & \textbf{Train vs. Validation Gap} & \textbf{What Happened} \\
@@ -176,7 +157,8 @@ Prior to selecting ResNet50 as the primary backbone, a comparative analysis was 
   \centering
   \caption{Comparing Four Different Neural Network Architectures}
   \label{tab:modelcomparison}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.2cm}|c|c|c|c|X|}
     \hline
     \textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Training Time} \\
@@ -215,7 +197,8 @@ Model inference latency refers to the duration required for the network to inges
   \centering
   \caption{Speed on Different Hardware}
   \label{tab:latency}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{4.5cm}|c|X|}
     \hline
     \textbf{Hardware} & \textbf{Speed} & \textbf{Good For What?} \\
@@ -237,7 +220,8 @@ To evaluate the scalability of the backend system under high concurrent access c
   \centering
   \caption{Real-World System Performance Under Load}
   \label{tab:backendperformance}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{4.5cm}|c|X|}
     \hline
     \textbf{Metric} & \textbf{Observation} & \textbf{Significance} \\
@@ -267,7 +251,8 @@ The image processing pipeline and classification subsystem were validated agains
   \centering
   \caption{Seed Verification Test Cases}
   \label{tab:seedtestcases}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{1.6cm}|X|X|c|}
     \hline
     \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
@@ -293,7 +278,8 @@ The complaint lodging and tracking functionalities were validated to verify data
   \centering
   \caption{Complaint System Test Cases}
   \label{tab:complainttestcases}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{1.6cm}|X|X|c|}
     \hline
     \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\
@@ -317,7 +303,8 @@ To ensure secure operations, the authorization and authentication mechanisms wer
   \centering
   \caption{Security and Access Control Test Cases}
   \label{tab:rbactestcases}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{1.6cm}|X|X|c|}
     \hline
     \textbf{Test ID} & \textbf{What We Tested} & \textbf{Expected Behavior} & \textbf{Result} \\

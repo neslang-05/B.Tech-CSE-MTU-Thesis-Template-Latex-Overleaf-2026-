@@ -32,6 +32,8 @@ font=\small
 \draw[->, thick] (api) -- (application);
 \draw[->, thick] (application) -- (domain);
 \draw[->, thick] (infra) -- (domain);
+\draw[->, thick] (infra.west) -- ++(-1.2cm,0) |- (application.west);
+
 \end{tikzpicture}
 \caption{Backend Clean Architecture Layers}
 \label{fig:backend-clean-architecture}
@@ -53,11 +55,13 @@ The layered architecture improves:
 
 The backend uses modern technologies for API development, authentication, AI integration, and database management. The core technologies and libraries comprising this stack are summarized in Table~\ref{tab:backend-tech-stack}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Backend Technology Stack}
 \label{tab:backend-tech-stack}
-\renewcommand{\arraystretch}{1.2}
+\small
+\renewcommand{\arraystretch}{1.1}
+
 \begin{tabularx}{\textwidth}{|p{5.2cm}|X|}
 \hline
 \textbf{Technology} & \textbf{Purpose} \\
@@ -100,11 +104,13 @@ Serilog & Request logging and monitoring \\
 
 The backend source code is divided into multiple layers and modules to maintain clear responsibility boundaries, as outlined in Table~\ref{tab:backend-project-structure}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Backend Project Structure}
 \label{tab:backend-project-structure}
-\renewcommand{\arraystretch}{1.2}
+\small
+\renewcommand{\arraystretch}{1.1}
+
 \begin{tabularx}{\textwidth}{|p{5.2cm}|X|}
 \hline
 \textbf{Folder / Layer} & \textbf{Purpose} \\
@@ -181,11 +187,13 @@ These services manage AI processing, validation, database interaction, and respo
 \subsection{DTOs}
 Data Transfer Objects (DTOs) are used for request and response communication between layers. The primary DTOs utilized in the system and their respective purposes are listed in Table~\ref{tab:important-dtos}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Important DTOs}
 \label{tab:important-dtos}
-\renewcommand{\arraystretch}{1.2}
+\small
+\renewcommand{\arraystretch}{1.1}
+
 \begin{tabularx}{\textwidth}{|p{5.2cm}|X|}
 \hline
 \textbf{DTO} & \textbf{Purpose} \\
@@ -247,11 +255,13 @@ The repository pattern abstracts database operations from business logic.
 \subsection{AI and Cloud Integrations}
 The system integrates multiple Azure services for AI processing and storage, as detailed in Table~\ref{tab:external-services}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{External Service Integrations}
 \label{tab:external-services}
-\renewcommand{\arraystretch}{1.2}
+\small
+\renewcommand{\arraystretch}{1.1}
+
 \begin{tabularx}{\textwidth}{|p{5.2cm}|X|}
 \hline
 \textbf{Service} & \textbf{Purpose} \\
@@ -300,7 +310,14 @@ The backend database maintains relationships between users, seed batches, verifi
 ]
 
 % ---- TOP ROW ----
-\node[entity] (users) {
+\node[entity] (roles) {
+    \textbf{AspNetRoles}
+    \nodepart{second}
+    PK: Id \\
+    RoleName
+};
+
+\node[entity, right=4cm of roles] (users) {
     \textbf{Users}
     \nodepart{second}
     PK: Id \\
@@ -318,14 +335,17 @@ The backend database maintains relationships between users, seed batches, verifi
     District \\
     Phone
 };
-\node[entity, right=4cm of profiles] (roles) {
-    \textbf{AspNetRoles}
-    \nodepart{second}
-    PK: Id \\
-    RoleName
-};
 
 % ---- MIDDLE ROW ----
+\node[entity, below=3cm of roles] (tokens) {
+    \textbf{RefreshTokens}
+    \nodepart{second}
+    PK: Id \\
+    FK: UserId \\
+    Token \\
+    ExpiresAt
+};
+
 \node[entity, below=3cm of users] (verification) {
     \textbf{VerificationHistories}
     \nodepart{second}
@@ -335,7 +355,8 @@ The backend database maintains relationships between users, seed batches, verifi
     IsAuthentic \\
     Confidence
 };
-\node[entity, right=4cm of verification] (complaints) {
+
+\node[entity, below=3cm of profiles] (complaints) {
     \textbf{ProductComplaints}
     \nodepart{second}
     PK: Id \\
@@ -344,7 +365,27 @@ The backend database maintains relationships between users, seed batches, verifi
     IssueType \\
     AssignedOfficerId
 };
-\node[entity, right=4cm of complaints] (actions) {
+
+% ---- BOTTOM ROW ----
+\node[entity, below=3cm of tokens] (systemlogs) {
+    \textbf{SystemLogs}
+    \nodepart{second}
+    PK: Id \\
+    Level \\
+    Message \\
+    Timestamp
+};
+
+\node[entity, below=3cm of verification] (audit) {
+    \textbf{AuditLogs}
+    \nodepart{second}
+    PK: Id \\
+    FK: ActorUserId \\
+    Action \\
+    EntityType
+};
+
+\node[entity, below=3cm of complaints] (actions) {
     \textbf{ComplaintActions}
     \nodepart{second}
     PK: Id \\
@@ -354,40 +395,16 @@ The backend database maintains relationships between users, seed batches, verifi
     RiskLevel
 };
 
-% ---- BOTTOM ROW ----
-\node[entity, below=3cm of verification] (audit) {
-    \textbf{AuditLogs}
-    \nodepart{second}
-    PK: Id \\
-    FK: ActorUserId \\
-    Action \\
-    EntityType
-};
-\node[entity, right=4cm of audit] (tokens) {
-    \textbf{RefreshTokens}
-    \nodepart{second}
-    PK: Id \\
-    FK: UserId \\
-    Token \\
-    ExpiresAt
-};
-\node[entity, below=3cm of actions] (systemlogs) {
-    \textbf{SystemLogs}
-    \nodepart{second}
-    PK: Id \\
-    Level \\
-    Message \\
-    Timestamp
-};
-
 % ---- RELATIONSHIPS ----
 \draw[relation] (users) -- node[left]{\scriptsize 1:1} (profiles);
 \draw[relation] (profiles) -- (roles);
 \draw[relation] (users) -- node[left]{\scriptsize 1:N} (verification);
+\draw[relation] (users) -- node[above]{\scriptsize 1:1} (profiles);
+\draw[relation] (users) -- node[above, sloped, pos=0.5]{\scriptsize 1:N} (tokens);
 \draw[relation] (verification) -- node[above]{\scriptsize 1:N} (complaints);
-\draw[relation] (complaints) -- node[above]{\scriptsize 1:N} (actions);
-\draw[relation] (actions) -- node[above, pos=0.35]{\scriptsize 1:N} (audit);
-\draw[relation] (audit) -- node[above]{\scriptsize 1:N} (tokens);
+\draw[relation] (complaints) -- node[left]{\scriptsize 1:N} (actions);
+\draw[relation] (actions) -- node[above]{\scriptsize 1:N} (audit);
+\draw[relation] (roles) -- node[above]{\scriptsize M:N} (users);
 
 % ---- LEGEND ----
 \node[
@@ -431,11 +448,13 @@ The Presentation Layer exposes RESTful APIs for frontend communication.
 \subsection{API Controllers}
 The backend contains multiple API controllers responsible for different system modules. These controllers and their design objectives are summarized in Table~\ref{tab:api-controllers}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{API Controllers}
 \label{tab:api-controllers}
-\renewcommand{\arraystretch}{1.2}
+\small
+\renewcommand{\arraystretch}{1.1}
+
 \begin{tabularx}{\textwidth}{|p{5.2cm}|X|}
 \hline
 \textbf{Controller} & \textbf{Purpose} \\

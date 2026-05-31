@@ -38,6 +38,8 @@ After merging the two datasets, we had a total of 1,563 paddy seed images divide
 \centering
 \caption{Dataset Source Summary}
 \label{tab:dataset_source_summary}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|c|p{6cm}|}
 \hline
@@ -59,6 +61,8 @@ ICAR Manipur Custom Dataset & 350 & $\sim$23.7\,MB & \nolinkurl{nilambarelangbam
 \centering
 \caption{Class-wise Distribution of the Combined Dataset}
 \label{tab:class_distribution}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{0.8\textwidth}{!}{%
 \begin{tabular}{|l|c|c|}
 \hline
@@ -86,6 +90,8 @@ We divided the 1,563 images into three separate groups: one for training, one fo
 \centering
 \caption{Dataset Split Statistics}
 \label{tab:dataset_split}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|p{7cm}|}
 \hline
@@ -224,6 +230,8 @@ A comprehensive summary of the optimizer, learning rates, regularizers, and gene
 \centering
 \caption{Hyperparameter Configuration and Training Settings}
 \label{tab:hyperparameters}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|p{7.5cm}|}
 \hline
@@ -265,6 +273,8 @@ After training finished, we saved the model in multiple formats to ensure compat
 \centering
 \caption{Model Export Formats}
 \label{tab:export_formats}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|c|c|c|p{6.5cm}|}
 \hline
@@ -284,33 +294,6 @@ DUS Reference DB & \texttt{.csv} & $<$1\,MB & The 12 reference seed varieties fo
 }
 \end{table}
 
-\section{Model Deployment}
-
-After training was complete, we integrated the model into a web service and deployed it to Google Cloud Platform (GCP). The goal was to make the model accessible as a live API that other applications can call to classify seeds in real-time.
-
-\subsection{Serving Infrastructure}
-
-We wrapped the trained model in FastAPI, a fast and modern Python web framework. The API has a single endpoint that works like this: it receives a seed image, resizes and normalizes it, runs it through ResNet50, extracts the 17 physical parameters, matches the seed against our 12 reference varieties, and returns everything as a neat JSON response. The steps are:
-
-\begin{enumerate}
-    \item \textbf{Request}---The FastAPI endpoint receives the image file.
-    \item \textbf{Preprocessing}---The image is resized to $224 \times 224$ pixels and normalized using ImageNet's standard values.
-    \item \textbf{Model Inference}---ResNet50 processes the image and produces raw scores (logits) for each of the three classes.
-    \item \textbf{Post-processing}---Softmax converts those scores into probabilities, we extract the 17 physical measurements, and we find the best-matching varieties.
-    \item \textbf{Response}---A JSON response is sent back with the prediction, confidence scores, physical measurements, and the top-3 variety matches.
-\end{enumerate}
-
-\subsection{Containerisation and CI/CD Pipeline}
-
-We packaged everything---the model weights, the FastAPI server, and all required libraries---into a Docker container. Docker is like a lightweight virtual machine that ensures the model works the same way on any computer or cloud platform.
-
-Deployment happens automatically: whenever we push new code to our GitHub repository's main branch, a GitHub Actions workflow automatically builds a fresh Docker image, uploads it to Google Cloud's storage service (Artifact Registry), and deploys it to Google Cloud Run. Cloud Run is perfect for this because it automatically scales up when there are many requests and scales down when there's little traffic, so we don't pay for idle servers.
-
-The live API is publicly accessible at:
-\begin{center}
-\href{https://resnet-api-297419987783.asia-south1.run.app/}{\nolinkurl{https://resnet-api-297419987783.asia-south1.run.app/}}
-\end{center}
-
 \section{Model Comparison and Selection}
 
 A performance comparison among all four models is shown in table 4.6. Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared MobileNetV2, DenseNet121, and GoogleNet, with the comparative results detailed in Table~\ref{tab:architecture_comparison}.
@@ -319,6 +302,8 @@ A performance comparison among all four models is shown in table 4.6. Before com
 \centering
 \caption{Architecture Comparison on Test Set}
 \label{tab:architecture_comparison}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|c|c|c|c|c|}
 \hline
@@ -353,27 +338,28 @@ The extra 4.4 minutes of training time is a small price to pay for these advanta
 After completing both training phases, we evaluated our final ResNet50 model on the test set---the images we'd held back and never shown the model during training. The final evaluation metrics are compiled in Table~\ref{tab:final_test_performance}, and a detailed summary of the training trajectory and learning stability is provided in Table~\ref{tab:training_behaviour}.
 
 \begin{table}[htbp]
-    \centering
-    \caption{Final Test Set Performance---ResNet50}
-    \label{tab:final_test_performance}
-    
-    \resizebox{\textwidth}{!}{%
-    \begin{tabular}{|l|c|p{8cm}|}
-        \hline
-        \textbf{Metric} & \textbf{Value} & \textbf{Status} \\
-        \hline
-        Test Accuracy & 99.57\% & Far exceeds industry standard (85--90\%) \\
-        \hline
-        Precision & $\sim$0.99 & Outstanding---almost no false positives \\
-        \hline
-        Recall & $\sim$0.99 & Outstanding---catches almost all cases \\
-        \hline
-        F1 Score & $\sim$0.99 & Excellent---perfectly balanced performance \\
-        \hline
-        Train-Validation Gap & $<$5\% & Great generalization---model isn't overfitting \\
-        \hline
-    \end{tabular}%
-    }
+\centering
+\caption{Final Test Set Performance---ResNet50}
+\label{tab:final_test_performance}
+\small
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|p{8cm}|}
+\hline
+\textbf{Metric} & \textbf{Value} & \textbf{Status} \\
+\hline
+Test Accuracy & 99.57\% & Far exceeds industry standard (85--90\%) \\
+\hline
+Precision & $\sim$0.99 & Outstanding---almost no false positives \\
+\hline
+Recall & $\sim$0.99 & Outstanding---catches almost all cases \\
+\hline
+F1 Score & $\sim$0.99 & Excellent---perfectly balanced performance \\
+\hline
+Train-Validation Gap & $<$5\% & Great generalization---model isn't overfitting \\
+\hline
+\end{tabular}%
+}
 \end{table}
 
 From Table~4.7 we observed that, the final test accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality classification. The near-perfect precision, recall, and F1-score indicate highly reliable performance across all seed quality categories. These results demonstrate that the proposed system is suitable for practical deployment and can support accurate seed quality assessment in agricultural applications.
@@ -385,6 +371,8 @@ Table~\ref{tab:training_behaviour} summarizes the key observations recorded duri
 \centering
 \caption{Training Behaviour Summary}
 \label{tab:training_behaviour}
+\small
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{|p{4cm}|p{11.5cm}|}
 \hline

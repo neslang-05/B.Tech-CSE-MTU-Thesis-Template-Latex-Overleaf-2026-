@@ -23,24 +23,33 @@ As illustrated in Figure~\ref{fig:model_request_flow}, an inference request begi
 
 From there, two operations run in parallel: a PyTorch inference engine --- with ResNet-50 weights pre-loaded to avoid cold-start delays --- computes classification logits \cite{paszke2019pytorch, he2016deep}, while OpenCV contour routines extract 17 DUS (Distinctness, Uniformity, and Stability) morphological parameters \cite{bradski2000opencv}. The results are aggregated, scored against reference cultivars, and returned as JSON.
 
+The sequential execution steps of this request flow are defined as follows:
+\begin{enumerate}
+    \item \textbf{Request:} The FastAPI endpoint receives the image payload via a multipart POST request from the backend proxy.
+    \item \textbf{Preprocessing:} The image is decoded into an OpenCV matrix, resized to $224 \times 224$ pixels, and normalized using the standard ImageNet channel moments.
+    \item \textbf{Model Inference:} The pre-loaded ResNet50 model runs inference in a background thread pool to generate raw classification logits.
+    \item \textbf{Morphological Post-processing:} Simultaneously, OpenCV contour analysis extracts the 17 DUS physical measurements, and the system performs variety matching against the 12 reference profiles.
+    \item \textbf{Response:} The API aggregates the model predictions, confidence levels, variety distance scores, and DUS metrics into a structured JSON payload returned to the client.
+\end{enumerate}
+
 \begin{figure}[H]
   \centering
   \begin{adjustbox}{max width=\textwidth}
     \begin{tikzpicture}[
-      node distance=0.6cm and 0.8cm,
-      box/.style={draw=black!80, fill=blue!5, thick, rounded corners=4pt, align=center, font=\scriptsize, minimum width=2.8cm, minimum height=1cm},
-      subbox/.style={draw=black!80, fill=orange!10, thick, rounded corners=4pt, align=center, font=\scriptsize, minimum width=3.2cm, minimum height=0.9cm},
+      node distance=1.2cm and 1.5cm,
+      box/.style={draw=black!80, fill=blue!5, thick, rounded corners=4pt, align=center, font=\small, minimum width=3.8cm, minimum height=1.1cm},
+      subbox/.style={draw=black!80, fill=orange!10, thick, rounded corners=4pt, align=center, font=\small, minimum width=4cm, minimum height=1.1cm},
       arrow/.style={->, thick, >=stealth, draw=black!80}
     ]
       % Nodes
       \node[box, fill=gray!10] (req) {1. Image Payload\\(Multipart POST)};
-      \node[box, fill=cyan!10, right=of req] (asgi) {2. ASGI Validation\\(FastAPI \& Pydantic)};
-      \node[box, fill=purple!10, right=of asgi] (pre) {3. Preprocessing\\(OpenCV \& Tensor)};
+      \node[box, fill=cyan!10, below=of req] (asgi) {2. ASGI Validation\\(FastAPI \& Pydantic)};
+      \node[box, fill=purple!10, below=of asgi] (pre) {3. Preprocessing\\(OpenCV \& Tensor)};
       
-      \node[subbox, right=of pre, yshift=0.8cm] (resnet) {4a. PyTorch Engine\\(ResNet-50 Inference)};
-      \node[subbox, right=of pre, yshift=-0.8cm, fill=teal!10] (dus) {4b. Morphology\\(OpenCV DUS Metrics)};
+      \node[subbox, below left=of pre, xshift=-0.5cm] (resnet) {4a. PyTorch Engine\\(ResNet-50 Inference)};
+      \node[subbox, below right=of pre, xshift=0.5cm, fill=teal!10] (dus) {4b. Morphology\\(OpenCV DUS Metrics)};
       
-      \node[box, fill=green!10, right=of resnet, yshift=-0.8cm] (post) {5. Aggregation \&\\JSON Serialization};
+      \node[box, fill=green!10, below=3.2cm of pre] (post) {5. Aggregation \&\\JSON Serialization};
 
       % Background AI box
       \begin{scope}[on background layer]
@@ -51,10 +60,10 @@ From there, two operations run in parallel: a PyTorch inference engine --- with 
       % Arrows
       \draw[arrow] (req) -- (asgi);
       \draw[arrow] (asgi) -- (pre);
-      \draw[arrow] (pre) |- (resnet);
-      \draw[arrow] (pre) |- (dus);
-      \draw[arrow] (resnet) -| (post);
-      \draw[arrow] (dus) -| (post);
+      \draw[arrow] (pre) -- (resnet);
+      \draw[arrow] (pre) -- (dus);
+      \draw[arrow] (resnet) -- (post);
+      \draw[arrow] (dus) -- (post);
     \end{tikzpicture}
   \end{adjustbox}
   \caption{Asynchronous model request processing flow.}
@@ -85,11 +94,12 @@ From there, two operations run in parallel: a PyTorch inference engine --- with 
 
 The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_spec_predict} and \ref{tab:api_spec_health} define the schema contracts for communication with the backend orchestrator.
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption{API Specification for the \texttt{POST /predict} Model Inference Endpoint}
   \label{tab:api_spec_predict}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.2cm}|X|}
     \hline
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
@@ -105,11 +115,12 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
   \end{tabularx}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption{API Specification for the \texttt{GET /health} Liveness Endpoint}
   \label{tab:api_spec_health}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.2cm}|X|}
     \hline
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
@@ -133,16 +144,16 @@ The service uses a multi-stage Docker build to balance reproducibility against i
 
 \begin{figure}[H]
   \centering
-  \begin{adjustbox}{max width=\textwidth}
+  \begin{adjustbox}{max width=0.8\textwidth}
     \begin{tikzpicture}[
-      node distance=0.8cm and 1cm,
-      box/.style={draw=black!80, fill=blue!5, thick, rounded corners=4pt, align=center, font=\scriptsize, minimum width=3cm, minimum height=1cm},
+      node distance=1.2cm,
+      box/.style={draw=black!80, fill=blue!5, thick, rounded corners=4pt, align=center, font=\small, minimum width=4.8cm, minimum height=1.1cm},
       arrow/.style={->, thick, >=stealth, draw=black!80}
     ]
       \node[box] (git) {1. CI/CD Pipeline\\(GitHub Actions)};
-      \node[box, fill=purple!10, right=of git] (docker) {2. Multi-Stage Build\\(Docker Builder $\rightarrow$ Slim)};
-      \node[box, fill=cyan!10, right=of docker] (registry) {3. Artifact Registry\\(Version Tagging)};
-      \node[box, fill=green!10, right=of registry] (run) {4. GCP Cloud Run\\(Serverless Auto-scale)};
+      \node[box, fill=purple!10, below=of git] (docker) {2. Multi-Stage Build\\(Docker Builder $\rightarrow$ Slim)};
+      \node[box, fill=cyan!10, below=of docker] (registry) {3. Artifact Registry\\(Version Tagging)};
+      \node[box, fill=green!10, below=of registry] (run) {4. GCP Cloud Run\\(Serverless Auto-scale)};
 
       \draw[arrow] (git) -- (docker);
       \draw[arrow] (docker) -- (registry);
@@ -154,6 +165,22 @@ The service uses a multi-stage Docker build to balance reproducibility against i
 \end{figure}
 
 The image is deployed to GCP Cloud Run \cite{biswas2022gcp}. Cloud Run manages HTTPS termination and load balancing, and scales to zero when idle, so infrastructure costs track actual query volume rather than reserved capacity.
+
+\subsection{CI/CD Deployment Pipeline}
+The automated build and release lifecycle is managed via a continuous integration and continuous deployment (CI/CD) pipeline implemented with GitHub Actions. Whenever updates are merged into the repository's production branch, the pipeline executes the following stages:
+\begin{itemize}
+    \item \textbf{Build Validation:} Runs linter checks and automated tests to ensure code quality.
+    \item \textbf{Docker Compilation:} Triggers a multi-stage Docker build, generating a security-hardened and size-optimized production container.
+    \item \textbf{Registry Storage:} Authenticates with Google Cloud and pushes the compiled image to the secure GCP Artifact Registry with versioned tags.
+    \item \textbf{Serverless Deployment:} Deploys the container to GCP Cloud Run, utilizing serverless auto-scaling to dynamically adjust resource allocation based on request volumes.
+\end{itemize}
+
+\subsection{Live Production API Endpoint}
+To demonstrate the functionality of the serving layer under real-world conditions, the API is exposed as a live web service. Other client applications and services in the AgriVerify platform (such as the ASP.NET Core backend proxy) communicate with this service at:
+\begin{center}
+\href{https://resnet-api-297419987783.asia-south1.run.app/}{\nolinkurl{https://resnet-api-297419987783.asia-south1.run.app/}}
+\end{center}
+
 
 % % ──────────────────────────────────────────────────────────────
 % \section{Configuration and Defensive Security Hardening}

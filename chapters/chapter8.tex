@@ -8,7 +8,8 @@ AgriVerify communicates across four main boundaries. To keep everything secure, 
 \centering
 \caption{How Different Parts of AgriVerify Communicate}
 \label{tab:integration_matrix}
-\renewcommand{\arraystretch}{1.35}
+\small
+\renewcommand{\arraystretch}{1.1}
 \begin{tabularx}{\textwidth}{|p{3.5cm}|p{3.5cm}|X|}
 \hline
 \textbf{Communication Path} & \textbf{Protocol} & \textbf{What Happens \& Security} \\
@@ -34,7 +35,7 @@ When a farmer submits a seed image, it travels through several stages: from the 
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-    node distance=1.8cm and 2.2cm,
+    node distance=1.8cm and 3.5cm,
     box/.style={rectangle, draw=black!80, rounded corners, minimum width=3.8cm, minimum height=1.1cm, align=center, font=\small, thick},
     client/.style={box, fill=blue!10, draw=blue!80},
     proxy/.style={box, fill=yellow!15, draw=yellow!80!black},
