@@ -69,42 +69,69 @@ To evaluate the class-specific performance of the classifier, metrics were compu
 The model achieved 100.0\% precision for the pure category, which can be attributed to the highly distinct visual markers of genuine paddy seeds, such as uniform golden-brown coloration, intact husks, and consistent surface textures. Conversely, the model demonstrated 100.0\% recall for the impure category, successfully flagging every damaged, defective, or counterfeit seed. This asymmetric performance is highly desirable for agricultural quality control, ensuring that sub-standard seed batches are consistently intercepted while minimizing the false rejection of certified stock~\cite{liu2020}.
 
 The high classification performance is primarily due to class-weighted loss functions and data augmentation strategies employed during training. These techniques mitigate class imbalance issues and prevent the network from exhibiting classification bias toward the majority class.
-
+\newpage
 \section{Confusion Matrix Analysis}
 
 To analyze the distribution of classification errors, a confusion matrix was constructed. The quantitative prediction distributions are detailed in Table~\ref{tab:confusion}, and the corresponding normalized confusion matrix is visualized in Figure~\ref{fig:confusion-matrix}.
 
 \begin{table}[htbp]
-  \centering
-  \caption{Detailed Look at Every Prediction}
-  \label{tab:confusion}
-  \renewcommand{\arraystretch}{1.35}
-  \begin{tabularx}{0.75\textwidth}{|l|c|c|}
-    \hline
-    \multirow{2}{*}{\textbf{Actual Seed Type}} & \multicolumn{2}{c|}{\textbf{What the Model Predicted}} \\
-    \cline{2-3}
-    & \textbf{Impure} & \textbf{Pure} \\
-    \hline
-    \textbf{Impure} & 107 & 0 \\
-    \hline
-    \textbf{Pure} & 1 & 123 \\
-    \hline
-  \end{tabularx}
+    \centering
+    \caption{Detailed Look at Every Prediction}
+    \label{tab:confusion}
+    \renewcommand{\arraystretch}{1.35}
+
+    \resizebox{0.75\textwidth}{!}{%
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \multirow{2}{*}{\textbf{Actual Seed Type}} &
+        \multicolumn{2}{c|}{\textbf{What the Model Predicted}} \\
+        \cline{2-3}
+        & \textbf{Impure} & \textbf{Pure} \\
+        \hline
+        \textbf{Impure} & 107 & 0 \\
+        \hline
+        \textbf{Pure} & 1 & 123 \\
+        \hline
+    \end{tabular}%
+    }
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Confusion Matrix Components}
+    \label{tab:confusion_components}
+    \renewcommand{\arraystretch}{1.25}
+
+    \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Metric} & \textbf{Value} \\
+        \hline
+        True Positive (TP) & 107 \\
+        \hline
+        True Negative (TN) & 123 \\
+        \hline
+        False Positive (FP) & 1 \\
+        \hline
+        False Negative (FN) & 0 \\
+        \hline
+    \end{tabular}
 \end{table}
 
 \begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{images/confusion-matrix.jpeg}
-  \caption{Visual representation of how often the model got predictions right or wrong.}
-  \label{fig:confusion-matrix}
+    \centering
+    \includegraphics[width=\textwidth]{images/confusion-matrix.jpeg}
+    \caption{Visual representation of Confusion Matrix}
+    \label{fig:confusion-matrix}
 \end{figure}
 
 Out of the 231 test samples evaluated, the model correctly classified 230 samples. The specific classification outcomes are analyzed below:
 
-\textbf{Impure Class (107 Samples):} All 107 impure samples were correctly classified as impure (True Positives), yielding zero false negatives. From an agricultural safety perspective, this prevents the inadvertent distribution and planting of defective or counterfeit seed batches.
+\textbf{Impure Class (107 Samples):}
+All 107 impure samples were correctly classified as impure (True Positives), yielding zero false negatives. From an agricultural safety perspective, this prevents the inadvertent distribution and planting of defective or counterfeit seed batches.
 
-\textbf{Pure Class (124 Samples):} The model correctly identified 123 pure samples (True Negatives), with only 1 sample misclassified as impure (False Positive). This conservative error is preferable in agricultural workflows; while a false positive merely necessitates a secondary manual inspection, a false negative (failing to identify impure seeds) could lead to complete crop failure and economic losses for the farmer.
-
+\textbf{Pure Class (124 Samples):}
+The model correctly identified 123 pure samples (True Negatives), with only 1 sample misclassified as impure (False Positive). This conservative error is preferable in agricultural workflows; while a false positive merely necessitates a secondary manual inspection, a false negative (failing to identify impure seeds) could lead to complete crop failure and economic losses for the farmer.
+\newpage
 \section{Regularization Effectiveness}
 
 With a dataset size of 1,563 images, training deep neural networks introduces a significant risk of overfitting, where the model memorizes high-frequency noise in the training set rather than extracting generalizable morphological features. To mitigate this, several regularization techniques were evaluated, as compared in Table~\ref{tab:regularization}.
@@ -127,7 +154,7 @@ With a dataset size of 1,563 images, training deep neural networks introduces a 
   \end{tabularx}
 \end{table}
 
-The validation-to-training accuracy gap was reduced to 2.8\% when all regularization methods were active. This small generalization error indicates that the network successfully extracted generalizable features. This was achieved through the following architectural and optimization strategies:
+From the table 9.5 we observed that the validation-to-training accuracy gap was reduced to 2.8\% when all regularization methods were active. This small generalization error indicates that the network successfully extracted generalizable features. This was achieved through the following architectural and optimization strategies:
 
 \begin{itemize}
     \item \textbf{Weight Decay (AdamW):} L2 regularization was applied to penalize large weight magnitudes, thereby constraining model complexity and improving generalization~\cite{loshchilov2019adamw}.
@@ -168,11 +195,11 @@ Prior to selecting ResNet50 as the primary backbone, a comparative analysis was 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{images/model-comparison.jpeg}
-  \caption{Visual comparison of how each model performed and how long training took.}
+  \caption{Comparison of each model and training phase.}
   \label{fig:model-comparison}
 \end{figure}
 
-ResNet50, DenseNet121, and GoogLeNet achieved identical classification accuracies of 99.57\%. MobileNetV2 registered a slightly lower accuracy of 99.13\% but required significantly less training time. ResNet50 was selected as the final architecture due to several specific advantages.
+As shown in table 9.6 ResNet50, DenseNet121, and GoogLeNet achieved identical classification accuracies of 99.57\%. MobileNetV2 registered a slightly lower accuracy of 99.13\% but required significantly less training time. ResNet50 was selected as the final architecture due to several specific advantages.
 
 The residual connections (skip connections) in ResNet50 address the vanishing gradient problem, allowing efficient backpropagation through the 50-layer architecture and facilitating fine-tuning without information loss~\cite{he2016deep, xu2021}. Furthermore, ResNet50 exhibits superior compatibility across deployment frameworks, including PyTorch, TorchScript, ONNX, and edge-optimized runtime engines. This cross-platform compatibility supports future plans to deploy AgriVerify as a native mobile application. The marginal training time overhead (an additional 4.4 minutes compared to GoogLeNet) is offset by these deployment advantages, given that model training is an offline process~\cite{pytorch2019}.
 
