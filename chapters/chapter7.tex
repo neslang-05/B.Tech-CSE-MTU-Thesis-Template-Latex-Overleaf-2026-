@@ -34,13 +34,13 @@ A request passes through four layers before reaching backend services (Figure~\r
 \node[fill=green!10, below=of ui] (hooks) {\textbf{State Synchronization}\\(TanStack Query)};
 \node[fill=yellow!10, below=of hooks] (services) {\textbf{Service Layer}\\(Axios API Client)};
 \node[fill=orange!10, below=of services] (proxy) {\textbf{API Proxy Route}\\(Next.js Intermediary)};
-\node[fill=red!10, right=1.2cm of services] (backend) {\textbf{ASP.NET Backend}\\(Business \& Data)};
-\node[fill=purple!10, right=1.2cm of proxy] (ml) {\textbf{AI Inference}\\(Model Engine)};
+\node[fill=red!10, right=1.2cm of proxy] (backend) {\textbf{ASP.NET Backend}\\(Business \& Data)};
+\node[fill=purple!10, below=of backend] (ml) {\textbf{AI Inference}\\(Model Engine)};
 
 \draw[arrow] (ui) -- (hooks);
 \draw[arrow] (hooks) -- (services);
 \draw[arrow] (services) -- (proxy);
-\draw[arrow] (proxy) -| (backend);
+\draw[arrow] (proxy) -- (backend);
 \draw[arrow] (backend) -- (ml);
 \end{tikzpicture}
 \end{adjustbox}
