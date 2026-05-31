@@ -94,11 +94,12 @@ The sequential execution steps of this request flow are defined as follows:
 
 The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_spec_predict} and \ref{tab:api_spec_health} define the schema contracts for communication with the backend orchestrator.
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption{API Specification for the \texttt{POST /predict} Model Inference Endpoint}
   \label{tab:api_spec_predict}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.2cm}|X|}
     \hline
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
@@ -114,11 +115,12 @@ The microservice exposes a tightly constrained RESTful API. Tables~\ref{tab:api_
   \end{tabularx}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
   \centering
   \caption{API Specification for the \texttt{GET /health} Liveness Endpoint}
   \label{tab:api_spec_health}
-  \renewcommand{\arraystretch}{1.35}
+  \small
+  \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|p{3.2cm}|X|}
     \hline
     \textbf{Attribute} & \textbf{Endpoint Constraint / Schema Definition} \\
