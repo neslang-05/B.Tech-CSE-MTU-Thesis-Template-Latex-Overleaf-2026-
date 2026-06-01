@@ -1,89 +1,36 @@
-% \chapter{Conclusion and Future Work}
-
 \section{Summary of Work}
 
-AgriVerify(\textbf{AI-Based Paddy Seed Quality Assessment And Farmer Feedback System}) was built to address a specific, practical problem: farmers in rural regions lack an easy, accessible, and convenient way to verify paddy seed quality before planting. Existing methods, such as manual inspection and laboratory testing, are often time-consuming, inconsistent, and not easily accessible to smallholder farmers. The system responds to that gap by combining deep learning detection, OCR-based packaging analysis, cloud deployment, and a farmer complaint workflow into a single platform.
+We developed AgriVerify to address a practical problem: smallholder farmers in rural regions do not have an easy way to verify paddy seed quality before planting. Traditional seed inspection methods require sending samples to specialized labs, which is expensive, slow, and inaccessible to average farmers. This system bridges that gap by combining a deep learning model for visual inspection, packaging text extraction (OCR), and an administrative complaint workflow into a single platform.
 
-The architecture reflects those requirements. A Next.js Frontend delivers role-based dashboards for farmers, officers, administrators, and public users. An ASP.NET Core backend built on Clean Architecture principles handles API orchestration and business logic. A FastAPI microservice runs the machine learning inference. Azure AI Cognitive Services handles OCR and report synthesis.
+The system's architecture reflects these requirements. We built a Next.js web application that provides role-based interfaces for farmers, agricultural officers, and administrators. The backend was developed using ASP.NET Core following Clean Architecture principles, ensuring that data validation and business rules are separated from database or web concerns. We served the deep learning model using a FastAPI microservice, while Azure AI services were integrated to run OCR on packaging labels and generate plain-language feedback reports.
 
-The seed detection model uses ResNet50 transfer learning, trained on a curated dataset of genuine, suspicious and low quality paddy seed images. Preprocessing and augmentation rotation, normalization, brightness adjustment, cropping, flipping were applied to improve generalization. The model extracts visual features including shape, texture, colour distribution, and grain structure to detect seed quality.
+To evaluate seed quality, we trained a ResNet50 classifier using transfer learning on a dataset of healthy, damaged, and impure paddy grains. We used image preprocessing and augmentation techniques—including rotation, normalization, and brightness adjustments—to ensure the model remains robust under the poor lighting conditions typical of rural fields. The model measures key physical traits such as grain length, width, circularity, and color distribution.
 
-OCR through Azure Computer Vision extracts batch numbers, expiry dates, and manufacturer details from seed packaging. Combined with the detection output, Azure OpenAI synthesises these into plain-language summaries that non-technical users can act on without needing to interpret raw model scores.
-
-Farmers can also submit complaints about suspicious or failed seed products directly through the platform. Agricultural officers investigate, record actions, update complaint status, and can trigger batch embargoes where warranted. This turns what would otherwise be an isolated prediction system into a traceable quality monitoring workflow.
-
-The ML API was containerized with Docker and deployed on scalable cloud infrastructure. The Frontend and backend were designed for low-latency operation and remain usable under limited connectivity conditions common in rural agricultural regions.
+When a user runs a scan, the backend combines the seed classification results with the batch details extracted from the packaging label. It then uses Azure OpenAI to compile these findings into a simple, non-technical summary. If a farmer discovers a seed batch has failed to germinate after sowing, they can log a complaint through the platform. These reports are sent directly to regional agricultural officers, who can review the complaints, record their investigations, and flag problematic seed batches. This provides a transparent feedback loop to help track seed fraud in local markets.
 
 \section{Key Contributions and Findings}
 
-\begin{enumerate}
+The primary contribution of this work lies in the development and deployment of a localized deep learning pipeline for paddy seed classification that bridges scientific certification parameters with field-level agricultural practice. By training a ResNet50 classifier on seed specimens collected in collaboration with local research institutions, the system successfully categorizes samples into genuine and impure batches. Unlike simple binary image classification systems, this model extracts key morphometric descriptors---including grain length, aspect ratio, and husk uniformity---and compares them against established Distinctness, Uniformity, and Stability (DUS) standards. This approach provides smallholder farmers with a scientifically grounded quality assessment directly in the field, helping to eliminate the subjectivity and inconsistency associated with manual seed inspections.
 
-\item \textbf{AI-Based Automated Paddy Seed Quality Assessment}\\
-The proposed detection model successfully distinguishes between healthy, damaged, and counterfeit paddy seeds with high accuracy and low inference latency. Transfer learning using ResNet50 significantly reduced the amount of labelled training data required while maintaining strong predictive performance, making real-time deployment feasible.
+Furthermore, this project demonstrates the feasibility of orchestrating heterogeneous AI services within a unified, real-time transaction workflow. The backend architecture consolidates multiple specialized services---combining Azure Blob Storage, a FastAPI machine learning microservice, Azure AI Vision OCR, and the Azure OpenAI Service---into a single transactional request. By extracting packaging batch numbers via optical character recognition and passing the combined classification metrics to a large language model, the system synthesizes unstructured analytical statistics into a clear, plain-language advisory summary. This design shows how complex, multi-service machine learning workflows can be simplified to deliver immediate, actionable feedback to users.
 
-\item \textbf{Integration of Multiple AI Services}\\
-The system integrates multiple AI-driven components into a unified verification platform, including:
+Finally, the system addresses the operational challenges of deploying advanced software services in resource-constrained rural environments. To ensure usability over unstable 3G and 4G networks in districts like Senapati and Tamenglong, we implemented client-side image compression in the browser to minimize upload payloads without losing morphological detail. This mobile-first optimization, combined with a Next.js server-side API proxy, shields sensitive authorization credentials while bypassing client network bottlenecks. The deployment of this containerized architecture across Vercel and Render demonstrates a low-cost, scalable framework that empowers agricultural communities to combat seed counterfeiting and report market anomalies directly to regional enforcement authorities.
 
-\begin{itemize}
-    \item Deep learning for seed detection
-    \item OCR for packaging text extraction
-    \item Cloud-based REST APIs for orchestration
-    \item Automated report generation and result summarisation
-\end{itemize}
-
-Each module addresses a different stage of the verification workflow. Together, they provide detection results, provenance-related information, and user-friendly summaries that can be understood without technical expertise.
-
-\item \textbf{DUS Parameter Evaluation}\\
-The platform extracts and evaluates physical seed characteristics such as length, width, colour variance, circularity, and surface texture. These measurements are compared against reference values for known cultivars, extending the system beyond binary detection toward scientific seed quality evaluation aligned with the Distinctness, Uniformity, and Stability (DUS) framework.
-
-\item \textbf{Real-Time Farmer Assistance}\\
-Farmers can upload seed images and receive detection results, confidence scores, and advisory summaries within seconds. This substantially reduces the delay associated with traditional laboratory-based testing methods, which often require several days and may exceed the optimal planting period.
-
-\item \textbf{Secure and Scalable System Architecture}\\
-The implementation incorporates JWT authentication, role-based access control, repository patterns, and asynchronous task execution to address security, maintainability, and performance requirements. The cloud-ready architecture supports scalability without major structural modifications.
-
-\item \textbf{Complaint Redressal and Governance Workflow}\\
-The complaint management module provides farmers with a structured mechanism to report suspicious seed products while enabling agricultural officers to investigate and document cases efficiently. This establishes a transparent audit trail across the seed supply chain.
-
-\item \textbf{Reduction of Manual Dependency}\\
-The proposed model identifies damaged grains, defects, and counterfeit seed varieties more consistently than manual inspection methods, which are often affected by observer expertise and environmental conditions such as lighting. Automation reduces subjectivity and improves consistency in the verification process.
-
-\item \textbf{Cloud-Native AI Deployment}\\
-The system adopts a cloud-native deployment approach using Docker containerisation, REST APIs, and scalable backend services. This simplifies monitoring, maintenance, and redeployment while enabling resource allocation to scale dynamically according to workload demand.
-
-\end{enumerate}
 
 \section{Future Enhancements}
 
 \begin{enumerate}
 
-\item \textbf{Offline-First Progressive Web Application (PWA)}\\
-Intermittent connectivity is common in many of the regions this system targets. Implementing offline-first capabilities using Progressive Web Application (PWA) technologies and IndexedDB would allow farmers to scan seeds and queue submissions without an active internet connection, synchronizing data automatically once connectivity becomes available.
+\item \textbf{Local Language Support (Manipuri and Regional Dialects)}\\
+The current system is English-only, which presents a barrier to many farmers in Manipur. Translating the web interface into Meiteilon (Manipuri) and adding audio playback of the verification reports would improve accessibility and adoption in local farming communities.
 
-\item \textbf{Enhanced Security Mechanisms}\\
-The current implementation stores JWT tokens in localStorage. Migrating to \texttt{HttpOnly} cookies with Content Security Policy (CSP) enforcement would reduce vulnerability to XSS attacks and session hijacking, improving the overall security posture of the platform before large-scale deployment.
+\item \textbf{On-Device Offline Inference (TensorFlow Lite / ONNX)}\\
+Hilly districts in Manipur often have no cellular coverage. We want to convert our PyTorch ResNet50 model to a lightweight TensorFlow Lite format and run inference directly on Android devices offline, queueing sync logs for when they return to network range.
 
-\item \textbf{Blockchain-Based Verification Ledger}\\
-Each verification report could be cryptographically hashed and stored on a distributed ledger to create a tamper-evident record of seed batch history across the agricultural supply chain. This would provide regulators and buyers with an independently verifiable audit trail.
+\item \textbf{Cultivar Expansion for Northeast India}\\
+Expanding the classification model to support more specific paddy varieties grown in the region, such as *RC Maniphou-12*, *CAU-R1*, and local heirloom grains, requiring further field dataset collection.
 
-\item \textbf{IoT and Smart Agriculture Integration}\\
-Integrating the platform with IoT devices such as soil sensors, humidity monitors, and fertilizer quality detectors would allow the system to combine environmental data with seed verification results, enabling more accurate agronomic recommendations.
+\item \textbf{Physical Label Anti-Counterfeiting Integration}\\
+Adding support for physical verification methods like QR codes or security holograms from agricultural distribution departments to run parallel with visual grain inspection.
 
-\item \textbf{Expansion to Multiple Crop Varieties}\\
-The current dataset and model are limited to paddy seeds. Future versions of the system could be extended to support wheat, maize, pulses, and vegetable seeds. However, each crop category would require dedicated labeled datasets and model-specific optimization.
-
-\item \textbf{Mobile Application Development}\\
-Developing a dedicated Android or iOS application would improve camera integration, offline storage, device-level optimization, and overall usability for farmers who are more comfortable using native mobile applications than browser-based systems.
-
-\item \textbf{Multilingual Farmer Assistance}\\
-An English-only interface limits accessibility in linguistically diverse agricultural regions. Adding support for regional languages and voice-assisted interaction would reduce literacy barriers and improve adoption among farmers.
-
-\item \textbf{Advanced Analytics Dashboard}\\
-Aggregated verification data could be analyzed to identify counterfeit seed distribution trends, regional fraud hotspots, and seasonal quality variations. Such insights would assist agricultural officers and policymakers in making data-driven decisions.
-
-\item \textbf{Federated Learning for Privacy-Preserving AI}\\
-Federated learning techniques could allow model training across decentralized devices without transferring raw image data to a centralized server. This would improve privacy while still enabling the AI model to learn continuously from field data.
-
-\item \textbf{Explainable AI (XAI)}\\
-Incorporating Explainable AI techniques such as Grad-CAM visualizations and feature heatmaps would help users understand which image regions influenced the detection decision. This would improve transparency and trustworthiness, especially for agricultural officers and regulatory authorities.
 \end{enumerate}

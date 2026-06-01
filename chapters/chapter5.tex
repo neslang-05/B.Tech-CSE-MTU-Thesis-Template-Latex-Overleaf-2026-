@@ -5,7 +5,7 @@
 % \chapter{Model Serving API}
 % \label{ch:model-serving-api}
 
-Deploying a trained model as a live service introduces a different set of problems than training it. Model development focuses on architecture and accuracy; the serving layer determines response latency, concurrent throughput and uptime under real load \cite{martin2017clean}. In AgriVerify, the PyTorch ResNet-50 model from \textbf{Chapter 4} runs inside a dedicated inference microservice built specifically for this purpose.
+Deploying a trained model as a live service introduces a different set of problems than training it. Model development focuses on architecture and accuracy; the serving layer determines response latency, concurrent throughput and uptime under real load \cite{martin2018clean}. In AgriVerify, the PyTorch ResNet-50 model from \textbf{Chapter 4} runs inside a dedicated inference microservice built specifically for this purpose.
 
 This chapter describes the design of that microservice, implemented with FastAPI and Uvicorn \cite{ramirez2023fastapi}. It covers the asynchronous request lifecycle, the tensor normalization pipeline, the API endpoint contracts, and the containerised deployment approach using Docker multi-stage builds on GCP Cloud Run \cite{merkel2014docker}.
 
@@ -146,7 +146,7 @@ The service uses a multi-stage Docker build to balance reproducibility against i
   \label{fig:container_deployment_workflow}
 \end{figure}
 
-The image is deployed to GCP Cloud Run \cite{biswas2022gcp}. Cloud Run manages HTTPS termination and load balancing, and scales to zero when idle, so infrastructure costs track actual query volume rather than reserved capacity.
+The image is deployed to GCP Cloud Run \cite{gcp2023cloudrun}. Cloud Run manages HTTPS termination and load balancing, and scales to zero when idle, so infrastructure costs track actual query volume rather than reserved capacity.
 
 \subsection{CI/CD Deployment Pipeline}
 The automated build and release lifecycle is managed via a continuous integration and continuous deployment (CI/CD) pipeline implemented with GitHub Actions. Whenever updates are merged into the repository's production branch, the pipeline executes the following stages:
