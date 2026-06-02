@@ -2,16 +2,16 @@
 % CHAPTER 6: BACKEND SYSTEM ARCHITECTURE AND IMPLEMENTATION
 % AgriVerify --- AI-Powered Seed Quality Assessment and Farmer Feedback System
 % ============================================================
-The backend of the AgriVerify system serves as the central coordinator for the entire platform. It handles the core business logic, coordinates the database schema, communicates with our specialized deep learning inference containers, and serves clean REST APIs for the Next.js frontend client. We developed this service using ASP.NET Core Web API on .NET 8, following the Clean Architecture pattern to keep the codebase modular, testable, and easy to maintain as requirements evolve.
+Our backend application coordinates request routing, database state, and downstream machine learning inference. We built the service using ASP.NET Core on .NET 8, organizing the code around Clean Architecture principles. This separation ensures that core business logic remains independent of external databases and third-party APIs.
 
-By dividing the application into layers, we isolated our core domain entities and agricultural rules from external dependencies like database ORMs or third-party web frameworks. If we need to migrate from SQL Server to another database, or replace our external OCR API with a local model, we only need to write a new implementation in the infrastructure layer without changing our primary business services.
+Isolating the database configuration and external API adapters from the domain entities allowed us to develop the system incrementally. For example, during testing, we could swap out the cloud-based SQL Server configuration for an in-memory database instance without altering the service logic that runs the seed verification rules.
 
 % ============================================================
 \section{Architectural Design}
 \label{sec:backend-architecture}
 % ============================================================
 
-The backend follows a layered architecture based on Clean Architecture principles, with the relationship and dependency flow between these layers illustrated in Figure~\ref{fig:backend-clean-architecture}. Each layer performs a dedicated responsibility while maintaining loose coupling between components.
+The backend uses four distinct projects corresponding to the layers in Figure~\ref{fig:backend-clean-architecture}. Dependencies flow inward, meaning inner projects cannot reference outer ones. This compile-time constraint prevents database or presentation concerns from leaking into the core logic.
 
 \begin{figure}[H]
 \centering
@@ -40,14 +40,14 @@ font=\small
 \label{fig:backend-clean-architecture}
 \end{figure}
 
-Adopting this layered design helps separate core business policies from technical details like web servers and database connections. This separation of concerns made it much easier to write automated unit tests for our verification services. We could mock the database interfaces and simulate seed verification workflows locally, even when working offline without access to our cloud database. Additionally, this structure allows us to scale individual layers independently; for example, the API controllers can be deployed to auto-scaling serverless containers while the database runs on a separate, dedicated resource.
+This physical separation simplifies testing. When writing unit tests for our verification logic, we mocked the repository interfaces and simulated image analysis runs offline without needing active connections to Azure or SQL Server. It also helps with deployment; we can scale the API presentation layer on serverless containers during peak harvesting seasons while leaving the underlying database server on a fixed tier to control costs.
 
 % ============================================================
 \section{Technology Stack}
 \label{sec:backend-tech-stack}
 % ============================================================
 
-The backend uses modern technologies for API development, authentication, AI integration, and database management. The core technologies and libraries comprising this stack are summarized in Table~\ref{tab:backend-tech-stack}.
+The backend uses specific libraries and frameworks to support request handling, user session management, and external service client interfaces. The core components of this technology stack are outlined in Table~\ref{tab:backend-tech-stack}.
 
 \begin{table}[htbp]
 \centering
@@ -89,14 +89,14 @@ Serilog & Request logging and monitoring \\
 \end{tabularx}
 \end{table}
 
-We selected ASP.NET Core because its asynchronous request processing pipeline handles concurrent image uploads efficiently, preventing the system from choking when multiple users submit scans at the same time. For data access, we used Entity Framework Core as our object-relational mapper (ORM) to write type-safe queries in C\char35{}. It also automated our database migrations, allowing us to modify the database schema during development without having to write raw SQL scripts manually.
+Choosing ASP.NET Core was driven by its Kestrel web server performance and built-in asynchronous pipeline. Handling multi-part form data uploads for 300KB images requires non-blocking I/O thread management, otherwise, simultaneous uploads from multiple farmers would exhaust the server's thread pool. For data persistence, Entity Framework Core serves as our database adapter. Using code-first migrations automated schema updates as we added fields for DUS morphological properties, avoiding the need to run manual SQL alter scripts across development and production environments.
 
 % ============================================================
 \section{Project Structure}
 \label{sec:backend-project-structure}
 % ============================================================
 
-The backend source code is divided into multiple layers and modules to maintain clear responsibility boundaries, as outlined in Table~\ref{tab:backend-project-structure}.
+We organized the backend source code into distinct physical folders to maintain responsibility boundaries across the architecture, as detailed in Table~\ref{tab:backend-project-structure}.
 
 \begin{table}[htbp]
 \centering
@@ -128,35 +128,35 @@ Middleware & Authentication and exception handling \\
 \end{tabularx}
 \end{table}
 
-The project is structured to enforce our dependency rules at compile time. The innermost Domain layer has no dependencies on outside libraries or other projects. The Application project references only the Domain, containing our core business services and data contracts. The Infrastructure and Presentation layers reside on the outside, referencing the inner Application project to implement concrete data access, external cloud services, and HTTP API endpoints.
+By structuring the solution into separate projects, the .NET compiler enforces our architectural boundaries. The Domain project compile target has zero dependencies. The Application project, containing the business interface definitions, references only Domain. Concrete implementations—like EF Core context classes, Azure SDK integrations, and controller routes—reside in the Infrastructure and Presentation projects respectively, preventing presentation details from dictating business structures.
 
 % ============================================================
 \section{Domain Layer}
 \label{sec:domain-layer}
 % ============================================================
 
-The Domain Layer contains the core business entities and contracts of the application. This layer is independent from external frameworks and infrastructure components.
+The Domain Layer contains the application's core data models and interface contracts. This project has zero dependencies on external storage libraries, web frameworks, or ORM tools, ensuring that our agricultural verification rules remain isolated from infrastructure changes.
 
 \subsection{Core Entities}
-Our domain layer defines the central models representing our business rules and database entities. The main entities include the base \texttt{User}, which is extended using ASP.NET Core Identity to support specific profile structures for \texttt{Farmer} and \texttt{Officer} accounts. The agricultural domain is modeled through \texttt{Seed} (defining reference cultivars) and \texttt{SeedBatch} (representing physical batches distributed by manufacturers). 
+Our domain models map the physical elements of the seed verification workflow to structured data definitions. The \texttt{User} base class integrates with ASP.NET Core Identity to handle authentication, but we extended it with a one-to-one relationship to a \texttt{Profile} entity storing regional details (like District and Phone) to support geographic query filtering by agricultural officers. The physical components are modeled through \texttt{Seed} (defining reference cultivars) and \texttt{SeedBatch} (representing physical seed batches distributed by manufacturers). 
 
 When a verification scan is processed, the system creates a \texttt{DetectionResult} containing model labels, confidence levels, and physical parameters. If a farmer reports an issue with a seed batch, a \texttt{Complaint} entity is generated to track the investigation details. Lastly, we log system actions through the \texttt{AuditLog} entity to maintain a clear record of administrative and verification changes.
 
 \subsection{Interfaces}
-To decouple our business logic from technical implementations, the domain layer defines generic and specific contracts. These include \texttt{IRepository} for abstracting database operations, and specialized service interfaces like \texttt{IVerificationService}, \texttt{IAuthenticationService}, \texttt{IComplaintService}, and \texttt{IAnalyticsService}. By coding against these interfaces rather than concrete classes, we can easily swap our storage engines or external AI service integrations during testing.
+Rather than allowing the business logic to directly call SQL Server or Azure services, we defined interfaces within the Domain layer. These include repository abstractions like \texttt{IRepository<T>} and functional service interfaces like \texttt{IVerificationService} and \texttt{IComplaintService}. During unit testing, this allowed us to substitute the live cloud integrations with mock classes, meaning we could test the verification routing and database mappings locally without paying for Azure consumption or relying on active internet access.
 
 % ============================================================
 \section{Application Layer}
 \label{sec:application-layer}
 % ============================================================
 
-The Application Layer coordinates business workflows and request processing.
+The Application Layer coordinates the business workflows and transaction boundaries of the platform.
 
 \subsection{Application Services}
-Our application services implement the core use cases of the platform. The \texttt{VerificationService} coordinates the image analysis workflow, handling validation, calling the ML inference API, and storing results. The \texttt{AuthenticationService} manages user accounts, password hashing, and token issuance. The \texttt{ComplaintService} handles farmer feedback submission and routing, while the \texttt{AnalyticsService} compiles performance trends. The \texttt{AdminService} provides tools for managing users and verifying system integrity.
+The Application layer houses the coordinate logic for the system's workflows. The \texttt{VerificationService} handles the steps of the analysis pipeline: validating file parameters, calling the FastAPI model service, uploading the raw image to blob storage, and invoking Azure OpenAI to parse the combined metrics. By placing this coordination in a dedicated service, we kept the API controllers small. Other services include \texttt{ComplaintService}, which validates farmer complaints and routes them to regional officer queues based on district IDs, and \texttt{AuthenticationService}, which handles BCrypt password validation and issues JWT tokens.
 
 \subsection{DTOs}
-We use Data Transfer Objects (DTOs) to transfer data across layer boundaries and avoid exposing database entities directly to the client. This protects the internal database schema and reduces overall network payload size. The primary DTOs utilized in the system and their respective purposes are listed in Table~\ref{tab:important-dtos}.
+Passing raw Entity Framework models directly to the client creates two issues: it exposes our internal database schema, and it causes serialization cycles due to navigation properties (for instance, a User referencing a Complaint that references a User). To prevent this, we mapped database entities to Data Transfer Objects (DTOs) using AutoMapper. For example, \texttt{VerificationResponse} only returns the visual classification label, confidence score, and extracted DUS metrics, stripping out internal SQL primary keys and auditing properties. Using DTOs also reduced JSON payload sizes, which is important for mobile users operating on high-latency rural connections. The primary DTOs utilized in the system and their respective purposes are listed in Table~\ref{tab:important-dtos}.
 
 \begin{table}[htbp]
 \centering
@@ -187,23 +187,20 @@ AdminDashboardResponse & Dashboard statistics \\
 \end{table}
 
 \subsection{Validation}
-To keep our application services clean, we integrated FluentValidation to handle incoming request validation. This validation blocks malformed data from reaching the database or AI endpoints. The validation layer checks that uploaded image formats are valid JPEGs or PNGs, verifies that files do not exceed our maximum size limits, validates email formats, enforces password complexity rules, and ensures that all required API fields are present.
+To prevent malformed data from hitting the deep learning container or database, we write validation logic using FluentValidation. We intercept incoming requests before they reach the main service logic. The validator checks that uploaded files have a valid MIME type (restricting uploads to JPEG or PNG), verifies that the payload does not exceed the 10MB server limit (though client-side compression usually keeps it under 300KB), and enforces password and email syntax constraints. This preemptive validation prevents downstream errors in the PyTorch model service and saves database connections.
 
 % ============================================================
 \section{Infrastructure Layer}
 \label{sec:infrastructure-layer}
 % ============================================================
 
-The Infrastructure Layer manages database operations, external integrations, and cloud services.
+The Infrastructure Layer implements the interfaces defined in our Domain layer, handling direct database connections and network communication with external APIs.
 
-\subsection{Database Management}
-Database communications are managed through Entity Framework Core. The framework maps our C\char35{} classes directly to SQL Server tables, handles database transactions, and manages foreign key constraints. We use EF migrations to apply schema updates incrementally, keeping development and production databases synchronized.
-
-\subsection{Repository Pattern}
-We implemented the Repository Pattern to separate data querying from business logic. A generic repository provides common CRUD operations, while specialized repositories (such as the Seed and Complaint repositories) handle complex queries. This allows us to write optimized SQL joins when pulling verification histories and user profiles in a single query, avoiding the common N+1 query problem.
+\subsection{Database Management and Repositories}
+Database communication is configured using EF Core. While ORMs simplify basic database updates, they can introduce performance bottlenecks if queries are not carefully constructed. For example, to avoid the N+1 query problem—where the application executes a separate SQL query to load the user profile for every verification record displayed on the officer dashboard—we wrote optimized LINQ queries using \texttt{.Include()} statements. This forces EF Core to generate single SQL JOIN queries, returning all required data in one database trip. We also implemented the repository pattern to encapsulate these data access details behind the domain interfaces, keeping database-specific LINQ logic out of the application services. We use EF code-first migrations to apply schema updates incrementally, keeping development and production databases synchronized.
 
 \subsection{AI and Cloud Integrations}
-The infrastructure layer wraps the external APIs and services that power our analytical workflow, as detailed in Table~\ref{tab:external-services}.
+Our infrastructure implementations handle connection lifecycles for external cloud APIs. The external service integrations are detailed in Table~\ref{tab:external-services}.
 
 \begin{table}[htbp]
 \centering
@@ -227,7 +224,7 @@ ResNet Model & Paddy seed Quality Determination\\
 \end{tabularx}
 \end{table}
 
-When a verification request arrives, the infrastructure service uploads the raw image binary to Azure Blob Storage and retrieves a secure URL. This URL is passed to the Azure OCR engine to read batch details from the packaging label. Simultaneously, the image is sent to our ResNet50 container for classification. Finally, both results are passed to Azure OpenAI to generate a clear, plain-language feedback report.
+When the verification service receives a compressed image, the storage adapter uploads it to Azure Blob Storage and generates a read-only URL. This URL is dispatched to the Azure AI Vision OCR service to extract text from the packaging label, such as batch numbers and expiry dates. At the same time, the image is sent to our FastAPI service hosting the ResNet50 model. The results are aggregated, and the backend sends the combined data to the Azure OpenAI service, instructing the model to synthesize the raw statistics and OCR text into a plain-language summary for Meitei farmers.
 
 % ============================================================
 \section{Database Schema}
@@ -384,10 +381,10 @@ The database schema is structured around a relational model to maintain strong r
 \label{sec:presentation-layer}
 % ============================================================
 
-The Presentation Layer exposes RESTful APIs for frontend communication.
+The Presentation Layer exposes the HTTP endpoints used by the Next.js frontend client.
 
 \subsection{API Controllers}
-Our API controllers act as the gateway for HTTP requests, handling route mapping and returning standard JSON payloads. The controllers validate request formats, delegate business logic processing to the application layer, and convert internal results into standard HTTP status codes. The backend contains multiple API controllers responsible for different system modules. These controllers and their design objectives are summarized in Table~\ref{tab:api-controllers}.
+The API controllers handle routing and request parsing. They extract the client's payload, run the FluentValidation middleware, and pass the data to the application services. Upon completion, the controllers map the internal result models to appropriate HTTP status codes, such as returning a 201 Created status for a successfully registered complaint, or a 400 Bad Request if the input image is blurry. This prevents raw internal exceptions from bubbling up to the client. The controllers and their routing purposes are summarized in Table~\ref{tab:api-controllers}.
 
 \begin{table}[htbp]
 \centering
@@ -416,14 +413,14 @@ ReferenceDataController & Dropdown reference data \\
 \end{table}
 
 \subsection{Middleware}
-To keep our controllers clean, we use custom middleware components to handle cross-cutting concerns. Our authentication middleware validates JWT tokens on protected endpoints. The request logging middleware uses Serilog to record response times and endpoint usage, helping us catch bottleneck issues during active scans. Finally, a global exception handling middleware intercepts uncaught runtime errors, logging the stack trace and returning a formatted error payload to the client instead of exposing internal code details.
+We wrote custom middleware components to process HTTP requests before they hit the controllers. The authentication middleware extracts the JWT from the request header, decodes the signature using our symmetric key, and populates the current user context. The logging middleware uses Serilog to record the execution time of each request, which helped us locate performance bottlenecks in our downstream OCR integrations. Finally, the exception-handling middleware captures uncaught runtime errors. Instead of displaying default stack traces that expose database table names and directory paths, the middleware logs the error details internally and returns a structured JSON error response to the client.
 
 % ============================================================
 \section{Authentication and Security}
 \label{sec:backend-security}
 % ============================================================
 
-The backend uses JWT-based authentication with role-based authorization, following the flow depicted in Figure~\ref{fig:jwt-backend-flow}.
+Authentication and authorization are managed through JSON Web Tokens (JWT) to support a stateless API architecture. The validation pipeline is illustrated in Figure~\ref{fig:jwt-backend-flow}.
 
 \begin{figure}[H]
 \centering
@@ -452,14 +449,14 @@ font=\small
 \label{fig:jwt-backend-flow}
 \end{figure}
 
-The security implementation focuses on protecting our API endpoints and data. When a user logs in, the backend issues an encrypted JWT token. The client includes this token in the header of subsequent requests. Our authentication middleware verifies the token signatures and checks the user's role before granting access. We also implement a refresh token rotation mechanism, allowing users to stay logged in securely without exposing long-lived access tokens. All passwords are hashed using BCrypt before database storage, and external communications require HTTPS connections.
+Authentication relies on JSON Web Tokens (JWT) to support a stateless API architecture. During authentication, the backend hashes incoming passwords using BCrypt and compares them against the stored hash. If valid, the system generates an access token with a 15-minute lifespan and a cryptographically signed refresh token stored in an HttpOnly cookie to mitigate cross-site scripting (XSS) risks. When the short-lived access token expires, the client proxy automatically submits the refresh token to obtain a new access token, preventing session disruption while minimizing the impact of a compromised access token. Role validation is performed during this middleware pass, blocking farmers from accessing officer endpoints.
 
 % ============================================================
 \section{Verification Workflow}
 \label{sec:verification-workflow}
 % ============================================================
 
-The seed verification workflow integrates AI quality assessment, AI Summary Generation and database persistence, as shown in Figure~\ref{fig:verification-workflow}.
+The seed verification workflow coordinates image validation, deep learning classification, text extraction, and database persistence, as shown in Figure~\ref{fig:verification-workflow}.
 
 \begin{figure}[H]
 \centering
@@ -492,7 +489,7 @@ font=\small
 \label{fig:verification-workflow}
 \end{figure}
 
-The seed verification process is structured as a multi-stage workflow. When a farmer uploads an image, the frontend proxies the payload to our backend controllers. The request undergoes validation checks to verify file size and headers. An initial image quality step checks for severe blur or poor lighting, which could cause model misclassifications. If the image passes, it is uploaded to storage, and the backend triggers the ResNet50 model to analyze seed quality. Simultaneously, the OCR service extracts label data from the packaging. The backend saves the classification results to the database and uses Azure OpenAI to compile a plain-language summary for the user.
+The seed verification workflow handles image validation, AI inference, and database persistence. When a farmer submits an image, the API controller validates the upload headers and checks for basic image quality, such as assessing if the image is too blurry or dark, which would yield inaccurate model classifications. If the check passes, the image is written to Azure Blob Storage, and the system concurrently calls the ResNet50 FastAPI classification endpoint and the Azure OCR text extraction API. Once both responses return, the system saves the classification scores, morphological parameters, and label text to SQL Server. Finally, the backend feeds these inputs to Azure OpenAI to generate a clear advisory report, returnable as a unified JSON response.
 
 % ============================================================
 % ============================================================
@@ -500,6 +497,6 @@ The seed verification process is structured as a multi-stage workflow. When a fa
 \label{sec:configuration-deployment}
 % ============================================================
 
-The backend uses multiple configuration files for different deployment environments. We store settings across \texttt{appsettings.json}, \texttt{appsettings.Development.json}, and \texttt{appsettings.Production.json}. These environment files keep sensitive information, like database connection strings, JWT signing keys, and cloud API credentials, separate from our application code.
+We split application configurations into environment-specific files: \texttt{appsettings.json}, \texttt{appsettings.Development.json}, and \texttt{appsettings.Production.json}. During local development, the app connects to a local database instance and disables HTTPS enforcement. In production, we override these settings using environment variables injected by our container hosting platform, securing our database credentials, JWT security keys, and Azure service passwords.
 
-During startup, \texttt{Program.cs} reads these configuration files to initialize our services. It configures the SQL Server DbContext, registers our domain services with the dependency injection container, enables the authentication and middleware pipelines, and configures logging via Serilog. This allows us to run the application with minimal dependencies during local development and easily switch to cloud databases and monitoring in our production environment.
+During startup, the \texttt{Program.cs} entry point reads these parameters to register database context classes, configure our dependency injection containers, enable JWT validation rules, and build the HTTP request pipeline. This allows us to run the application with minimal dependencies during local development and easily switch to cloud databases and monitoring in our production environment.

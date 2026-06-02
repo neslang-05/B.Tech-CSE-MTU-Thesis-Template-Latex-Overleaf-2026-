@@ -1,8 +1,8 @@
-This chapter explains the integration and communication layout of the AgriVerify platform. The application is divided into three distinct areas: a Next.js web frontend, an ASP.NET Core backend server for business logic, and a FastAPI service that serves our machine learning models \cite{martin2018clean}. Decoupling the frontend user interface, data validation, and deep learning inference allows each service to run and scale independently based on demand.
+This chapter details how the Next.js frontend client, the ASP.NET Core backend, and the FastAPI model serving service communicate. Running these components as independent services allows us to scale them separately based on request volume. For example, the visual frontend and deep learning microservice can scale dynamically during peak harvesting periods without requiring continuous database server upgrades.
 
 \section{System Integration}
 
-The AgriVerify system routes communication across several different boundaries. During early development, hosting the Next.js frontend and ASP.NET Core backend on separate subdomains caused CORS blocking in browsers. To solve this, we implemented a dedicated API proxy route in Next.js \cite{nextjs2024}. The browser sends requests directly to the local Next.js server, which intercepts the call, injects authentication tokens, and forwards the payload to the internal ASP.NET Core backend. This prevents exposing internal API paths and security credentials directly to the public web \cite{masue2024quantifying}. Table~\ref{tab:integration_matrix} lists the communication paths, protocols, and security methods used across the services.
+Communication in the AgriVerify platform traverses distinct host boundaries. Initially, hosting the Next.js client on Vercel and the ASP.NET Core API on Render triggered browser-level CORS errors and SameSite cookie blocking. To resolve this, we configured Next.js server-side API proxy routes. The client browser makes requests directly to the Next.js origin, which forwards them to the Render backend server, handling JWT token injections server-side. This layout bypasses browser same-site restrictions and prevents public exposure of our backend API endpoints. Table~\ref{tab:integration_matrix} summarizes our service integration paths and security implementations.
 
 \begin{table}[htbp]
 \centering
@@ -90,21 +90,21 @@ The lifecycle of a verification request spans five processing stages, illustrate
 \label{fig:unified_integration_flow}
 \end{figure}
 
-The steps in our operational pipeline are structured as follows:
+The request execution pipeline follows a linear path:
 
 \begin{enumerate}
-    \item \textbf{Image Compression and Proxy Routing:} When a farmer uploads an image, the client-side JavaScript compresses the file in the browser. The browser sends the compressed image to our Next.js API route. The proxy server attaches the active JWT authorization token, refreshing it automatically if it has expired \cite{axios2024, jones2015jwt}.
+    \item \textbf{Client-Side Compression and Routing:} When a user uploads a photo, the browser-based JavaScript downsamples the image. The client pushes this payload to our Next.js API proxy, which appends the JWT authorization token to the request headers, automatically requesting a token refresh if the signature has expired \cite{axios2024, jones2015jwt}.
     
-    \item \textbf{Backend Ingestion and Initial Validation:} The Next.js proxy forwards the payload to the ASP.NET Core API. The backend processes the request headers and performs validation checks on the image properties before starting the AI analysis \cite{freeman2020pro}.
+    \item \textbf{API Ingestion and Validation:} The Next.js server forwards the request to the ASP.NET Core backend. The API controllers run FluentValidation rules to ensure the multipart upload headers and file sizes are correct before triggering the AI workflow \cite{freeman2020pro}.
     
-    \item \textbf{Distributed Model Inference:} The backend distributes the image processing load to dedicated microservices. A custom FastAPI service serves our ResNet50 classification model, while Azure Computer Vision handles OCR text extraction. When we first deployed the FastAPI service to serverless container instances on GCP Cloud Run, loading the PyTorch framework and model weights from cold starts caused an unacceptable 15-second latency. To resolve this, we configured our container settings to keep at least one instance active during farming seasons, bringing standard response times down to under two seconds.
+    \item \textbf{Parallel AI Processing:} The backend coordinates downstream microservices. It forwards the image to the FastAPI model service for ResNet50 classification while simultaneously calling the Azure Vision OCR API to read the seed packet label. To resolve startup latency on GCP Cloud Run serverless instances, we configured the FastAPI service to maintain a minimum of one warm instance during active agricultural periods, avoiding a 15-second cold-start delay.
     
-    \item \textbf{Cloud Storage and Database Persistence:} Once the services complete their runs, the backend stores the results. To prevent database bloat, we avoid storing raw image files as binary data in our SQL database. Instead, images are saved directly to Azure Blob Storage, and the SQL database only stores the resulting storage URLs alongside the model scores and extracted batch data \cite{copard2020azure}.
+    \item \textbf{Blob Storage and SQL Mapping:} After classification and text extraction complete, the backend uploads the seed image to Azure Blob Storage. Rather than storing binary image files directly in SQL Server, which would inflate database size and degrade query performance, we store only the image URLs alongside the classification scores and batch numbers \cite{copard2020azure}.
     
-    \item \textbf{Report Synthesis and UI Rendering:} The backend feeds the combined OCR text and seed classification results to Azure OpenAI. The LLM generates a clear, plain-language advisory report. This text is passed back through our API proxy and displayed to the farmer on the web interface.
+    \item \textbf{Report Synthesis and Rendering:} The backend sends the combined classification statistics and OCR text to Azure OpenAI, which compiles a summary for Meitei farmers. The backend returns this text as a JSON response to the Next.js client, which renders it on the user dashboard.
 \end{enumerate}
 
-Alongside this verification pipeline, we run an automated build and release workflow. When code changes are pushed to GitHub, a CI/CD runner compiles our services using multi-stage Dockerfiles. The resulting images are stored in the Azure Container Registry (ACR) and automatically deployed to Azure Container Apps (ACA), which handles horizontal scaling based on request volume \cite{merkel2014docker}.
+We automate service builds using GitHub Actions. Pushes to our main branch trigger a runner that compiles each service into a Docker image. To reduce build times and final image sizes, we use multi-stage Dockerfiles that compile the application code in a builder environment and copy only the final binaries to the runtime base. The runner pushes the optimized images to Azure Container Registry, triggering automatic deployment updates on Azure Container Apps \cite{merkel2014docker}.
 
 \subsection{Unexpected Integration Challenges and Resolutions}
 

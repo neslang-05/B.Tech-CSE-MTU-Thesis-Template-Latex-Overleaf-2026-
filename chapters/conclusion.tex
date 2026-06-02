@@ -19,18 +19,8 @@ Finally, the system addresses the operational challenges of deploying advanced s
 
 \section{Future Enhancements}
 
-\begin{enumerate}
+While the current system implements the core verification pipeline, several practical improvements would make it more viable for long-term field use. Our first priority is adding local language localization, specifically Meiteilon (Manipuri) and Kuki-Chin languages, and integrating text-to-speech audio feedback. Because many farmers in rural Manipur prefer oral communication or struggle with English interfaces, audio-guided reports would lower the barrier to adoption. 
 
-\item \textbf{Local Language Support (Manipuri and Regional Dialects)}\\
-The current system is English-only, which presents a barrier to many farmers in Manipur. Translating the web interface into Meiteilon (Manipuri) and adding audio playback of the verification reports would improve accessibility and adoption in local farming communities.
+Additionally, network reliability remains a bottleneck in hilly districts. To address this, we plan to implement a Progressive Web Application (PWA) wrapper that supports offline caching. By converting our ResNet50 model weights to ONNX or TensorFlow Lite formats, we can execute basic visual classifications directly on the user's mobile device browser without making backend API calls. The application would queue verification reports and sync them with our central SQL database once the device returns to cellular coverage. 
 
-\item \textbf{On-Device Offline Inference (TensorFlow Lite / ONNX)}\\
-Hilly districts in Manipur often have no cellular coverage. We want to convert our PyTorch ResNet50 model to a lightweight TensorFlow Lite format and run inference directly on Android devices offline, queueing sync logs for when they return to network range.
-
-\item \textbf{Cultivar Expansion for Northeast India}\\
-Expanding the classification model to support more specific paddy varieties grown in the region, such as *RC Maniphou-12*, *CAU-R1*, and local heirloom grains, requiring further field dataset collection.
-
-\item \textbf{Physical Label Anti-Counterfeiting Integration}\\
-Adding support for physical verification methods like QR codes or security holograms from agricultural distribution departments to run parallel with visual grain inspection.
-
-\end{enumerate}
+Finally, expanding the classification model requires broader dataset collection. Our current training data focuses on a limited set of local cultivars. Working with regional agricultural departments to collect and annotate samples of local heirloom varieties and common state-certified seeds like *RC Maniphou-12* would improve model robustness in different districts. We also plan to integrate physical security checks, such as scanning official government holograms or manufacturer QR codes, to run in parallel with the morphological visual assessment, creating a multi-layered verification check.
