@@ -1,0 +1,4 @@
+$ python main.py --mode=train --epochs=10
+Loading training datasets...
+Training started. Epoch 1/10 - loss: 0.652 - acc: 0.723
+Training completed. Model saved to outputs/best_model.pth

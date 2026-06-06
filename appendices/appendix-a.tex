@@ -1,205 +1,35 @@
-\section*{Directory Architecture}
+% =========================================================================
+% APPENDIX A: SOURCE CODE DIRECTORY STRUCTURE
+% =========================================================================
+This appendix documents the directory structure of the proposed system's monorepo, outlining the organization of the frontend application, backend services, and machine learning components.
 
-\begin{tcolorbox}[colback=black!5, colframe=black!80, title=AgriVerify Project Monorepo Structure]
+\section*{Project Folder Layout}
+The complete system is organized into a modular monorepo structure. Below is the simplified tree representation of the codebase:
+
+\begin{tcolorbox}[colback=black!5, colframe=black!80, title={System Directory Structure}]
 \begin{verbatim}
-agriverify-monorepo/
+my-project-monorepo/
 |-- backend/
-|   |-- AgriVerify.API/
-|   |   |-- Controllers/
-|   |   |-- Program.cs
-|   |-- AgriVerify.Core/
-|   |   |-- Entities/
-|   |   |-- Interfaces/
-|   |-- AgriVerify.Infrastructure/
-|       |-- Data/
-|       |-- Services/
-|-- frontend/
 |   |-- src/
-|       |-- app/
-|       |-- components/
-|       |-- guards/
-|       |-- store/
-|-- model-serving/
-    |-- app/
-    |   |-- main.py
-    |   |-- model.py
-    |   |-- weights/
-    |-- Dockerfile
+|   |   |-- controllers/       # Handles incoming HTTP API requests
+|   |   |-- models/            # Database entities and data schemas
+|   |   |-- services/          # Core business logic processing
+|   |   |-- config/            # Application settings and environment variables
+|   |-- Dockerfile             # Multi-stage container specification
+|-- frontend/
+|   |-- public/                # Static assets (images, icons)
+|   |-- src/
+|   |   |-- components/        # Reusable UI components
+|   |   |-- hooks/             # Custom React/Vue hooks
+|   |   |-- state/             # Centralized state management
+|   |   |-- App.js             # Application entry component
+|   |-- package.json           # Frontend dependencies list
+|-- ml_service/
+|   |-- models/                # Saved weights and model checkpoints
+|   |-- predict.py             # Inference pipeline code
+|   |-- train.py               # Model training script
+|   |-- requirements.txt       # Python environment dependencies
+|-- docker-compose.yml         # Dev and production orchestrator file
+|-- README.md                  # Quick-start documentation guide
 \end{verbatim}
 \end{tcolorbox}
-
-\section*{Core Implementation Snippets}
-
-\subsection*{1. ASP.NET Core Verification Orchestrator (\texttt{VerificationService.cs})}
-
-The following service orchestrates incoming seed verification requests, communicating with the FastAPI inference microservice and persisting the verification history into SQL Server via Entity Framework Core.
-
-\begin{lstlisting}[style=mystyle, language=C]
-using AgriVerify.Core.Entities;
-using AgriVerify.Core.Interfaces;
-using Microsoft.Extensions.Logging;
-using System.Net.Http.Json;
-
-namespace AgriVerify.Infrastructure.Services;
-
-public class VerificationService : IVerificationService
-{
-    private readonly HttpClient _httpClient;
-    private readonly IRepository<VerificationHistory> _repository;
-    private readonly ILogger<VerificationService> _logger;
-
-    public VerificationService(
-        HttpClient httpClient, 
-        IRepository<VerificationHistory> repository, 
-        ILogger<VerificationService> logger)
-    {
-        _httpClient = httpClient;
-        _repository = repository;
-        _logger = logger;
-    }
-
-    public async Task<VerificationResultDto> VerifySeedBatchAsync(Stream imageStream, string userId)
-    {
-        _logger.LogInformation("Initiating AI verification for user {UserId}", userId);
-        
-        using var content = new MultipartFormDataContent();
-        content.Add(new StreamContent(imageStream), "file", "seed_sample.jpg");
-
-        var response = await _httpClient.PostAsync("/predict", content);
-        response.EnsureSuccessStatusCode();
-
-        var aiPrediction = await response.Content.ReadFromJsonAsync<AIPredictionResponse>();
-        
-        var historyRecord = new VerificationHistory
-        {
-            Id = Guid.NewGuid().ToString(),
-            UserId = userId,
-            PredictedClass = aiPrediction.QualityClass,
-            ConfidenceScore = aiPrediction.Confidence,
-            ExtractedLength = aiPrediction.DUSParameters.Length,
-            ExtractedWidth = aiPrediction.DUSParameters.Width,
-            ExtractedAspectRation = aiPrediction.DUSParameters.AspectRatio,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _repository.AddAsync(historyRecord);
-        await _repository.SaveChangesAsync();
-
-        return new VerificationResultDto
-        {
-            RecordId = historyRecord.Id,
-            QualityClass = historyRecord.PredictedClass,
-            Confidence = historyRecord.ConfidenceScore,
-            IsGenuine = historyRecord.PredictedClass == "Healthy"
-        };
-    }
-}
-\end{lstlisting}
-
-\subsection*{2. FastAPI ResNet50 Inference Microservice (\texttt{main.py})}
-
-This microservice loads the fine-tuned ResNet50 PyTorch model weights and exposes a high-throughput REST API endpoint for real-time seed tensor classification and DUS physical parameter extraction.
-
-\begin{lstlisting}[style=mystyle, language=Python]
-import io
-import torch
-import torchvision.transforms as transforms
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image
-from pydantic import BaseModel
-from typing import Dict, Any
-
-app = FastAPI(title="AgriVerify ResNet50 Microservice", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
-# Device setup & model loading
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = torch.load("weights/resnet50_paddy_final.pth", map_location=device)
-model.eval()
-
-# ResNet ImageNet Normalization Pipeline
-preprocess = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
-CLASSES = ["Healthy", "Damaged", "Fake / Low Quality"]
-
-class PredictionResponse(BaseModel):
-    QualityClass: str
-    Confidence: float
-    DUSParameters: Dict[str, float]
-
-@app.post("/predict", response_model=PredictionResponse)
-async def predict_seed(file: UploadFile = File(...)):
-    if not file.filename.endswith(('.jpg', '.jpeg', '.png')):
-        raise HTTPException(status_code=400, detail="Unsupported file format")
-
-    try:
-        contents = await file.read()
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
-        tensor = preprocess(image).unsqueeze(0).to(device)
-
-        with torch.no_grad():
-            outputs = model(tensor)
-            probabilities = torch.nn.functional.softmax(outputs, dim=1)[0]
-            confidence, predicted_idx = torch.max(probabilities, 0)
-        
-        # Simulated DUS parameter calculation for architectural demonstration
-        width_px, height_px = image.size
-        aspect_ratio = round(width_px / height_px, 2)
-
-        return PredictionResponse(
-            QualityClass=CLASSES[predicted_idx.item()],
-            Confidence=round(confidence.item() * 100, 2),
-            DUSParameters={"Length": 9.4, "Width": 2.8, "AspectRatio": aspect_ratio}
-        )
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Inference failure: {str(e)}")
-\end{lstlisting}
-
-\subsection*{3. Next.js Client Role Guard (\texttt{RoleGuard.tsx})}
-
-The client-side React component enforces strictly partitioned role navigation, protecting administrative and officer portals from unauthorized access.
-
-\begin{lstlisting}[style=mystyle, language=HTML]
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/useAuthStore';
-
-interface RoleGuardProps {
-  children: React.ReactNode;
-  allowedRoles: ('Farmer' | 'Officer' | 'Admin')[];
-}
-
-export const RoleGuard: React.FC<RoleGuardProps> = ({ children, allowedRoles }) => {
-  const { user, isAuthenticated, isHydrated } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isHydrated) return;
-
-    if (!isAuthenticated || !user) {
-      router.replace('/auth/login');
-      return;
-    }
-
-    if (!allowedRoles.includes(user.role)) {
-      router.replace(user.role === 'Farmer' ? '/dashboard' : '/officer/dashboard');
-    }
-  }, [isAuthenticated, user, allowedRoles, isHydrated, router]);
-
-  if (!isHydrated || !isAuthenticated || !user || !allowedRoles.includes(user.role)) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-600"></div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-};
-\end{lstlisting}

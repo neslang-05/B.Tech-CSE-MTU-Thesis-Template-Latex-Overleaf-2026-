@@ -1,395 +1,62 @@
-% \chapter{Deep Learning Model for Paddy Seed Quality Classification}
-
-\section{Dataset Description}
-
-\subsection{Data Sources and Collection (Kaggle)}
-
-We built our training dataset by combining two sources from Kaggle. The first is a publicly available dataset, and the second is a custom collection we put together in partnership with India's Council of Agricultural Research (ICAR) facility in Manipur. By bringing these two sources together, we got a larger and more realistic dataset---one that includes seed images captured in different ways and from different parts of India. This diversity is crucial because it helps the model learn to recognize seeds regardless of lighting conditions or camera setup.
-
-\subsubsection{Public Source}
-The first source is the Paddy Seeds Quality Classification dataset published on Kaggle by Ayyan Arkadalkani:
-\begin{center}
-\href{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}{\nolinkurl{https://www.kaggle.com/datasets/ayyanarkadalkani/paddy-seeds-quality-classification-dataset}}
-\end{center}
-
-This dataset contains 1,213 labeled images split into three categories: Genuine, Suspicious, or Low Quality seeds. The images take up about 183~MB of storage. These images were captured under many different lighting conditions and backgrounds, which made them a solid foundation for our model to learn general patterns about what different seed qualities look like.
-
-\subsubsection{Custom Source}
-The second source is a dataset we collected directly from ICAR's Manipur laboratory. ICAR researchers took photographs of paddy seeds under controlled lab conditions, focusing on the specific varieties grown in northeastern India. This custom collection includes 350 images occupying about 24.7~MB of storage. We've published this dataset on Kaggle as an open resource so other researchers can use it:
-\begin{center}
-\href{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}{\nolinkurl{https://www.kaggle.com/datasets/nilambarelangbam/paddy-seed-images-collected-from-icar-manipur}}
-\end{center}
-
-% Dataset Image
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{images/Paddy-seed.jpeg}
-    \caption{Sample images collected from ICAR Manipur.}
-    \label{fig:icar_dataset_samples}
-\end{figure}
-\newpage
-When we combined both datasets, we ended up with 1,563 images that represent a wider variety of seed conditions than either dataset alone. This combined dataset better reflects what farmers and agricultural officers actually encounter in the field across different regions of India.
-
-\subsection{Dataset Statistics and Class Distribution}
-
-After merging the two datasets, we had a total of 1,563 paddy seed images divided into three quality categories. A detailed breakdown of the datasets, their image counts, storage sizes, and public Kaggle repositories is summarized in Table~\ref{tab:dataset_source_summary}, while the class-wise distribution of these images is provided in Table~\ref{tab:class_distribution}.
-
-\begin{table}[htbp]
-\centering
-\caption{Dataset Source Summary}
-\label{tab:dataset_source_summary}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|p{6cm}|}
-\hline
-\textbf{Source} & \textbf{Images} & \textbf{Size} & \textbf{Kaggle Identifier} \\
-\hline
-Paddy Seeds Quality Classification & 1,213 & $\sim$183\,MB & \nolinkurl{ayyanarkadalkani/paddy-seeds-quality-classification-dataset} \\
-(Ayyan Arkadalkani) & & & \\
-\hline
-ICAR Manipur Custom Dataset & 350 & $\sim$23.7\,MB & \nolinkurl{nilambarelangbam/paddy-seed-images-collected-from-icar-manipur} \\
-(Our Collection) & & & \\
-\hline
-\textbf{Combined Total} & \textbf{1,563} & \textbf{$\sim$208\,MB} & --- \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
-\begin{table}[htbp]
-\centering
-\caption{Class-wise Distribution of the Combined Dataset}
-\label{tab:class_distribution}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{0.8\textwidth}{!}{%
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Class} & \textbf{Number of Images} & \textbf{Percentage (\%)} \\
-\hline
-Genuine Paddy Seeds & $\sim$750 & $\sim$48.0 \\
-\hline
-Suspicious Paddy Seeds & $\sim$510 & $\sim$32.6 \\
-\hline
-Low Quality Seeds & $\sim$303 & $\sim$19.4 \\
-\hline
-\textbf{Total} & \textbf{1,563} & \textbf{100.0} \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
-From Table 4.2 we observed that, the dataset we have contain more Genuine seed images than Suspicious or Low Quality ones which makes sense because in real life, most seeds are genuine. However, this imbalance could cause the model to become biased toward recognizing genuine seeds and miss the problematic ones. To fix this, we used a technique called weighted sampling during training: when building each training batch, we ensured each quality category contributed fairly, regardless of how many examples we had of each type.
-
-\subsection{Train/Validation/Test Split Strategy}
-
-We divided the 1,563 images into three separate groups: one for training, one for validation, and one for testing. A key principle we followed was stratified splitting, which means we made sure each group had roughly the same mix of Genuine, Suspicious, and Counterfeit seeds as the overall dataset. The proportions, approximate image counts, and primary objectives of each split are summarized in Table~\ref{tab:dataset_split}. This partitioning prevents any group from accidentally having too many of one type, which could give us misleading results.
-
-\begin{table}[htbp]
-\centering
-\caption{Dataset Split Statistics}
-\label{tab:dataset_split}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|c|c|c|p{7cm}|}
-\hline
-\textbf{Split} & \textbf{Proportion} & \textbf{Approx. Images} & \textbf{Purpose} \\
-\hline
-Training Set & 80\% & $\sim$1,250 & Used to teach the model by adjusting its internal weights \\
-\hline
-Validation Set & 10\% & $\sim$157 & Used to tune settings and watch for the model learning too much from training data \\
-\hline
-Test Set & 10\% & $\sim$156 & Held completely separate to give a final, unbiased measure of how well the model works \\
-\hline
-\end{tabular}%
-}
-\end{table}
-Table 4.3 presents the data split statistics used in this study. The training set is used to train the model, allowing it to learn from the images and adjust its internal parameters to improve model performance. The validation set serves as a quality control mechanism; after each training epoch, the model is evaluated on this set to monitor its performance and detect potential overfitting, where the model memorizes the training data rather than learning generalizable patterns. The test set remains completely unseen during the training and validation phases. It is used only once at the end of the process to provide an unbiased and reliable evaluation of the model's performance on previously unseen images.
-\subsection{Data Preprocessing and Augmentation}
-\label{subsec:augmentation}
-
-Before showing images to the neural network, we prepared them using a standard pipeline. All images were resized to $224 \times 224$ pixels---this is the standard size that ResNet50 (our neural network architecture) expects. We then adjusted the color values using ImageNet statistics (numbers from a large, well-known image dataset):
-\begin{equation}
-\mu = [0.485, 0.456, 0.406], \quad \sigma = [0.229, 0.224, 0.225]
-\end{equation}
-
-This normalization step is important because the pre-trained model we started with was trained on images normalized this way, so we keep the same approach for consistency.
-
-To make the model more robust and help it learn from our limited training data, we applied six data augmentation techniques during training. Think of augmentation as artificially creating new training examples by tweaking the original images in realistic ways:
-
-\begin{enumerate}
-    \item \textbf{Random Resized Crop} We randomly crop a portion of the image and resize it to $224 \times 224$ pixels. This simulates seeds being photographed from different distances and positions within the frame.
-    
-    \item \textbf{Horizontal Flip} We randomly flip images left-to-right about half the time. Seeds have a natural bilateral symmetry, so this helps the model learn that a flipped seed is still the same seed.
-    
-    \item \textbf{Vertical Flip} We randomly flip images top-to-bottom about half the time, adding more variation in how the seeds appear.
-    
-    \item \textbf{Random Rotation} We rotate images randomly by up to $\pm 30^{\circ}$ (30 degrees in either direction). Real seed photos might not be perfectly aligned, so this prepares the model for that reality.
-    
-    \item \textbf{Translation/Random Shift} We randomly shift the image content left, right, up, or down. This prevents the model from relying on the seed always appearing in the center of the photo.
-    
-    \item \textbf{Colour Jitter} We randomly adjust brightness, contrast, color saturation, and hue. Since real agricultural photos are taken under different lighting conditions, this helps the model handle that variation.
-\end{enumerate}
-
-\section{Model Architecture}
-
-\subsection{ResNet50 Backbone (25.6M Parameters)}
-
-We chose ResNet50 as the foundation of our detection model. This neural network has 50 layers and about 25.6 million parameters (adjustable settings inside the network). What makes ResNet special is its use of "skip connections" shortcuts that let information flow directly around groups of layers. This design makes it much easier to train very deep networks because it prevents the gradient (the training signal) from fading as it travels backward through the network.
-
-Rather than training from scratch, we started with weights that were pre-trained on ImageNet, a massive dataset of millions of everyday images. This pre-trained starting point is like giving the model a head start: it already knows how to recognize edges, textures, and shapes, so we only need to teach it the specific patterns that distinguish different seed qualities.
-
-\subsection{Custom Model Head}
-
-On top of the ResNet50 backbone, we added a custom section designed specifically for seed quality assessment.  This section takes the features learned by ResNet and processes them into a final decision about whether a seed is Genuine, Suspicious, or Low Quality. Here's what this custom section does:
-
-\begin{enumerate}
-    \item Compresses the spatial information into a single summary vector (Global Average Pooling)
-    \item Passes it through a fully connected layer with 512 hidden units
-    \item Applies Batch Normalisation to stabilize the values
-    \item Uses ReLU activation to introduce non-linearity
-    \item Applies Dropout (randomly ignoring 50\% of values) to reduce overfitting
-    \item Outputs 3 final scores (one for each seed quality) with softmax to convert them to probabilities
-\end{enumerate}
-
-\subsection{Anti-Overfitting Techniques}
-
-Overfitting is the enemy of machine learning---it's when a model memorizes the training data instead of learning generalizable patterns. We used several techniques to prevent this:
-
-\begin{itemize}
-    \item \textbf{Dropout}---During training, we randomly "turn off" 50\% of neurons in the model head. This forces the network to learn redundant representations, so it can't rely on a few specific neurons. Think of it like training a team where you randomly swap out players---the team learns to work together, not depend on one star player.
-    
-    \item \textbf{Batch Normalisation}---After each layer, we normalize the values to keep them in a genuine range. This stabilizes training and acts as a natural regularizer.
-    
-    \item \textbf{Label Smoothing}---Instead of forcing the network to be 100\% confident about each prediction, we "soften" the targets slightly (using $\epsilon = 0.1$). This prevents the model from becoming overconfident and improves generalization.
-    
-    \item \textbf{Weight Decay}---We penalize large weights during training, keeping the model's parameters from growing too large. A smaller model is typically more generalizable.
-    
-    \item \textbf{Data Augmentation}---As described earlier, we artificially expand the training data with slight variations, giving the model more diverse examples to learn from.
-    
-    \item \textbf{Early Stopping}---We continuously monitor performance on the validation set. If it starts getting worse, we stop training immediately and use the best weights we've found so far.
-\end{itemize}
-
-\section{DUS Parameter Integration}
-
-\subsection{Feature Extraction---17 Physical Parameters}
-
-Beyond just classifying seeds as Genuine, Suspicious, or Low quality, we wanted our model to extract physical measurements that agriculture experts understand. The standard set of measurements in agriculture is called DUS---Distinctiveness, Uniformity, and Stability. We programmed our model to extract 17 of these physical parameters from each seed image:
-
-\begin{itemize}
-    \item How long and how wide each seed is
-    \item The ratio of length to width
-    \item The perimeter and total area of the seed
-    \item How circular the seed is (circularity) and how solid it is (solidity)
-    \item How elongated the seed is (eccentricity)
-    \item Mathematical descriptions of how the seed's mass is distributed
-    \item Hu moments---a special mathematical descriptor of seed shape that works the same way whether the seed is rotated, scaled, or shifted in the image
-\end{itemize}
-
-These 17 parameters bridge the gap between what the neural network learns (visual patterns) and what agricultural experts care about (standard physical measurements). This makes our system more transparent and trustworthy to end users.
-
-\subsection{Pixel-to-Physical Unit Conversion}
-
-When we measure seeds in a photograph, the measurements are in pixels, which depends on the camera and how far away it was. To convert pixel measurements to real-world millimetres, we include a reference object (a ruler with known dimensions) in each photograph. We then calculate:
-\begin{equation}
-\text{scale} = \frac{\text{reference\_length\_mm}}{\text{reference\_length\_pixels}}
-\end{equation}
-
-This scale factor is applied to all measurements, so when we report that a seed is 6.2 mm long, it's truly 6.2 millimetres---not dependent on camera distance or image resolution.
-
-\subsection{Variety Matching (12 Reference Varieties)}
-
-We created a reference database of 12 standard paddy seed varieties used in India, based on official ICAR documentation. For each variety, we computed the typical values of all 17 physical parameters from multiple certified seed samples. When a new seed image is analyzed, we compare its 17 parameters against these 12 reference profiles using a simple distance calculation:
-\begin{equation}
-d_i = \sqrt{\sum_{j=1}^{17} (p_j - r_{i,j})^2}
-\end{equation}
-
-Here, $p_j$ is one of the 17 measurements from the new seed, $r_{i,j}$ is the standard value for variety $i$, and $d_i$ tells us how different the new seed is from variety $i$. The variety with the smallest distance is the best match---this is the variety the seed most closely resembles. We report the top 3 matches so users can see alternatives if needed.
-
-\section{Training Pipeline}
-
-\subsection{Phase 1---Model Head Training (Epochs 1--8)}
-
-We trained the model in two phases. In Phase 1 (the first 8 training cycles), we froze the ResNet50 backbone---meaning its weights didn't change---and only trained the custom model head we added on top. Think of this like keeping a well-established expert's knowledge fixed and just training a new student to interpret their findings. We used a learning rate of 0.001, which controls how big the weight updates are. A learning rate that's too high causes instability; too low and training is slow. The batch size (number of images processed before updating weights) was set to 32.
-
-At the end of each of these 8 epochs, we checked performance on the validation set to make sure the head was learning properly and not starting to overfit.
-
-\subsection{Phase 2---Full Fine-Tuning (Epochs 9--15)}
-
-In Phase 2 (epochs 9--15), we unfroze the entire network and trained everything end-to-end. We reduced the learning rate by 10 times to 0.0001---a smaller rate because we're now adjusting a fully-trained backbone and don't want to destroy what it's already learned. This phase refined the backbone's features to specialize better for seed detection.
-
-We monitored validation performance carefully and stopped training at epoch 15 when we noticed the validation loss starting to increase (a sign the model was beginning to overfit). We then loaded the best weights we'd found during the entire training run---these became our final model.
-
-\subsection{Hyperparameter Configuration and Optimiser}
-
-A comprehensive summary of the optimizer, learning rates, regularizers, and general training configurations is provided in Table~\ref{tab:hyperparameters}:
-
-\begin{table}[htbp]
-\centering
-\caption{Hyperparameter Configuration and Training Settings}
-\label{tab:hyperparameters}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|p{7.5cm}|}
-\hline
-\textbf{Hyperparameter} & \textbf{Value} & \textbf{Notes} \\
-\hline
-Optimiser & AdamW & Smart learning rate that adapts during training \\
-\hline
-Phase 1 Learning Rate & 0.001 & Used while training only the head \\
-\hline
-Phase 2 Learning Rate & 0.0001 & Used for full network fine-tuning (10 times smaller) \\
-\hline
-Weight Decay (L2) & 0.0001 & Penalizes large weights to keep the model simple \\
-\hline
-Batch Size & 32 & Number of images processed before updating weights \\
-\hline
-Loss Function & Cross-Entropy + Label Smoothing & Prevents overconfidence with $\epsilon = 0.1$ \\
-\hline
-LR Scheduler & StepLR & Reduces learning rate further after 8 epochs \\
-\hline
-Gradient Clipping & Max norm = 1.0 & Prevents unstable training due to large gradients \\
-\hline
-Early Stopping Patience & 10 epochs & Stops if validation loss doesn't improve for 10 epochs \\
-\hline
-Input Resolution & $224 \times 224$ pixels & Standard size for ResNet50 \\
-\hline
-Total Epochs & 15 & Stopped when overfitting began \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
-We chose the AdamW optimiser because it's smart about adjusting the learning rate for different parameters and handles weight decay better than older methods.
-
-\subsection{Model Export Formats}
-
-After training finished, we saved the model in multiple formats to ensure compatibility with different environments. The exported files, including their sizes and target use cases, are listed in Table~\ref{tab:export_formats}.
-
-\begin{table}[htbp]
-\centering
-\caption{Model Export Formats}
-\label{tab:export_formats}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|c|c|c|p{6.5cm}|}
-\hline
-\textbf{Format} & \textbf{Extension} & \textbf{Size} & \textbf{Use Case} \\
-\hline
-PyTorch Native & \texttt{.pth} & $\sim$98\,MB & The original format; used by FastAPI for serving \\
-\hline
-TorchScript & \texttt{.pt} & $\sim$97\,MB & For production servers and systems using C++ \\
-\hline
-ONNX & \texttt{.onnx} & $\sim$98\,MB & For cross-platform use and systems not using PyTorch \\
-\hline
-Configuration & \texttt{.json} & $\sim$2\,KB & Metadata about the model, class labels, and settings \\
-\hline
-DUS Reference DB & \texttt{.csv} & $<$1\,MB & The 12 reference seed varieties for matching \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
-\section{Model Comparison and Selection}
-
-A performance comparison among all four models is shown in table 4.6. Before committing to ResNet50, we tested four popular neural network architectures on the same dataset, using the same training approach, to see which performed best. We compared MobileNetV2, DenseNet121, and GoogleNet, with the comparative results detailed in Table~\ref{tab:architecture_comparison}.
-
-\begin{table}[htbp]
-\centering
-\caption{Architecture Comparison on Test Set}
-\label{tab:architecture_comparison}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1 Score} & \textbf{Time (min)} \\
-\hline
-ResNet50 & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 16.4 \\
-\hline
-DenseNet121 & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 15.0 \\
-\hline
-GoogleNet & 99.57\% & 99.57\% & 99.57\% & 99.57\% & 12.2 \\
-\hline
-MobileNetV2 & 99.13\% & 99.15\% & 99.13\% & 99.13\% & 8.5 \\
-\hline
-\end{tabular}%
-}
-\end{table}
-As from the table 4.6 we observed that ResNet50, DenseNet121, and GoogleNet all achieved the same 99.57\% accuracy, demonstrating that our dataset is rich enough that all three architectures can learn to classify seeds nearly perfectly. MobileNetV2 achieved slightly lower accuracy at 99.13\% but trained much faster---in just 8.5 minutes compared to 16.4 minutes for ResNet50.
-
-We chose ResNet50 for three practical reasons:
-
-\begin{enumerate}
-    \item Its design with skip connections is well-understood in the research community, making it easier to diagnose training issues and fine-tune behavior.
-    
-    \item It has excellent support across different deployment platforms---PyTorch, TorchScript, ONNX, and more---giving us flexibility in where and how we deploy it.
-    
-    \item Most published agricultural image detection research uses ResNet50, so our results are directly comparable to other teams' work, helping the scientific community benchmark progress.
-\end{enumerate} 
-The extra 4.4 minutes of training time is a small price to pay for these advantages, especially since training only happens once.
-\newpage
-\section{Final Model Performance Summary}
-
-After completing both training phases, we evaluated our final ResNet50 model on the test set---the images we'd held back and never shown the model during training. The final evaluation metrics are compiled in Table~\ref{tab:final_test_performance}, and a detailed summary of the training trajectory and learning stability is provided in Table~\ref{tab:training_behaviour}.
-
-\begin{table}[htbp]
-\centering
-\caption{Final Test Set Performance---ResNet50}
-\label{tab:final_test_performance}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|c|p{8cm}|}
-\hline
-\textbf{Metric} & \textbf{Value} & \textbf{Status} \\
-\hline
-Test Accuracy & 99.57\% & Far exceeds industry standard (85--90\%) \\
-\hline
-Precision & $\sim$0.99 & Outstanding---almost no false positives \\
-\hline
-Recall & $\sim$0.99 & Outstanding---catches almost all cases \\
-\hline
-F1 Score & $\sim$0.99 & Excellent---perfectly balanced performance \\
-\hline
-Train-Validation Gap & $<$5\% & Great generalization---model isn't overfitting \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
-From Table~4.7 we observed that, the final test accuracy of 99.57\% significantly exceeds the typical industry benchmark of 85--90\% for automated seed quality detection/assessment. The near-perfect precision, recall, and F1-score indicate highly reliable performance across all seed quality categories. These results demonstrate that the proposed system is suitable for practical deployment and can support accurate seed quality assessment in agricultural applications.
-```
-\newpage
-Table~\ref{tab:training_behaviour} summarizes the key observations recorded during the training phase of the ResNet50 model. Monitoring training and validation accuracy along with loss values helps evaluate convergence, learning stability, and generalization capability. The observations presented below indicate that the model learned effectively, maintained stable performance throughout training, and benefited from the use of early stopping.
-
-\begin{table}[htbp]
-\centering
-\caption{Training Behaviour Summary}
-\label{tab:training_behaviour}
-\small
-\renewcommand{\arraystretch}{1.1}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|p{4cm}|p{11.5cm}|}
-\hline
-\textbf{Observation} & \textbf{Detail} \\
-\hline
-Initial Convergence & The model started at about 86\% accuracy and quickly improved to near its best performance within the first few epochs \\
-\hline
-Loss Trajectory & The loss (error) steadily decreased from about 1.0 to nearly 0.0 across all 15 epochs \\
-\hline
-Mid-training Stability & After the initial improvement phase, training was smooth and consistent with no wild fluctuations \\
-\hline
-Overfitting Control & The gap between training accuracy and validation accuracy never exceeded 5\%, indicating the model learned general patterns rather than memorizing training data \\
-\hline
-Training Stopped at & Epoch 15---we detected the first signs of overfitting and stopped immediately, preserving the best weights we'd found \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
-The observations in Table~\ref{tab:training_behaviour} show that the training process was stable and effective. The model converged quickly, maintained high accuracy throughout training, and exhibited a small gap between training and validation performance. Early stopping further helped preserve the best-performing model while minimizing the risk of overfitting.
+% =========================================================================
+% CHAPTER 4: IMPLEMENTATION DETAILS
+% =========================================================================
+This chapter details the actual implementation of the proposed system. It includes information about the software tools, database tables, API routes, and critical code snippets.
+
+\section{Technology Stack}
+List and describe the programming languages, libraries, frameworks, and operating systems used. For example:
+\begin{description}
+    \item[Backend:] Python with FastAPI or ASP.NET Core for writing high-performance REST APIs.
+    \item[Frontend:] TypeScript and React/Next.js for building a responsive, component-based user interface.
+    \item[Database:] PostgreSQL or Firebase Firestore for storing structured application data.
+    \item[Machine Learning:] PyTorch or TensorFlow for training and evaluating deep learning models.
+\end{description}
+
+\section{Algorithms and Pseudocode}
+You can present the core operations of your system using pseudocode. Algorithm~\ref{alg:simple-process} shows an example using the \texttt{algorithm} package.
+
+\begin{algorithm}[H]
+\caption{Data Processing and Verification}
+\label{alg:simple-process}
+\begin{algorithmic}[1]
+\REQUIRE Input dataset $D$, Threshold parameter $\tau$
+\ENSURE Verified items list $V$
+\STATE Initialize empty list $V$
+\FORALL{item $x \in D$}
+    \STATE $score \leftarrow \text{EvaluateModel}(x)$
+    \IF{$score \ge \tau$}
+        \STATE Add $x$ to $V$
+        \STATE $\text{SendNotification}(x, \text{"Verified"})$
+    \ELSE
+        \STATE $\text{SendNotification}(x, \text{"Rejected"})$
+    \ENDIF
+\ENDFOR
+\RETURN $V$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Code Listings}
+You can include code listings directly in LaTeX. Listing~\ref{lst:python-sample} shows an example python function.
+
+\begin{lstlisting}[language=Python, caption={Sample Python Inference Function}, label={lst:python-sample}]
+import torch
+import torch.nn as nn
+
+def predict_sample(model, image_tensor, threshold=0.5):
+    # Set model to evaluation mode
+    model.eval()
+    with torch.no_grad():
+        output = model(image_tensor)
+        probabilities = torch.sigmoid(output)
+        prediction = (probabilities > threshold).float()
+    return prediction.item(), probabilities.item()
+\end{lstlisting}
+
+Listing~\ref{lst:shell-sample} shows how to display a custom terminal/shell output using the \texttt{tcblisting} environment configured in the preamble.
+
+\begin{tcblisting}{terminal shell, title={Server Execution Terminal}, label={lst:shell-sample}}
+$ python main.py --mode=train --epochs=10
+Loading training datasets...
+Training started. Epoch 1/10 - loss: 0.652 - acc: 0.723
+Training completed. Model saved to outputs/best_model.pth
+\end{tcblisting}

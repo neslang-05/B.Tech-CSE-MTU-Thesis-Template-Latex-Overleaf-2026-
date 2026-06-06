@@ -6,33 +6,20 @@
 \geometry{a4paper, top=25mm, left=38mm, bottom=25mm, right=25mm} 
 
 % -------------------------------------------------
+% Centralized Metadata & Helper Packages
+% -------------------------------------------------
+\usepackage{etoolbox} % For conditional checks (like checking if author fields are empty)
+\input{thesis-details.tex} % Load all user metadata
+
+% -------------------------------------------------
 % Document Formatting & Spacing
 % -------------------------------------------------
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
-\setlength{\parindent}{0pt}
+\setlength{\parindent}{1.5em}
+\usepackage{indentfirst}
 \usepackage{microtype}
-
-\makeatletter
-\newif\if@indentfirst
-\@indentfirsttrue
-
-\def\@afterheading{%
-  \global\@nobreaktrue
-  \everypar{%
-    \if@nobreak
-      \global\@nobreakfalse
-      \clubpenalty \@M
-      \if@noskipsec \gdef\@nobreaktrue \fi
-      \if@indentfirst
-        \hspace*{1.5em}% Indent only the first paragraph by 1.5em
-      \fi
-    \else
-      \clubpenalty \@clubpenalty
-      \global\everypar{}% Clear globally to handle grouped environments like TOC
-    \fi}}
-\makeatother
 
 % -------------------------------------------------
 % Graphics & Figures
@@ -172,7 +159,7 @@
 \usepackage[nottoc,numbib]{tocbibind}
 
 \titleformat{\chapter}[display]
-  {\normalfont\huge\bfseries}{Chapter \thechapter}{20pt}{\Huge}
+  {\normalfont\huge\bfseries\filright}{Chapter \thechapter}{20pt}{\Huge}
 \titleformat{\section}
   {\normalfont\large\bfseries}{\thesection}{1em}{}
 
@@ -194,24 +181,6 @@
 \usepackage{xurl}
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, urlcolor=black, hypertexnames=false]{hyperref}
 
-\makeatletter
-% Wrap list and bibliography commands to disable first-paragraph indentation inside them
-\let\oldtableofcontents\tableofcontents
-\renewcommand{\tableofcontents}{{\@indentfirstfalse\oldtableofcontents}}
-
-\let\oldlistoftables\listoftables
-\renewcommand{\listoftables}{{\@indentfirstfalse\oldlistoftables}}
-
-\let\oldlistoffigures\listoffigures
-\renewcommand{\listoffigures}{{\@indentfirstfalse\oldlistoffigures}}
-
-\let\oldprintnomenclature\printnomenclature
-\renewcommand{\printnomenclature}{{\@indentfirstfalse\oldprintnomenclature}}
-
-\let\oldprintbibliography\printbibliography
-\renewcommand{\printbibliography}{{\@indentfirstfalse\oldprintbibliography}}
-\makeatother
-
 \begin{document}
 
 % TITLE PAGE
@@ -223,9 +192,6 @@
 \thispagestyle{empty}
 \mbox{}
 \newpage
-
-% % Set Roman page numbering
-% \pagenumbering{roman}
 
 \newpage
 \thispagestyle{empty}
@@ -240,57 +206,26 @@
 % Set Roman page numbering
 \pagenumbering{roman}
 
-% bonafide-certificate
+% BONAFIDE CERTIFICATE
 \newpage
 \setcounter{page}{1}
 \phantomsection
 \addcontentsline{toc}{chapter}{BONAFIDE CERTIFICATE}
-% \begin{center}
-%     {\fontsize{16}{19}\selectfont\textbf{BONAFIDE CERTIFICATE}}
-% \end{center}
 \input{chapters/bonafide-certificate.tex}
 
-
-
-% ----------------DECLARATION----------------------
+% DECLARATION
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{DECLARATION}
-% \begin{center}
-%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-% \end{center}
-\input{chapters/decleration-Joymangol.tex}
+\input{chapters/declaration.tex}
 
-\newpage
-% \begin{center}
-%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-% \end{center}
-\input{chapters/decleration-Nilambar.tex}
-
-\newpage
-% \begin{center}
-%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-% \end{center}
-\input{chapters/decleration-Yaiphaba.tex}
-
-\newpage
-% \begin{center}
-%     {\fontsize{16}{19}\selectfont\bfseries DECLARATION}
-% \end{center}
-\input{chapters/decleration-Dayananda.tex}
-% ---------------------------------------------------
-
-% ---------------------ACKNOWLEDGEMENT--------------
+% ACKNOWLEDGEMENT
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{ACKNOWLEDGEMENT}
-% \begin{center}
-%     {\fontsize{16}{19}\selectfont\bfseries ACKNOWLEDGEMENT}
-% \end{center}
 \input{chapters/acknowledgement.tex}
-% -------------------------------------------------
 
-% ------------------ABSTRACT------------------------
+% ABSTRACT
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{ABSTRACT}
@@ -298,123 +233,74 @@
     {\fontsize{16}{19}\selectfont\bfseries ABSTRACT}
 \end{center}
 \input{chapters/abstract.tex}
-% --------------------------------------------------
 
-
-% --------------------TABLE OF CONTENTS------------
+% TABLE OF CONTENTS
 \newpage
 \renewcommand{\contentsname}{\centering \Huge Table of Contents}
 \tableofcontents
-% ---------------------------------------------------
 
-% -----------------LIST OF TABLES-----------------
+% LIST OF TABLES
 \newpage
 \listoftables
-% ---------------------------------------------------
 
-
-% -----------------LIST OF FIGURES-----------------
+% LIST OF FIGURES
 \newpage
 \listoffigures
-% ---------------------------------------------------
 
-
-% ---------------------SYMBOLS AND ACRONYMS--------------
+% SYMBOLS AND ACRONYMS
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{Symbols and Acronyms}
 \renewcommand{\nomname}{Symbols and Acronyms}
 \markboth{Symbols and Acronyms}{Symbols and Acronyms}
-\input{chapters/abbreviations.tex} % This loads the list of \nomenclature entries
+\input{chapters/abbreviations.tex} 
 \printnomenclature
-% --------------------------------------------------------
-
 
 % Switch to Arabic page numbering
 \newpage
 \pagenumbering{arabic}
 
-
-% -----------------CHAPTER-1-----------------
+% --- CHAPTERS ---
 \chapter{Introduction}
 \input{chapters/chapter1.tex}
-% ----------------------------------
 
-% % -----------------CHAPTER-2-----------------
 \chapter{Literature Review}
 \input{chapters/chapter2.tex}
-% % ----------------------------------
 
-% % -----------------CHAPTER-3-----------------
 \chapter{System Design and Architecture}
 \input{chapters/chapter3.tex}
-% % % ----------------------------------
 
-% % % -----------------CHAPTER-4-----------------
-\chapter{Deep Learning Model for Paddy Seed Quality Assessment}
+\chapter{Implementation Details}
 \input{chapters/chapter4.tex}
-% % ----------------------------------
 
-% % -----------------CHAPTER-5-----------------
-\chapter{Model Serving API}
+\chapter{Results and Discussion}
 \input{chapters/chapter5.tex}
-% % ----------------------------------
 
-% % -----------------CHAPTER-6-----------------
-\chapter{Backend System Architecture and Implementation}
-\input{chapters/chapter6.tex}
-% ----------------------------------
+\chapter{Conclusion and Future Work}
+\input{chapters/conclusion.tex}
 
-% % -----------------CHAPTER-7-----------------
-\chapter{Frontend System Architecture and Implementation}
-\input{chapters/chapter7.tex}
-% ----------------------------------
-
-% % -----------------CHAPTER-8-----------------
- \chapter{System Integration}
- \input{chapters/chapter8.tex}
-% ----------------------------------
-
-% % -----------------CHAPTER-9-----------------
- \chapter{Results and Evaluation}
- \input{chapters/chapter9.tex}
-% ----------------------------------
-
-
-% % -----------------CHAPTER-10-----------------
- \chapter{Conclusion And Future Work}
- \input{chapters/conclusion.tex}
-% ----------------------------------
-
-
-
-% --------------------REFERENCES--------------------
+% --- REFERENCES ---
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{References}
 \printbibliography
-% -------------------------------------------------------
 
-% \appendix
-% \chapter{Source Code}
-% \label{app:source-code}
-% \input{appendices/appendix-a.tex}
+% --- APPENDICES ---
+\newpage
+\appendix
+\chapter{Source Code Directory Structure}
+\input{appendices/appendix-a.tex}
 
-% \chapter{API Documentation}
-% \label{app:api-doc}
-% \input{appendices/appendix-b.tex}
+\chapter{REST API Specification}
+\input{appendices/appendix-b.tex}
 
-% \chapter{Database Schema and ERD}
-% \label{app:db-schema}
-% \input{appendices/appendix-c.tex}
+\chapter{Database Schema Dictionary}
+\input{appendices/appendix-c.tex}
 
-% \chapter{Model Configuration and DUS Database}
-% \label{app:model-config}
-% \input{appendices/appendix-d.tex}
+\chapter{System Configuration Parameters}
+\input{appendices/appendix-d.tex}
 
-% \chapter{Deployment Guide}
-% \label{app:deployment}
-% \input{appendices/appendix-e.tex}
+\chapter{Deployment and Containerization Specifications}
+\input{appendices/appendix-e.tex}
 
 \end{document}
-    

@@ -1,17 +1,14 @@
-This appendix documents the relational database schema supporting the ASP.NET Core Entity Framework Core data layer. All transactional data, user profiles, verification audits, and formal product grievances are persisted within Microsoft SQL Server. The relational tables adhere to third normal form (3NF) to ensure data integrity and prevent update anomalies.
+% =========================================================================
+% APPENDIX C: DATABASE SCHEMA DICTIONARY
+% =========================================================================
+This appendix documents the database schema and data dictionary supporting the application's persistence layer. Tables are designed in Third Normal Form (3NF) to ensure integrity.
 
-\section*{1. Entity Relationship Overview}
-
-The core relational architecture centers around four primary tables: \texttt{Users}, \texttt{VerificationHistories}, \texttt{ProductComplaints}, and \texttt{BatchRiskRegistries}. Foreign key constraints enforce strict referential integrity between user identities and their corresponding transactional records.
-
-\section*{2. Relational Table Definitions and Data Dictionary}
-
-\subsection*{Users Table (\texttt{dbo.Users})}
-Stores authentication credentials, role assignments, and regional jurisdiction metadata.
+\section*{1. Users Table (\texttt{users})}
+Stores core user details, credential hashes, and system access role designations.
 
 \begin{table}[htbp]
   \centering
-  \caption{Data Dictionary for \texttt{dbo.Users} Table}
+  \caption{Data Dictionary for \texttt{users} Table}
   \label{tab:db-users}
   \small
   \renewcommand{\arraystretch}{1.1}
@@ -19,113 +16,34 @@ Stores authentication credentials, role assignments, and regional jurisdiction m
     \hline
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
     \hline
-    \texttt{Id} & \texttt{NVARCHAR(450)} & No & Primary Key. Cryptographic GUID string. \\
-
-    \texttt{Email} & \texttt{NVARCHAR(256)} & No & Unique Index. User login email address. \\
-
-    \texttt{PasswordHash} & \texttt{NVARCHAR(MAX)} & No & BCrypt / PBKDF2 hashed password digest. \\
-
-    \texttt{Role} & \texttt{NVARCHAR(32)} & No & RBAC Enum: \texttt{Farmer}, \texttt{Officer}, or \texttt{Admin}. \\
-
-    \texttt{District} & \texttt{NVARCHAR(128)} & Yes & Regional agricultural district assignment in Manipur. \\
-
-    \texttt{CreatedAt} & \texttt{DATETIME2} & No & UTC timestamp of user onboarding. Default \texttt{GETUTCDATE()}. \\
-
-    \texttt{IsActive} & \texttt{BIT} & No & Boolean flag indicating active login eligibility. Default 1. \\
+    \texttt{id} & \texttt{UUID} & No & Unique identifier (Primary Key). \\
+    \texttt{username} & \texttt{VARCHAR(50)} & No & Unique username for authentication. \\
+    \texttt{email} & \texttt{VARCHAR(100)} & No & Unique email address. \\
+    \texttt{password\_hash} & \texttt{VARCHAR(255)} & No & Secure Argon2 or bcrypt salted hash value. \\
+    \texttt{role} & \texttt{VARCHAR(20)} & No & System authorization role (e.g., 'Admin', 'User'). \\
+    \texttt{created\_at} & \texttt{TIMESTAMP} & No & Datetime of record creation. Defaults to current time. \\
     \hline
   \end{tabularx}
 \end{table}
 
-\subsection*{Verification Histories Table (\texttt{dbo.VerificationHistories})}
-Maintains an immutable historical record of all seed imagery submitted for AI evaluation.
+\section*{2. Transactions Log Table (\texttt{activity\_logs})}
+Maintains a system audit trail to monitor requests and resource access details.
 
 \begin{table}[htbp]
   \centering
-  \caption{Data Dictionary for \texttt{dbo.VerificationHistories} Table}
-  \label{tab:db-verifications}
+  \caption{Data Dictionary for \texttt{activity\_logs} Table}
+  \label{tab:db-logs}
   \small
   \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|l|l|c|X|}
     \hline
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
     \hline
-    \texttt{Id} & \texttt{NVARCHAR(450)} & No & Primary Key. Unique transaction GUID. \\
-
-    \texttt{UserId} & \texttt{NVARCHAR(450)} & No & Foreign Key referencing \texttt{dbo.Users(Id)}. \\
-
-    \texttt{BatchNumber} & \texttt{NVARCHAR(64)} & Yes & Commercial seed lot identifier extracted via OCR. \\
-
-    \texttt{PredictedClass} & \texttt{NVARCHAR(64)} & No & Model verdict: \texttt{Healthy}, \texttt{Damaged}, or \texttt{Fake}. \\
-
-    \texttt{ConfidenceScore} & \texttt{FLOAT} & No & Model certainty percentage ($0.00 - 100.00$). \\
-
-    \texttt{ExtractedLength} & \texttt{FLOAT} & Yes & Physical grain length measurement in millimeters. \\
-
-    \texttt{ExtractedWidth} & \texttt{FLOAT} & Yes & Physical grain width measurement in millimeters. \\
-
-    \texttt{ImageUrl} & \texttt{NVARCHAR(512)} & No & Azure Blob Storage secure path to uploaded sample image. \\
-
-    \texttt{CreatedAt} & \texttt{DATETIME2} & No & UTC timestamp of inference execution. \\
-    \hline
-  \end{tabularx}
-\end{table}
-
-\subsection*{Product Complaints Table (\texttt{dbo.ProductComplaints})}
-Captures formal farmer grievances and tracks investigation workflows by assigned Agricultural Officers.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Data Dictionary for \texttt{dbo.ProductComplaints} Table}
-  \label{tab:db-complaints}
-  \small
-  \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|l|c|X|}
-    \hline
-    \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
-    \hline
-    \texttt{Id} & \texttt{NVARCHAR(450)} & No & Primary Key. Unique grievance ID. \\
-
-    \texttt{UserId} & \texttt{NVARCHAR(450)} & No & Foreign Key referencing \texttt{dbo.Users(Id)}. \\
-
-    \texttt{BatchNumber} & \texttt{NVARCHAR(64)} & No & Seed lot identifier under dispute. Indexed for rapid joins. \\
-
-    \texttt{Narrative} & \texttt{NVARCHAR(MAX)} & No & Detailed description of crop failure or physical anomalies. \\
-
-    \texttt{Severity} & \texttt{INT} & No & User-assigned severity index ($1 - 5$). \\
-
-    \texttt{Status} & \texttt{NVARCHAR(32)} & No & Workflow State: \texttt{Open}, \texttt{Investigating}, or \texttt{Resolved}. \\
-
-    \texttt{OfficerId} & \texttt{NVARCHAR(450)} & Yes & Foreign Key to \texttt{dbo.Users(Id)} for investigating officer. \\
-
-    \texttt{ResolutionNotes} & \texttt{NVARCHAR(MAX)} & Yes & Official investigation summary upon status closure. \\
-
-    \texttt{CreatedAt} & \texttt{DATETIME2} & No & UTC timestamp of grievance filing. \\
-    \hline
-  \end{tabularx}
-\end{table}
-
-\subsection*{Batch Risk Registry Table (\texttt{dbo.BatchRiskRegistries})}
-Aggregates automated warnings and crowdsourced failure counts to flag suspect commercial seed lines.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Data Dictionary for \texttt{dbo.BatchRiskRegistries} Table}
-  \label{tab:db-riskregistry}
-  \small
-  \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|l|c|X|}
-    \hline
-    \textbf{Column Name} & \textbf{Data Type} & \textbf{Nullable} & \textbf{Description \& Constraints} \\
-    \hline
-    \texttt{BatchNumber} & \texttt{NVARCHAR(64)} & No & Primary Key. Unique seed lot identifier. \\
-
-    \texttt{RiskLevel} & \texttt{NVARCHAR(32)} & No & Evaluated threat: \texttt{Low}, \texttt{Moderate}, \texttt{High}, or \texttt{Critical}. \\
-
-    \texttt{FailureReportsCount} & \texttt{INT} & No & Cumulative count of filed grievances against this batch. \\
-
-    \texttt{SupplierName} & \texttt{NVARCHAR(256)} & Yes & Registered manufacturer or distributor name. \\
-
-    \texttt{LastReportedAt} & \texttt{DATETIME2} & No & UTC timestamp of the most recent failure occurrence. \\
+    \texttt{log\_id} & \texttt{BIGINT} & No & Auto-incrementing identifier (Primary Key). \\
+    \texttt{user\_id} & \texttt{UUID} & Yes & Reference key (Foreign Key linking to \texttt{users.id}). \\
+    \texttt{action} & \texttt{VARCHAR(100)} & No & Description of action executed (e.g., 'FILE\_UPLOAD'). \\
+    \texttt{ip\_address} & \texttt{VARCHAR(45)} & No & Origin IP address of client requesting request. \\
+    \texttt{timestamp} & \texttt{TIMESTAMP} & No & Datetime when log was written. \\
     \hline
   \end{tabularx}
 \end{table}

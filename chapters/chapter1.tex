@@ -1,28 +1,34 @@
+% =========================================================================
+% CHAPTER 1: INTRODUCTION
+% =========================================================================
+This chapter introduces the thesis topic, provides the motivation for the research, establishes the objectives, and outlines the organization of the rest of the document.
+
 \section{Background and Context}
-In states like Manipur, agriculture is central to the livelihood of most families, with paddy cultivation forming the cornerstone of both food security and the rural economy. In these communities, crop yields depend heavily on the quality of the seed sown. Even with proper water and soil management, low-quality or counterfeit seeds will inevitably result in poor germination rates, high vulnerability to local pests, and weak crop yields. Recently, agricultural markets in developing regions have seen a rise in the trade of counterfeit seeds.
+Provide a broad overview of the domain of your project. For a Computer Science project, describe the technology stack, application domain, or theoretical area. For example, if your project involves machine learning in agriculture, explain the intersection of artificial intelligence and crop classification.
 
-These counterfeit seeds are often packaged and labeled to look exactly like high-yielding certified varieties, such as RC Maniphou-12 or CAU-R1, making them visually indistinguishable to the naked eye. Farmers generally only discover they have bought low-quality grain after sowing, by which point they have already lost their investment in fertilizers, labor, and precious planting windows. Traditional verification methods require sending samples to specialized agricultural laboratories for genetic or chemical testing. These tests are slow, expensive, and impractical for smallholder farmers who need to verify their seeds immediately before sowing.
-
-\section{Motivation}
-This project was prompted by the economic difficulties local farmers face when they unknowingly purchase low-quality or mislabeled seeds. In Manipur's rural farming communities, a single bad harvest due to counterfeit seeds can push a household into deep debt, disrupting local food supplies and weakening trust in local seed suppliers. There is a clear need for a simple, low-cost verification method that agricultural workers and cooperative groups can use on the spot.
-
-Recent developments in deep learning and computer vision offer a potential solution. Using convolutional neural networks, we can automate the visual analysis of grain patterns, textures, and shape variations to detect quality anomalies. The goal of this project is to take these machine learning techniques and package them into a lightweight web-based application. Since farmers in hilly districts like Senapati and Tamenglong often experience unstable 2G/3G mobile data connections, we wanted to design a highly optimized, low-bandwidth tool that runs in a standard mobile browser, providing immediate quality feedback without requiring expensive hardware.
+A citation example: machine learning algorithms have been widely used across various domains in recent years~\cite{kamilaris2018deep, mohanty2016plant}.
 
 \section{Problem Statement}
-Before the planting season, farmers lack a fast and accessible tool to verify whether their paddy seeds match the quality standards of genuine certified varieties. Visual inspection by eye is unreliable, and lab tests are too slow. 
-
-To address this, we developed \textbf{AgriVerify}, an integrated web-based platform that uses deep learning to inspect paddy seed imagery and run text extraction on package labels. By cross-referencing visual grain features against known standards and tracking user-reported germination rates, the platform aims to flag potential counterfeit batches. This setup provides a real-time verification option that helps map out regional quality issues and assists agricultural officers in tracking low-quality seed distribution.
+State the specific problem you are trying to solve clearly and concisely. Why is this a problem? Who does it affect? What are the current limitations of existing solutions?
 
 \section{Objectives}
-The primary objective of this project is to build a practical, integrated software system for paddy seed verification. To achieve this, we outlined the following specific tasks:
-\begin{enumerate}
-    \item To curate a localized dataset of paddy seed images and train a deep learning classifier to distinguish between high-quality seeds, damaged grains, and common contaminants.
-    \item To build a lightweight, mobile-responsive web frontend that allows users to upload seed photos for real-time model inference.
-    \item To implement a farmer feedback module where users can log actual germination rates and post-planting observations for their seed batches.
-    \item To establish a notification and dashboard system for agricultural officers to monitor reported anomalies and identify problematic seed batches.
-\end{enumerate}
+Define the goals and objectives of your thesis. You can list the primary and secondary objectives using the \texttt{itemize} environment:
+\begin{itemize}
+    \item To design and develop an efficient software system that solves the identified problem.
+    \item To implement a deep learning model with high accuracy for target classification.
+    \item To evaluate the performance of the system against baseline models.
+    \item To deploy the application as an interactive web-based service for end-users.
+\end{itemize}
 
-\section{Scope of the Project}
-This project focuses on the full-stack development and deployment of the AgriVerify web application. The work includes collecting and preprocessing digital images of local paddy varieties, training and optimizing a Convolutional Neural Network (CNN), and building the supporting database and API endpoints. 
+\section{Motivation}
+Explain why this research is worth pursuing. What are the benefits of solving this problem? Talk about the relevance to the industry, academia, or society (especially in a regional context like Manipur).
 
-The system's analysis is strictly limited to non-destructive visual evaluation of seeds using standard digital cameras; it does not perform chemical, genetic, or biological laboratory tests. The final output is a working prototype that demonstrates how combining computer vision with crowdsourced farmer feedback can help identify substandard seed batches in the field.
+\section{Thesis Organization}
+Describe how the remaining chapters of your thesis are structured. A typical layout is:
+\begin{itemize}
+    \item \textbf{Chapter 2: Literature Review} presents a review of existing work and technologies related to this domain.
+    \item \textbf{Chapter 3: System Design and Architecture} details the conceptual framework, architecture, and diagrams of the proposed system.
+    \item \textbf{Chapter 4: Implementation Details} explains the coding, databases, API integration, and environment settings.
+    \item \textbf{Chapter 5: Results and Discussion} showcases the experimental results, evaluations, and screenshots of the application.
+    \item \textbf{Chapter 6: Conclusion and Future Work} summarizes the contributions of the thesis and outlines avenues for future improvements.
+\end{itemize}

@@ -1,46 +1,44 @@
-%DEDICATION
+% =========================================================================
+% TITLE PAGE TEMPLATE
+% =========================================================================
+\newgeometry{top=2cm, bottom=2cm, left=3cm, right=2.5cm}
 {\centering
-    % \fontsize{22}{26}\selectfont \textbf{Synergy Project ... }\\
-    % % \vspace{0.2cm}
-    \fontsize{22}{26}\selectfont \textbf{AI-Based Paddy Seed Quality Assessment 
-And Farmer Feedback System} \\
-    \vspace{0cm}
-    \fontsize{18}{21}\selectfont \textit{A thesis submitted in partial fulfilment of the requirements }\\
-    \fontsize{18}{21}\selectfont \textit{for the award of the degree of}\\
-    \vspace{0.5cm}
-    % {\normalsize OF}\\
-    \vspace{0.3cm}
-    \fontsize{18}{21}\selectfont \textbf{Bachelor of Technology}\\
-    \vspace{0.5cm}
-    \fontsize{14}{16}\selectfont \textit{By}\\
-    \vspace{0.5cm}
-       \begin{center}
+    \vspace*{0.1cm}
+    {\fontsize{18}{22}\selectfont \textbf{\thesisTitle}\par}
+    \vspace{0.6cm}
+    {\fontsize{12}{14}\selectfont \textit{A thesis submitted in partial fulfilment of the requirements }\par}
+    {\fontsize{12}{14}\selectfont \textit{for the award of the degree of}\par}
+    \vspace{0.2cm}
+    {\fontsize{14}{17}\selectfont \textbf{\degree}\par}
+    \vspace{0.4cm}
+    {\fontsize{12}{14}\selectfont \textit{By}\par}
+    \vspace{0.2cm}
+    
+    \begin{center}
+        \fontsize{12}{14}\selectfont
         \begin{tabular}{l l}
-            \fontsize{14}{16}\selectfont \textbf{Joymangol Chingangbam} & \textbf{(2201CS0004)}\\
-            \fontsize{14}{16}\selectfont \textbf{Nilambar Elangbam} & \textbf{(2201CS0005)}\\
-            \fontsize{14}{16}\selectfont \textbf{Khangembam Yaiphaba Singh} & \textbf{(2201CS0102)}\\
-            \fontsize{14}{16}\selectfont \textbf{Dayananda Laishram} & \textbf{(2201CS0113)}\\
+            \ifdefempty{\authorA}{}{\textbf{\authorA} & \textbf{(\authorAReg)}\\}
+            \ifdefempty{\authorB}{}{\textbf{\authorB} & \textbf{(\authorBReg)}\\}
+            \ifdefempty{\authorC}{}{\textbf{\authorC} & \textbf{(\authorCReg)}\\}
+            \ifdefempty{\authorD}{}{\textbf{\authorD} & \textbf{(\authorDReg)}\\}
         \end{tabular}
     \end{center}
-    \vspace{1cm}
-    \begin{center}
-        \fontsize{14}{16}\selectfont \textit{Under the Guidance of}\\
-        \vspace{0.3cm}
-        \fontsize{14}{16}\selectfont \textbf{Dr. Roshni Rajkumari}\\
-        \fontsize{14}{16}\selectfont Assistant Professor\\
-    \end{center}
-    \vspace{0.2cm}
-    {\centering {\includegraphics[width=1.5in]{assets/logo.png}}\par}
-    \vspace{0.2cm}
-    {\fontsize{16}{19}\selectfont \textbf{Department of}}\\
-    {\fontsize{16}{19}\selectfont \textbf{Computer Science \& Engineering}}
-    % \makebox[\textwidth][c]{\fontsize{15}{16}\selectfont \textbf{DEPARTMENT OF COMPUTER SCIENCE \& ENGINEERING}}
-
-    \vspace{0.1cm}
-    \begin{center}
-        \fontsize{16}{19}\selectfont \textbf{Manipur Technical University}\\
-        % \vspace{1cm}
-        \fontsize{16}{19}\selectfont \textbf{May, 2026}\\
-    \end{center}}
     
-%BLANK PAGE
+    \vspace{0.3cm}
+    \begin{center}
+        \fontsize{12}{14}\selectfont \textit{Under the Guidance of}\\
+        \vspace{0.1cm}
+        \fontsize{13}{15}\selectfont \textbf{\supervisorName}\\
+        \fontsize{11}{13}\selectfont \supervisorDesignation, \supervisorDepartment\\
+    \end{center}
+    
+    \vfill
+    {\centering {\includegraphics[width=1.0in]{assets/logo.png}}\par}
+    \vspace{0.3cm}
+    {\fontsize{13}{16}\selectfont \textbf{\department}\par}
+    {\fontsize{13}{16}\selectfont \textbf{\university}\par}
+    {\fontsize{11}{13}\selectfont \universityAddress\par}
+    \vspace{0.2cm}
+    {\fontsize{12}{14}\selectfont \textbf{\submissionDate}\par}
+}
+\restoregeometry

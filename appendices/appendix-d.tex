@@ -1,79 +1,48 @@
-This appendix details the deep learning model configuration parameters and the authoritative DUS (Distinctness, Uniformity, and Stability) physical baseline reference database compiled from Indian Council of Agricultural Research (ICAR) documentation.
+% =========================================================================
+% APPENDIX D: SYSTEM CONFIGURATION PARAMETERS
+% =========================================================================
+This appendix details the deep learning model hyperparameters, neural network configuration parameters, and environmental baselines compiled during system optimization.
 
-\section*{1. ResNet50 Deep Learning Hyperparameter Configuration}
-
-The classification neural network was trained utilizing a progressive two-phase fine-tuning schedule on pre-trained ImageNet weights. The complete parameter specification governing network optimization is detailed in Table~\ref{tab:app-modelconfig}.
+\section*{1. Model Hyperparameter Configurations}
+The neural network backbone parameters and training schedules are documented below:
 
 \begin{table}[htbp]
   \centering
-  \caption{ResNet50 Deep Learning Architecture and Optimization Configuration}
+  \caption{Neural Network Architecture and Hyperparameter Optimization Settings}
   \label{tab:app-modelconfig}
   \small
   \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|l|c|X|}
     \hline
-    \textbf{Architectural Parameter} & \textbf{Configured Value} & \textbf{Engineering Rationale \& Execution Notes} \\
+    \textbf{Hyperparameter} & \textbf{Configured Value} & \textbf{Engineering Rationale / Execution Notes} \\
     \hline
-    \textbf{Backbone Network} & \texttt{ResNet-50} & 50-layer deep convolutional architecture with residual identity mappings. \\
-
-    \textbf{Input Tensor Resolution} & $224 \times 224 \times 3$ & Standard normalized RGB dimensions optimized for feature extraction. \\
-
-    \textbf{Optimization Algorithm} & \texttt{AdamW} & Adaptive moment estimation with decoupled L2 weight regularizer. \\
-
-    \textbf{Phase 1 Learning Rate} & $1.0 \times 10^{-3}$ & Head-only optimization (epochs 1--8) with frozen backbone layers. \\
-
-    \textbf{Phase 2 Learning Rate} & $1.0 \times 10^{-4}$ & End-to-end full fine-tuning (epochs 9--15) to prevent forgetting. \\
-
-    \textbf{Decoupled Weight Decay} & $1.0 \times 10^{-4}$ & Applied across all trainable parameters to suppress memorization. \\
-
-    \textbf{Loss Function} & Cross-Entropy + Smoothing & Label smoothing ($\alpha = 0.1$) prevents overconfident logit saturation. \\
-
-    \textbf{Training Batch Size} & 32 Samples & Mini-batch execution optimized for GPU memory constraints. \\
-
-    \textbf{Dropout Probability} & $0.50$ & Stochastic neuron deactivation prior to fully connected projection. \\
-
-    \textbf{Total Training Epochs} & 15 Epochs & Early stopping threshold triggered at epoch 15 upon validation plateau. \\
+    \textbf{Backbone Network} & \texttt{ResNet-50 / ViT} & Standard deep architecture options for feature extraction. \\
+    \textbf{Input Resolution} & $224 \times 224 \times 3$ & Normalized RGB dimensions matching standard dataset structures. \\
+    \textbf{Batch Size} & 32 & Chosen to balance memory limitations and gradient stability. \\
+    \textbf{Optimizer} & \texttt{AdamW} & Incorporates decoupled weight decay to minimize overfitting. \\
+    \textbf{Initial Learning Rate} & $1 \times 10^{-4}$ & Paired with a cosine annealing learning rate scheduler. \\
+    \textbf{Dropout Rate} & 0.3 & Introduced in fully connected layers to prevent co-adaptation. \\
     \hline
   \end{tabularx}
 \end{table}
 
-\section*{2. ICAR Physical DUS Baseline Reference Database}
-
-To execute morphological variety matching, the extracted seed geometry is compared against baseline physical descriptors established for 12 certified paddy varieties cultivated across Northeast India and Manipur agricultural zones.
+\section*{2. Environmental Baselines}
+The application services depend on the configuration baselines listed below:
 
 \begin{table}[htbp]
   \centering
-  \caption{ICAR Baseline Reference Parameters for Paddy Seed Varieties}
-  \label{tab:app-dusdatabase}
+  \caption{System Environment Variables and Server Configs}
+  \label{tab:app-envconfig}
   \small
   \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|c|c|c|X|}
+  \begin{tabularx}{\textwidth}{|l|c|X|}
     \hline
-    \textbf{Paddy Variety Name} & \textbf{Length (mm)} & \textbf{Width (mm)} & \textbf{Aspect Ratio} & \textbf{Phenotypic Classification Description} \\
+    \textbf{Variable Key} & \textbf{Default Value} & \textbf{Usage \& Constraint Details} \\
     \hline
-    \textbf{Chakhao Poireiton} & $9.20 \pm 0.30$ & $2.85 \pm 0.15$ & $3.23$ & Black aromatic sticky rice; distinct deep purple husk coloration. \\
-
-    \textbf{Chakhao Amubi} & $9.45 \pm 0.25$ & $2.90 \pm 0.12$ & $3.26$ & Traditional black rice with elongated grain geometry and dark pigmentation. \\
-
-    \textbf{Phoubi} & $8.80 \pm 0.20$ & $3.10 \pm 0.10$ & $2.84$ & Medium-slender grain cultivated extensively across Manipur valley wetlands. \\
-
-    \textbf{KD-263 (Khao Dawk)} & $9.10 \pm 0.22$ & $2.75 \pm 0.14$ & $3.31$ & High-yielding slender variety displaying bright golden straw coloration. \\
-
-    \textbf{RCM-9} & $8.95 \pm 0.18$ & $3.05 \pm 0.15$ & $2.93$ & ICAR Research Complex high-altitude cold-tolerant medium grain line. \\
-
-    \textbf{RCM-10} & $9.05 \pm 0.20$ & $2.95 \pm 0.12$ & $3.07$ & Certified rainfed lowland variety with robust mechanical resistance. \\
-
-    \textbf{Leimaphou} & $8.75 \pm 0.25$ & $3.15 \pm 0.18$ & $2.78$ & Short bold traditional grain displaying high milling recovery percentage. \\
-
-    \textbf{Akhanphou} & $9.35 \pm 0.30$ & $2.80 \pm 0.15$ & $3.34$ & Aromatic slender landrace with pronounced apical awn structures. \\
-
-    \textbf{Taothabi} & $8.60 \pm 0.22$ & $3.20 \pm 0.20$ & $2.69$ & Deep-water flood-resistant coarse grain displaying dark brown streaks. \\
-
-    \textbf{Darram Phou} & $9.15 \pm 0.25$ & $2.88 \pm 0.14$ & $3.18$ & Highly uniform premium slender grain cultivated in upland terraces. \\
-
-    \textbf{Ginphou} & $8.90 \pm 0.20$ & $3.00 \pm 0.15$ & $2.97$ & Early maturing drought-tolerant line exhibiting pale yellow husks. \\
-
-    \textbf{Eriphou} & $9.50 \pm 0.35$ & $2.70 \pm 0.18$ & $3.52$ & Extra long slender premium variety with distinct translucent kernels. \\
+    \texttt{ENV} & \texttt{production} & Configures security policies and levels of logging detail. \\
+    \texttt{PORT} & \texttt{8080} & Server port bound by application daemon. \\
+    \texttt{DB\_MAX\_POOL} & \texttt{20} & Maximum connection pool allotment allowed for DB driver. \\
+    \texttt{TIMEOUT\_SEC} & \texttt{30} & Active threshold timing out slow network sockets. \\
     \hline
   \end{tabularx}
 \end{table}

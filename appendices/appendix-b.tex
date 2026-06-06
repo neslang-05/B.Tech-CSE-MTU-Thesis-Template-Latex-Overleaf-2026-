@@ -1,121 +1,52 @@
-This appendix provides the comprehensive REST API contract specifications for the core microservices of the AgriVerify platform. The architecture separates the high-throughput Python inference API from the ASP.NET Core business orchestration backend. All API exchanges utilize JSON formatting over secure HTTPS connections.
+% =========================================================================
+% APPENDIX B: REST API SPECIFICATION
+% =========================================================================
+This appendix provides the REST API contract specifications for the system's core services. The architecture decouples the frontend client from the backend and machine learning services using standardized HTTP request and response structures.
 
-\section*{1. Model Serving Microservice (FastAPI)}
-
-\subsection*{POST /predict}
-Executes real-time visual seed classification and extracts physical DUS parameters from uploaded imagery.
+\section*{1. User Authentication Endpoint}
+\subsection*{POST /api/v1/auth/login}
+Authenticates users and returns a JSON Web Token (JWT) for secure session management.
 
 \begin{table}[htbp]
   \centering
-  \caption{Specification for \texttt{POST /predict} Endpoint}
+  \caption{Specification for \texttt{POST /api/v1/auth/login}}
+  \label{tab:api-login}
+  \small
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    \hline
+    \textbf{Parameter} & \textbf{Type / Format} & \textbf{Description} \\
+    \hline
+    \textbf{Headers} & \texttt{application/json} & Request payload must be formatted as JSON. \\
+    \textbf{Payload: username} & String (Required) & Username or email address of the registered user. \\
+    \textbf{Payload: password} & String (Required) & Case-sensitive raw password. \\
+    \hline
+    \textbf{Success Response} & \texttt{200 OK} & Returns: \texttt{\{ "token": "JWT\_STRING", "expires": 3600 \}} \\
+    \textbf{Error Response} & \texttt{401 Unauthorized} & Triggered by invalid credentials or inactive accounts. \\
+    \hline
+  \end{tabularx}
+\end{table}
+
+\section*{2. Machine Learning Inference Endpoint}
+\subsection*{POST /api/v1/predict}
+Executes real-time model inference on user-uploaded imagery or sensor telemetry.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Specification for \texttt{POST /api/v1/predict}}
   \label{tab:api-predict}
   \small
   \renewcommand{\arraystretch}{1.1}
   \begin{tabularx}{\textwidth}{|l|l|X|}
     \hline
-    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
+    \textbf{Parameter} & \textbf{Type / Format} & \textbf{Description} \\
     \hline
     \textbf{Content-Type} & \texttt{multipart/form-data} & Requires binary file upload stream. \\
-
-    \textbf{Payload Attribute} & \texttt{file} (Binary Stream) & JPEG or PNG seed sample imagery ($224 \times 224$ px optimized). \\
-
-    \textbf{Success Response (200)} & \texttt{application/json} & Returns classified status, confidence, and DUS geometry. \\
-
-    \textbf{Sample JSON Payload} & Object & \texttt{\textbraceleft"QualityClass": "Healthy", "Confidence": 92.15, "DUSParameters": \textbraceleft"Length": 9.4, "Width": 2.8, "AspectRatio": 3.36\textbraceright\textbraceright} \\
-
-    \textbf{Error Response (400)} & \texttt{application/json} & \texttt{\textbraceleft"detail": "Unsupported file format"\textbraceright} (Non-image uploads). \\
+    \textbf{Payload: file} & Binary File (Required) & Image or data file (e.g., JPEG, PNG, CSV). \\
+    \textbf{Payload: threshold} & Float (Optional) & Confidence threshold. Defaults to \texttt{0.50}. \\
     \hline
-  \end{tabularx}
-\end{table}
-
-\section*{2. ASP.NET Core Business Orchestration API}
-
-\subsection*{POST /api/v1/verification/submit}
-Accepts multipart uploads from client browsers, forwards imagery to the inference microservice, and logs immutable audit trails to SQL Server.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Specification for \texttt{POST /api/v1/verification/submit} Endpoint}
-  \label{tab:api-verifysubmit}
-  \small
-  \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|l|X|}
-    \hline
-    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \hline
-    \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Valid access token associated with registered farmer account. \\
-
-    \textbf{Payload} & \texttt{multipart/form-data} & \texttt{frontImage} (Binary) and \texttt{backImage} (Binary). \\
-
-    \textbf{Success Response (201)} & \texttt{application/json} & Returns committed database record ID alongside AI verdict. \\
-
-    \textbf{Sample JSON Payload} & Object & \texttt{\textbraceleft"recordId": "a89d3c-...", "qualityClass": "Healthy", "confidence": 92.15, "isGenuine": true\textbraceright} \\
-    \hline
-  \end{tabularx}
-\end{table}
-
-\subsection*{POST /api/v1/complaints}
-Submits formal farmer grievances regarding counterfeit batches or observed germination failures.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Specification for \texttt{POST /api/v1/complaints} Endpoint}
-  \label{tab:api-complaintpost}
-  \small
-  \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|l|X|}
-    \hline
-    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \hline
-    \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer security context required for auditing. \\
-
-    \textbf{Request Body (JSON)} & \texttt{ComplaintCreationDto} & \texttt{\textbraceleft"batchId": "B-99812", "narrative": "Zero germination", "severity": 4\textbraceright} \\
-
-    \textbf{Success Response (201)} & \texttt{application/json} & \texttt{\textbraceleft"complaintId": "C-1049", "status": "Open", "submittedAt": "2026-05-17T09:00:00Z"\textbraceright} \\
-    \hline
-  \end{tabularx}
-\end{table}
-
-\subsection*{GET /api/v1/complaints/\{id\}}
-Retrieves complete audit histories and evidence artifacts for an assigned grievance.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Specification for \texttt{GET /api/v1/complaints/\{id\}} Endpoint}
-  \label{tab:api-complaintget}
-  \small
-  \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|l|X|}
-    \hline
-    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \hline
-    \textbf{Path Parameter} & \texttt{id} (GUID / String) & Unique identifier assigned to the grievance record. \\
-
-    \textbf{Authorization} & \texttt{Bearer \{JWT\}} & Required. Farmer who created record or assigned Agricultural Officer. \\
-
-    \textbf{Success Response (200)} & \texttt{application/json} & Returns complete audit details and current investigation milestones. \\
-    \hline
-  \end{tabularx}
-\end{table}
-
-\subsection*{POST /api/v1/auth/login}
-Validates user credentials and issues cryptographically signed JWT pairs.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Specification for \texttt{POST /api/v1/auth/login} Endpoint}
-  \label{tab:api-authlogin}
-  \small
-  \renewcommand{\arraystretch}{1.1}
-  \begin{tabularx}{\textwidth}{|l|l|X|}
-    \hline
-    \textbf{Parameter / Attribute} & \textbf{Type / Format} & \textbf{Description \& Contract Constraints} \\
-    \hline
-    \textbf{Request Body (JSON)} & \texttt{LoginRequestDto} & \texttt{\textbraceleft"email": "farmer@manipur.gov.in", "password": "SecurePassword123!"\textbraceright} \\
-
-    \textbf{Success Response (200)} & \texttt{application/json} & \texttt{\textbraceleft"accessToken": "eyJhbGciOi...", "refreshToken": "d8e9a...", "user": \textbraceleft"role": "Farmer"\textbraceright\textbraceright} \\
-
-    \textbf{Error Response (401)} & \texttt{application/json} & \texttt{\textbraceleft"message": "Invalid email or authentication credentials"\textbraceright} \\
+    \textbf{Success Response} & \texttt{200 OK} & Returns JSON listing prediction classes, confidence scores, and processing latency. \\
+    \textbf{Error Response} & \texttt{422 Unprocessable} & Raised if the input file format is unsupported or corrupted. \\
     \hline
   \end{tabularx}
 \end{table}

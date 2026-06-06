@@ -1,13 +1,16 @@
+% =========================================================================
+% BONAFIDE CERTIFICATE TEMPLATE
+% =========================================================================
 \begin{center}
 \begin{minipage}{0.15\textwidth}
-    \includegraphics[width=\linewidth]{assets/logo.png} % Logo path
+    \includegraphics[width=\linewidth]{assets/logo.png} 
 \end{minipage}
 \hfill
 \begin{minipage}{0.82\textwidth}
     \centering
-    \textbf{\fontsize{16}{20}\selectfont MANIPUR TECHNICAL UNIVERSITY}\\[0.2em]
-    {\fontsize{9.5}{11.5}\selectfont (A University established under the \textbf{Manipur Technical University Act, 2016})}\\[0.3em]
-    {\fontsize{10.5}{12.5}\selectfont Imphal, Manipur -- 795004}\\[0.4em]
+    \textbf{\fontsize{16}{20}\selectfont \university}\\[0.2em]
+    {\fontsize{9.5}{11.5}\selectfont (\universityAct)}\\[0.3em]
+    {\fontsize{10.5}{12.5}\selectfont \universityAddress}\\[0.4em]
 \end{minipage}
 \end{center}
 \vspace{-0.3cm}
@@ -16,19 +19,21 @@
 \begin{center}
     {\fontsize{16}{19}\selectfont\textbf{BONAFIDE CERTIFICATE}}
 \end{center}
+\vspace{0.4cm}
 {
 \fontsize{12}{14}\selectfont
-This is to certify that the thesis entitled \textbf{``AI-Based Paddy Seed Quality Assessment And Farmer Feedback System''} submitted by:
+This is to certify that the thesis entitled \textbf{``\thesisTitle''} submitted by:
 \begin{center}
+    \fontsize{12}{14}\selectfont
     \begin{tabular}{l l}
-    \textbf{Joymangol Chingangbam} & \textbf{(2201CS0004)} \\
-    \textbf{Nilambar Elangbam} & \textbf{(2201CS0005)} \\
-    \textbf{Khangembam Yaiphaba Singh} & \textbf{(2201CS0102)} \\
-    \textbf{Dayananda Laishram} & \textbf{(2201CS0113)} \\
+    \ifdefempty{\authorA}{}{\textbf{\authorA} & \textbf{(\authorAReg)} \\}
+    \ifdefempty{\authorB}{}{\textbf{\authorB} & \textbf{(\authorBReg)} \\}
+    \ifdefempty{\authorC}{}{\textbf{\authorC} & \textbf{(\authorCReg)} \\}
+    \ifdefempty{\authorD}{}{\textbf{\authorD} & \textbf{(\authorDReg)} \\}
     \end{tabular}
 \end{center}
 
-to the \textbf{Department of Computer Science \& Engineering}, in partial fulfilment of the requirements for the award of the \textbf{Bachelor of Technology} degree in \textbf{Computer Science and Engineering}, is a genuine and original work carried out by them under my supervision during the academic year \textbf{2025--2026}.
+to the \textbf{\department}, in partial fulfilment of the requirements for the award of the \textbf{\degree} degree in \textbf{\branch}, is a genuine and original work carried out by them under my supervision during the academic year \textbf{\academicYear}.
 
 \noindent
 The project embodies the results of their own research and development work and has not been submitted, either in part or in full, for the award of any other degree or diploma of this university or any other institution. The work has been carried out with sincerity, academic integrity, and adherence to research ethics.
@@ -43,9 +48,9 @@ We consider this work worthy of consideration for the partial fulfilment of the 
     \raggedright
     \rule{5cm}{0.4pt}\\[0.5em]
     \textbf{Supervisor}\\[0.3em]
-    Dr. Roshni Rajkumari\\
-    Assistant Professor,\\
-    Computer Science \& Engineering
+    \textbf{\supervisorName}\\
+    \supervisorDesignation,\\
+    \supervisorDepartment
 \end{minipage}%
 \hfill
 \begin{minipage}[t]{0.48\textwidth}
@@ -54,9 +59,9 @@ We consider this work worthy of consideration for the partial fulfilment of the 
         \raggedright
         \rule{5cm}{0.4pt}\\[0.5em]
         \textbf{Head of Department}\\[0.3em]
-        Mrs. Tayenjam Aerena\\
-        Assistant Professor \& Head,\\
-        Computer Science \& Engineering
+        \textbf{\hodName}\\
+        \hodDesignation,\\
+        \hodDepartment
     \end{minipage}
 \end{minipage}
 }
